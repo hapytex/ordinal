@@ -18,7 +18,9 @@ library
   default-extensions:
       Safe
   exposed-modules:
-      Text.Numerals.English
+      Text.Numerals.Algorithm
+    , Text.Numerals.English
+    , Text.Numerals.Prefix
   other-modules:
       Text.Numerals.Internal
   build-depends:
