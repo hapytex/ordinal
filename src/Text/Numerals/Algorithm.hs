@@ -6,10 +6,8 @@ import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
 import Data.Text(Text, cons)
-import Data.Vector(Vector, (!))
+import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
-
-import GHC.Exts(IsList(fromList))
 
 type MergerFunction i = i -> i -> Text -> Text -> Text
 
