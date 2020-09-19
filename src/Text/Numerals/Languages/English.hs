@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 
-module Text.Numerals.English where
+module Text.Numerals.Languages.English where
 
 import Data.Text(Text)
 import Data.Vector(Vector)

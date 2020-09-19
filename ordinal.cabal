@@ -19,8 +19,8 @@ library
 --      Safe
   exposed-modules:
       Text.Numerals.Algorithm
-    , Text.Numerals.English
-    , Text.Numerals.French
+    , Text.Numerals.Languages.English
+    , Text.Numerals.Languages.French
     , Text.Numerals.Prefix
   other-modules:
       Text.Numerals.Internal

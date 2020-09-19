@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, RankNTypes #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Text.Numerals.Algorithm where
 
@@ -17,7 +17,6 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
   , lowWords :: Vector Text
   , midWords :: [(Int, Text)]
   , mergeFunction :: forall i . Integral i => MergerFunction i
---  , numberVal :: Intagral i
   }
 
 numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Int, Text) -> (forall i . Integral i => MergerFunction i) -> NumeralsAlgorithm
