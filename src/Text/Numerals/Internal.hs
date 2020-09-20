@@ -28,4 +28,7 @@ _thousand :: Integral i => i
 _thousand = 1000
 
 _million :: Integral i => i
-_million = 1000_000
+_million = 1_000_000
+
+_billion :: Integral i => i
+_billion = 1_000_000_000
