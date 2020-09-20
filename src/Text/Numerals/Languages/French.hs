@@ -9,7 +9,7 @@ import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Internal(_mergeWith, _mergeWith')
 
 french :: NumeralsAlgorithm
-french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge'
+french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "moins"
@@ -60,3 +60,6 @@ merge' l r | 100 > l && l > r = _mergeWith' '-'
            | l >= 100 && 100 > r = _mergeWith " et "
            | r > l = _mergeWith' ' '
 merge' _ _ = _mergeWith ", "
+
+ordinize' :: Text -> Text
+ordinize' t = t

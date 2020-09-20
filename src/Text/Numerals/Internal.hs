@@ -3,11 +3,12 @@
 module Text.Numerals.Internal (
     _div10, _rem10
   , _showText
-  , _mergeWith, _mergeWith'
+  , _mergeWith, _mergeWith', _replaceSuffix
   , _thousand, _million
   ) where
 
-import Data.Text(Text, cons, pack)
+import Data.Text(Text, cons, dropEnd, pack)
+import qualified Data.Text as T
 
 _mergeWith' :: Char -> Text -> Text -> Text
 _mergeWith' m = (. cons m) . (<>)
@@ -32,3 +33,6 @@ _million = 1_000_000
 
 _billion :: Integral i => i
 _billion = 1_000_000_000
+
+_replaceSuffix :: Int -> Text -> Text -> Text
+_replaceSuffix n s = (<> s) . dropEnd n

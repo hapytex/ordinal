@@ -1,15 +1,36 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
 module Text.Numerals.Languages.Dutch where
 
 import Data.Text(Text, isSuffixOf, snoc)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm)
+import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm, ordinizeFromDict)
 import Text.Numerals.Internal(_million, _mergeWith, _mergeWith')
 
+-- TODO: add "e" at the end
+$(pure [ordinizeFromDict [
+    ("één", "eerst")
+  , ("twee", "tweed")
+  , ("drie", "derd")
+  , ("vier", "vierd")
+  , ("vijf", "vijfd")
+  , ("zes", "zesd")
+  , ("zeven", "zevend")
+  , ("acht", "achtst")
+  , ("negen", "negend")
+  , ("tien", "tiend")
+  , ("elf", "elfd")
+  , ("twaalf", "twaalfd")
+  , ("ig", "igst")
+  , ("erd", "erdst")
+  , ("end", "endst")
+  , ("joen", "joenst")
+  , ("rd", "rdst")
+  ]])
+
 dutch :: NumeralsAlgorithm
-dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge'
+dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "min"
