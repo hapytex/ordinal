@@ -56,14 +56,16 @@ midWords' = [
   , (30, "dertig")
   ]
 
-_one :: Integral i => i -> Text -> Text
-_one 1 = const "een"
-_one _ = id
+_rightAnd :: Integral i => i -> Text -> Text
+_rightAnd 1 = const "een"
+_rightAnd _ = id
 
-_one' :: Integral i => i -> Text -> Text
-_one' 1 _ = "eenen"
-_one' _ t | isSuffixOf "e" t = t <> "ën"
-          | otherwise = t <> "en"
+_leftAnd :: Integral i => i -> Text -> Text
+_leftAnd 1 = const "eenen"
+_leftAnd n | 2 <- n = addE
+           | 3 <- n = addE
+           | otherwise = (<> "en")
+           where addE = (<> "ën")
 
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < _million = const id
@@ -72,4 +74,4 @@ merge' l r | r > l && r > _million = _mergeWith' ' '
            | r < 10 && 10 < l && l < 100 = go
            | l > _million = _mergeWith' ' '
            | otherwise = (<>)
-    where go tl tr = _one' r tr <> _one l tl
+    where go tl tr = _leftAnd r tr <> _rightAnd l tl
