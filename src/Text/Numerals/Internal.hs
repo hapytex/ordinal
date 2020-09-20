@@ -1,9 +1,10 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE NumericUnderscores, Safe #-}
 
 module Text.Numerals.Internal (
     _div10, _rem10
   , _showText
   , _mergeWith, _mergeWith'
+  , _thousand, _million
   ) where
 
 import Data.Text(Text, cons, pack)
@@ -23,3 +24,8 @@ _div10 = (`div` 10)
 _rem10 :: Integral i => i -> i
 _rem10 = (`rem` 10)
 
+_thousand :: Integral i => i
+_thousand = 1000
+
+_million :: Integral i => i
+_million = 1000_000

@@ -21,6 +21,7 @@ library
       Text.Numerals
     , Text.Numerals.Algorithm
     , Text.Numerals.Languages
+    , Text.Numerals.Languages.Dutch
     , Text.Numerals.Languages.English
     , Text.Numerals.Languages.French
     , Text.Numerals.Prefix

@@ -6,7 +6,7 @@ import Data.Text(Text)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm)
-import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWith')
+import Text.Numerals.Internal(_mergeWith, _mergeWith')
 
 french :: NumeralsAlgorithm
 french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge'
