@@ -5,13 +5,13 @@ module Text.Numerals.Algorithm where
 import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
-import Data.Text(Text, cons, pack, isSuffixOf)
+import Data.Text(Text, cons, isSuffixOf, pack, snoc)
 import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
 import Text.Numerals.Internal(_replaceSuffix)
 
-import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(IntegerL, StringL), Pat(VarP), mkName)
+import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(CharL, IntegerL, StringL), Pat(VarP), mkName)
 
 type MergerFunction i = i -> i -> Text -> Text -> Text
 
@@ -90,6 +90,8 @@ _packText :: String -> Exp
 _packText = AppE (VarE 'pack) . LitE . StringL
 
 _packExp :: Int -> String -> Exp -> Exp
+_packExp 0 [] nm = nm
+_packExp 0 [s] nm = AppE (AppE (VarE 'snoc) nm) (LitE (CharL s))
 _packExp 0 sc nm = AppE (AppE (VarE '(<>)) nm) (_packText sc)
 _packExp l sc nm = AppE (AppE (AppE (VarE '_replaceSuffix) (LitE (IntegerL (fromIntegral l)))) (_packText sc)) nm
 
