@@ -3,7 +3,7 @@
 module Text.Numerals.Internal (
     _div10, _rem10
   , _showText
-  , _mergeWith, _mergeWith', _replaceSuffix
+  , _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix
   , _thousand, _million
   ) where
 
@@ -12,6 +12,12 @@ import qualified Data.Text as T
 
 _mergeWith' :: Char -> Text -> Text -> Text
 _mergeWith' m = (. cons m) . (<>)
+
+_mergeWithSpace :: Text -> Text -> Text
+_mergeWithSpace = _mergeWith' ' '
+
+_mergeWithHyphen :: Text -> Text -> Text
+_mergeWithHyphen = _mergeWith' '-'
 
 _mergeWith :: Text -> Text -> Text -> Text
 _mergeWith m = (<>) . (<> m)

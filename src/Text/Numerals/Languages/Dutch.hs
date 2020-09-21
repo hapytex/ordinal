@@ -6,11 +6,12 @@ import Data.Text(Text, isSuffixOf, snoc)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm, ordinizeFromDict)
-import Text.Numerals.Internal(_million, _mergeWith, _mergeWith')
+import Text.Numerals.Internal(_million, _mergeWith, _mergeWithSpace, _mergeWith')
 
 -- TODO: add "e" at the end
-$(pure [ordinizeFromDict [
-    ("één", "eerst")
+$(pure [ordinizeFromDict "_ordinize'" [
+    ("nul", "nuld")
+  , ("één", "eerst")
   , ("twee", "tweed")
   , ("drie", "derd")
   , ("vier", "vierd")
@@ -28,6 +29,9 @@ $(pure [ordinizeFromDict [
   , ("joen", "joenst")
   , ("rd", "rdst")
   ]])
+
+ordinize' :: Text -> Text
+ordinize' = (`snoc` 'e') . _ordinize'
 
 dutch :: NumeralsAlgorithm
 dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
@@ -90,9 +94,9 @@ _leftAnd n | 2 <- n = addE
 
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < _million = const id
-merge' l r | r > l && r > _million = _mergeWith' ' '
+merge' l r | r > l && r > _million = _mergeWithSpace
            | r > l = (<>)
            | r < 10 && 10 < l && l < 100 = go
-           | l > _million = _mergeWith' ' '
+           | l > _million = _mergeWithSpace
            | otherwise = (<>)
     where go tl tr = _leftAnd r tr <> _rightAnd l tl

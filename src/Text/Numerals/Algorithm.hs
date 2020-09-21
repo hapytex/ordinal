@@ -97,7 +97,7 @@ ordinizeSingle :: Exp -> String -> String -> (Guard, Exp)
 ordinizeSingle nm sa sb = (NormalG (AppE (AppE (VarE 'isSuffixOf) (_packText sa)) nm), _packExp l sc nm)
     where (l, sc) = _getPrefix sa sb
 
-ordinizeFromDict :: [(String, String)] -> Dec
-ordinizeFromDict ts = FunD (mkName "ordinize'") [Clause [VarP t] (GuardedB (map (uncurry (ordinizeSingle t')) ts ++ [(NormalG (ConE 'True), t')])) []]
+ordinizeFromDict :: String -> [(String, String)] -> Dec
+ordinizeFromDict nm ts = FunD (mkName nm) [Clause [VarP t] (GuardedB (map (uncurry (ordinizeSingle t')) ts ++ [(NormalG (ConE 'True), t')])) []]
     where t = mkName "t"
           t' = VarE t

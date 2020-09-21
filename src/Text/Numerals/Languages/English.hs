@@ -6,9 +6,9 @@ import Data.Text(Text, isSuffixOf)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm, ordinizeFromDict)
-import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWith', _replaceSuffix)
+import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix)
 
-$(pure [ordinizeFromDict [
+$(pure [ordinizeFromDict "ordinize'" [
     ("one", "first")
   , ("two", "second")
   , ("three", "third")
@@ -84,7 +84,7 @@ merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < 100 = const id
 merge' l r | 100 > l && l > r = _mergeWith' '-'
            | l >= 100 && 100 > r = _mergeWith " and "
-           | r > l = _mergeWith' ' '
+           | r > l = _mergeWithSpace
 merge' _ _ = _mergeWith ", "
 
 --ordinize' t

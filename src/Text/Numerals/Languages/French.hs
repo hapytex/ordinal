@@ -6,7 +6,7 @@ import Data.Text(Text)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm)
-import Text.Numerals.Internal(_mergeWith, _mergeWith')
+import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWith')
 
 french :: NumeralsAlgorithm
 french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
@@ -58,8 +58,8 @@ merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < 100 = const id
 merge' l r | 100 > l && l > r = _mergeWith' '-'
            | l >= 100 && 100 > r = _mergeWith " et "
-           | r > l = _mergeWith' ' '
-merge' _ _ = _mergeWith ", "
+           | r > l = _mergeWithSpace
+merge' _ _ = _mergeWithSpace
 
 ordinize' :: Text -> Text
 ordinize' t = t
