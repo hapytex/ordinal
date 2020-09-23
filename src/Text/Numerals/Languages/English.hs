@@ -5,7 +5,7 @@ module Text.Numerals.Languages.English where
 import Data.Text(Text, isSuffixOf)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm, ordinizeFromDict)
+import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm, ordinizeFromDict)
 import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix)
 
 $(pure [ordinizeFromDict "ordinize'" [
@@ -24,7 +24,7 @@ $(pure [ordinizeFromDict "ordinize'" [
   ]])
 
 english :: NumeralsAlgorithm
-english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
+english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' highWords' merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "minus"
@@ -58,7 +58,7 @@ lowWords' = [
   , "twenty"
   ]
 
-midWords' :: [(Int, Text)]
+midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "thousand")
   , (100, "hundred")
@@ -87,17 +87,5 @@ merge' l r | 100 > l && l > r = _mergeWith' '-'
            | r > l = _mergeWithSpace
 merge' _ _ = _mergeWith ", "
 
---ordinize' t
---     | isSuffixOf "one" t = _replaceSuffix 3 "first" t
---    | isSuffixOf "two" t = _replaceSuffix 3 "second" t
---    | isSuffixOf "three" t = _replaceSuffix 3 "ird" t
---    | isSuffixOf "four" t = t <> "th"
---    | isSuffixOf "five" t = _replaceSuffix 2 "fth" t
---    | isSuffixOf "six" t = t <> "th"
---    | isSuffixOf "seven" t = t <> "th"
---    | isSuffixOf "eight" t = t <> "h"
---    | isSuffixOf "nine" t = _replaceSuffix 1 "th" t
---    | isSuffixOf "ten" t = t <> "th"
---    | isSuffixOf "eleven" t = t <> "th"
---    | isSuffixOf "twelve" t = _replaceSuffix 2 "fth" t
---    | otherwise = t
+highWords' :: [(Integer, Text)]
+highWords' = generatePrefixedHighNumbers ["illion"]

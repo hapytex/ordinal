@@ -15,11 +15,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  default-extensions:
---      Safe
+--  default-extensions: Safe
   exposed-modules:
       Text.Numerals
     , Text.Numerals.Algorithm
+    , Text.Numerals.Class
     , Text.Numerals.Languages
     , Text.Numerals.Languages.Dutch
     , Text.Numerals.Languages.English

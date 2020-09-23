@@ -3,10 +3,10 @@
 module Text.Numerals.Prefix where
 
 import Data.Text(Text)
-import Data.Vector(Vector, (!?))
+import Data.Vector(Vector, (!?), fromList)
 
-greekPrefixes :: Vector Text
-greekPrefixes = [
+greekPrefixes' :: [Text]
+greekPrefixes' = [
     "m"
   , "b"
   , "tr"
@@ -26,6 +26,9 @@ greekPrefixes = [
   , "octodec"
   , "novemdec"
   ]
+
+greekPrefixes :: Vector Text
+greekPrefixes = fromList greekPrefixes'
 
 greekPrefix :: Integral i => i -> Maybe Text
 greekPrefix n = greekPrefixes !? (fromIntegral n - 1)

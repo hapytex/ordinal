@@ -2,6 +2,8 @@
 
 module Text.Numerals.Algorithm where
 
+import Control.Applicative(liftA2)
+
 import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
@@ -9,7 +11,9 @@ import Data.Text(Text, cons, isSuffixOf, pack, snoc)
 import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
-import Text.Numerals.Internal(_replaceSuffix)
+import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal))
+import Text.Numerals.Internal(_million, _replaceSuffix, _thousand)
+import Text.Numerals.Prefix(greekPrefixes')
 
 import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(CharL, IntegerL, StringL), Pat(VarP), mkName)
 
@@ -19,13 +23,27 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
     minusWord :: Text
   , oneWord :: Text
   , lowWords :: Vector Text
-  , midWords :: [(Int, Text)]
+  , midWords :: [(Integer, Text)]
   , mergeFunction :: forall i . Integral i => MergerFunction i
   , ordinize :: Text -> Text
   }
 
-numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Int, Text) -> (forall i . Integral i => MergerFunction i) -> (Text -> Text) -> NumeralsAlgorithm
-numeralsAlgorithm minus zero one lowWords midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) ((sortOn (negate . fst) . toList) midWords)
+instance NumToWord NumeralsAlgorithm where
+    toCardinal NumeralsAlgorithm { minusWord=minusWord, oneWord=oneWord, lowWords=lowWords, midWords=midWords, mergeFunction=mergeFunction } = cardinal
+       where cardinal i
+                  | i < 0 = minusWord <> cons ' ' (go (-i))
+                  | otherwise = go i
+                  where go = compressSegments' oneWord mergeFunction . toSegments' lowWords midWords
+
+    toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
+
+
+data HighNumberAlgorithm =
+    ShortScale Text
+  | LongScale Text Text
+
+numeralsAlgorithm :: (Foldable f, Foldable g, Foldable h) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> h (Integer, Text) -> (forall i . Integral i => MergerFunction i) -> (Text -> Text) -> NumeralsAlgorithm
+numeralsAlgorithm minus zero one lowWords midWords highWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords ++ toList highWords))
 
 data NumberSegment i = NumberSegment {
       segmentDivision :: MNumberSegment i
@@ -50,7 +68,7 @@ toSegmentLow' vs = go
           nvs = fromIntegral (V.length vs) - 1
           tl = maybeSegment go
 
-toSegments' :: Integral i => Vector Text -> [(Int, Text)] -> i -> NumberSegment i
+toSegments' :: Integral i => Vector Text -> [(Integer, Text)] -> i -> NumberSegment i
 toSegments' lows = go
     where go [] n = toSegmentLow' lows n
           go ma@((m, v) : ms) n
@@ -69,16 +87,6 @@ compressSegments' one' merger = snd . go
           _mergeTail Nothing r = r
           _mergeTail (Just md') (vi, v) = (vi + mdi, merger vi mdi v md)
               where (mdi, md) = go md'
-
-toCardinal :: Integral i => NumeralsAlgorithm -> i -> Text
-toCardinal NumeralsAlgorithm { minusWord=minusWord, oneWord=oneWord, lowWords=lowWords, midWords=midWords, mergeFunction=mergeFunction } = cardinal
-    where cardinal i
-              | i < 0 = minusWord <> cons ' ' (go (-i))
-              | otherwise = go i
-              where go = compressSegments' oneWord mergeFunction . toSegments' lowWords midWords
-
-toOrdinal :: Integral i => NumeralsAlgorithm -> i -> Text
-toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
 _getPrefix :: [Char] -> [Char] -> (Int, [Char])
 _getPrefix [] bs = (0, bs)
@@ -103,3 +111,6 @@ ordinizeFromDict :: String -> [(String, String)] -> Dec
 ordinizeFromDict nm ts = FunD (mkName nm) [Clause [VarP t] (GuardedB (map (uncurry (ordinizeSingle t')) ts ++ [(NormalG (ConE 'True), t')])) []]
     where t = mkName "t"
           t' = VarE t
+
+generatePrefixedHighNumbers :: Integral i => [Text] -> [(i, Text)]
+generatePrefixedHighNumbers = reverse . zip (iterate (_thousand*) _million) . liftA2 (<>) greekPrefixes'

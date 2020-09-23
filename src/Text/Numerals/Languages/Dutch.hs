@@ -5,7 +5,7 @@ module Text.Numerals.Languages.Dutch where
 import Data.Text(Text, isSuffixOf, snoc)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, numeralsAlgorithm, ordinizeFromDict)
+import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm, ordinizeFromDict)
 import Text.Numerals.Internal(_million, _mergeWith, _mergeWithSpace, _mergeWith')
 
 -- TODO: add "e" at the end
@@ -34,7 +34,7 @@ ordinize' :: Text -> Text
 ordinize' = (`snoc` 'e') . _ordinize'
 
 dutch :: NumeralsAlgorithm
-dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' merge' ordinize'
+dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' highWords' merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "min"
@@ -68,7 +68,7 @@ lowWords' = [
   , "twintig"
   ]
 
-midWords' :: [(Int, Text)]
+midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "duizend")
   , (100, "honderd")
@@ -100,3 +100,6 @@ merge' l r | r > l && r > _million = _mergeWithSpace
            | l > _million = _mergeWithSpace
            | otherwise = (<>)
     where go tl tr = _leftAnd r tr <> _rightAnd l tl
+
+highWords' :: [(Integer, Text)]
+highWords' = generatePrefixedHighNumbers ["iljoen", "iljard"]
