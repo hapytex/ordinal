@@ -11,11 +11,10 @@ import Data.Text(Text, cons, isSuffixOf, pack, snoc)
 import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
-import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal))
+import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), ValueSplit(valueSplit))
 import Text.Numerals.Internal(_million, _replaceSuffix, _thousand)
 import Text.Numerals.Prefix(greekPrefixes')
 
-import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(CharL, IntegerL, StringL), Pat(VarP), mkName)
 
 type MergerFunction i = i -> i -> Text -> Text -> Text
 
@@ -38,9 +37,12 @@ instance NumToWord NumeralsAlgorithm where
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
 
-data HighNumberAlgorithm =
-    ShortScale Text
+data HighNumberAlgorithm
+  = ShortScale Text
   | LongScale Text Text
+
+instance ValueSplit HighNumberAlgorithm where
+    
 
 numeralsAlgorithm :: (Foldable f, Foldable g, Foldable h) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> h (Integer, Text) -> (forall i . Integral i => MergerFunction i) -> (Text -> Text) -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one lowWords midWords highWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords ++ toList highWords))
@@ -87,30 +89,6 @@ compressSegments' one' merger = snd . go
           _mergeTail Nothing r = r
           _mergeTail (Just md') (vi, v) = (vi + mdi, merger vi mdi v md)
               where (mdi, md) = go md'
-
-_getPrefix :: [Char] -> [Char] -> (Int, [Char])
-_getPrefix [] bs = (0, bs)
-_getPrefix aa@(a:as) ba@(b:bs)
-     | a == b = _getPrefix as bs
-     | otherwise = (length aa, ba)
-
-_packText :: String -> Exp
-_packText = AppE (VarE 'pack) . LitE . StringL
-
-_packExp :: Int -> String -> Exp -> Exp
-_packExp 0 [] nm = nm
-_packExp 0 [s] nm = AppE (AppE (VarE 'snoc) nm) (LitE (CharL s))
-_packExp 0 sc nm = AppE (AppE (VarE '(<>)) nm) (_packText sc)
-_packExp l sc nm = AppE (AppE (AppE (VarE '_replaceSuffix) (LitE (IntegerL (fromIntegral l)))) (_packText sc)) nm
-
-ordinizeSingle :: Exp -> String -> String -> (Guard, Exp)
-ordinizeSingle nm sa sb = (NormalG (AppE (AppE (VarE 'isSuffixOf) (_packText sa)) nm), _packExp l sc nm)
-    where (l, sc) = _getPrefix sa sb
-
-ordinizeFromDict :: String -> [(String, String)] -> Dec
-ordinizeFromDict nm ts = FunD (mkName nm) [Clause [VarP t] (GuardedB (map (uncurry (ordinizeSingle t')) ts ++ [(NormalG (ConE 'True), t')])) []]
-    where t = mkName "t"
-          t' = VarE t
 
 generatePrefixedHighNumbers :: Integral i => [Text] -> [(i, Text)]
 generatePrefixedHighNumbers = reverse . zip (iterate (_thousand*) _million) . liftA2 (<>) greekPrefixes'

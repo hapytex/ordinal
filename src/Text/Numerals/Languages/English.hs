@@ -5,7 +5,8 @@ module Text.Numerals.Languages.English where
 import Data.Text(Text, isSuffixOf)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm, ordinizeFromDict)
+import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix)
 
 $(pure [ordinizeFromDict "ordinize'" [

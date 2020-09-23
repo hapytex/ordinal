@@ -5,10 +5,10 @@ module Text.Numerals.Languages.Dutch where
 import Data.Text(Text, isSuffixOf, snoc)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm, ordinizeFromDict)
+import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Internal(_million, _mergeWith, _mergeWithSpace, _mergeWith')
 
--- TODO: add "e" at the end
 $(pure [ordinizeFromDict "_ordinize'" [
     ("nul", "nuld")
   , ("één", "eerst")

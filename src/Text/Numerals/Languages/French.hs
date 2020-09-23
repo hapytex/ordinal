@@ -6,6 +6,7 @@ import Data.Text(Text)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWith')
 
 french :: NumeralsAlgorithm
