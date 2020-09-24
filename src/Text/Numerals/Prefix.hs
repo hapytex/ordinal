@@ -13,6 +13,7 @@ greekPrefixes' = [
   , "quadr"
   , "quint"
   , "sext"
+  , "sept"
   , "oct"
   , "non"
   , "dec"
@@ -25,6 +26,7 @@ greekPrefixes' = [
   , "septended"
   , "octodec"
   , "novemdec"
+  , "vigint"
   ]
 
 greekPrefixes :: Vector Text

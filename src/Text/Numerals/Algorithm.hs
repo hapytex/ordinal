@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TemplateHaskellQuotes #-}
+{-# LANGUAGE OverloadedStrings, RankNTypes #-}
 
 module Text.Numerals.Algorithm where
 
@@ -12,7 +12,7 @@ import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
 import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), ValueSplit(valueSplit))
-import Text.Numerals.Internal(_million, _replaceSuffix, _thousand)
+import Text.Numerals.Internal(_million, _replaceSuffix, _thousand, _iLogFloor)
 import Text.Numerals.Prefix(greekPrefixes')
 
 
@@ -37,12 +37,20 @@ instance NumToWord NumeralsAlgorithm where
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
 
+_toNumberScale :: (Integral i, Integral j) => i -> (j, i)
+_toNumberScale i = (l-1, k)
+    where ~(_, l, k) = _iLogFloor _thousand i
+
 data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
 
 instance ValueSplit HighNumberAlgorithm where
-    
+    valueSplit vs i = go
+        where go | j < 0 = Nothing
+                 | otherwise = Just (m, "bla")
+              ~(j, m) = _toNumberScale i
+--    valueSplit (ShortScale suffix) = 
 
 numeralsAlgorithm :: (Foldable f, Foldable g, Foldable h) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> h (Integer, Text) -> (forall i . Integral i => MergerFunction i) -> (Text -> Text) -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one lowWords midWords highWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords ++ toList highWords))

@@ -4,7 +4,8 @@ module Text.Numerals.Internal (
     _div10, _rem10
   , _showText
   , _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix
-  , _thousand, _million
+  , _thousand, _million, _billion, _trillion
+  , _iLog, _iLogFloor
   ) where
 
 import Data.Text(Text, cons, dropEnd, pack)
@@ -39,6 +40,26 @@ _million = 1_000_000
 
 _billion :: Integral i => i
 _billion = 1_000_000_000
+
+_trillion :: Integral i => i
+_trillion = 1_000_000_000_000
+
+_iLogFloor :: (Integral i, Integral j) => i -> i -> (i, j, i)
+_iLogFloor b m = go b
+  where go i | m < i = (m, 0, 1)
+             | q < i = (q, 2 * e, j)
+             | otherwise = (div q i, 2 * e + 1, j * i)
+            where ~(q, e, j) = go (i*i)
+
+_iLog :: (Integral i, Integral j) => i -> i -> Maybe j
+_iLog b m = snd <$> go b
+  where go i | m < i = Just (m, 0)
+             | Just (q, e) <- go (i*i) = go' i q e
+             | otherwise = Nothing
+        go' i q e | q < i = Just (q, 2 * e)
+                  | m == 0 = Just (d, 2 * e + 1)
+                  | otherwise = Nothing
+            where (d, m) = divMod q i
 
 _replaceSuffix :: Int -> Text -> Text -> Text
 _replaceSuffix n s = (<> s) . dropEnd n
