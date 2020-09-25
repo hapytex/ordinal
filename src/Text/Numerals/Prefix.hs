@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 
-module Text.Numerals.Prefix where
+module Text.Numerals.Prefix (
+    latinPrefixes, latinPrefixes', latinPrefix
+  ) where
 
 import Data.Text(Text)
 import Data.Vector(Vector, (!?), fromList)
 
-greekPrefixes' :: [Text]
-greekPrefixes' = [
+latinPrefixes' :: [Text]
+latinPrefixes' = [
     "m"
   , "b"
   , "tr"
@@ -29,8 +31,8 @@ greekPrefixes' = [
   , "vigint"
   ]
 
-greekPrefixes :: Vector Text
-greekPrefixes = fromList greekPrefixes'
+latinPrefixes :: Vector Text
+latinPrefixes = fromList latinPrefixes'
 
-greekPrefix :: Integral i => i -> Maybe Text
-greekPrefix n = greekPrefixes !? (fromIntegral n - 1)
+latinPrefix :: Integral i => i -> Maybe Text
+latinPrefix n = latinPrefixes !? (fromIntegral n - 1)

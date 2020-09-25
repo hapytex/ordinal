@@ -1,12 +1,19 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
-module Text.Numerals.Languages.Dutch where
+module Text.Numerals.Languages.Dutch (
+    dutch
+  , ordinize'
+  , negativeWord', zeroWord', oneWord'
+  , lowWords', midWords', highWords'
+  , merge'
+  ) where
 
 import Data.Text(Text, isSuffixOf, snoc)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
+import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_million, _mergeWith, _mergeWithSpace, _mergeWith')
 
 $(pure [ordinizeFromDict "_ordinize'" [
@@ -34,7 +41,7 @@ ordinize' :: Text -> Text
 ordinize' = (`snoc` 'e') . _ordinize'
 
 dutch :: NumeralsAlgorithm
-dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' highWords' merge' ordinize'
+dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "min"
@@ -101,5 +108,5 @@ merge' l r | r > l && r > _million = _mergeWithSpace
            | otherwise = (<>)
     where go tl tr = _leftAnd r tr <> _rightAnd l tl
 
-highWords' :: [(Integer, Text)]
-highWords' = generatePrefixedHighNumbers ["iljoen", "iljard"]
+highWords' :: HighNumberAlgorithm
+highWords' = LongScale "iljoen" "iljard"

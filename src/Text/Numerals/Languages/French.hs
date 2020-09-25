@@ -5,12 +5,13 @@ module Text.Numerals.Languages.French where
 import Data.Text(Text)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
+import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWith')
 
 french :: NumeralsAlgorithm
-french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' highWords' merge' ordinize'
+french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "moins"
@@ -65,5 +66,5 @@ merge' _ _ = _mergeWithSpace
 ordinize' :: Text -> Text
 ordinize' t = t
 
-highWords' :: [(Integer, Text)]
-highWords' = generatePrefixedHighNumbers ["illion"]
+highWords' :: HighNumberAlgorithm
+highWords' =  LongScale "illion" "illiard"

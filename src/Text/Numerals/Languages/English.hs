@@ -5,8 +5,9 @@ module Text.Numerals.Languages.English where
 import Data.Text(Text, isSuffixOf)
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(NumeralsAlgorithm, generatePrefixedHighNumbers, numeralsAlgorithm)
+import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
+import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix)
 
 $(pure [ordinizeFromDict "ordinize'" [
@@ -25,7 +26,7 @@ $(pure [ordinizeFromDict "ordinize'" [
   ]])
 
 english :: NumeralsAlgorithm
-english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' highWords' merge' ordinize'
+english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text
 negativeWord' = "minus"
@@ -88,5 +89,5 @@ merge' l r | 100 > l && l > r = _mergeWith' '-'
            | r > l = _mergeWithSpace
 merge' _ _ = _mergeWith ", "
 
-highWords' :: [(Integer, Text)]
-highWords' = generatePrefixedHighNumbers ["illion"]
+highWords' :: HighNumberAlgorithm
+highWords' = ShortScale "illion"
