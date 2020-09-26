@@ -8,7 +8,7 @@ import Data.Vector(Vector)
 import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix)
+import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix)
 
 $(pure [ordinizeFromDict "ordinize'" [
     ("one", "first")
@@ -84,7 +84,7 @@ ordinalSuffix n
 
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < 100 = const id
-merge' l r | 100 > l && l > r = _mergeWith' '-'
+merge' l r | 100 > l && l > r = _mergeWithHyphen
            | l >= 100 && 100 > r = _mergeWith " and "
            | r > l = _mergeWithSpace
 merge' _ _ = _mergeWith ", "

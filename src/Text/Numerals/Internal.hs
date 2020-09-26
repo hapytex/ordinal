@@ -3,7 +3,7 @@
 module Text.Numerals.Internal (
     _div10, _rem10
   , _showText
-  , _mergeWith, _mergeWithSpace, _mergeWith', _replaceSuffix
+  , _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix
   , _thousand, _million, _billion, _trillion
   , _iLog, _iLogFloor
   ) where

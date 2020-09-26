@@ -73,7 +73,7 @@ instance ValueSplit HighNumberAlgorithm where
                  | otherwise = (m,) <$> _highToText vs j
               ~(j, m) = _toNumberScale i
 
-numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> (FreeMergerFunction) -> (Text -> Text) -> NumeralsAlgorithm
+numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one lowWords midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords))
 
 data NumberSegment i = NumberSegment {

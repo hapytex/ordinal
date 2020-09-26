@@ -56,6 +56,7 @@ midWords' = [
   , (30, "trente")
   ]
 
+-- TODO
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < 100 = const id
 merge' l r | 100 > l && l > r = _mergeWith' '-'
