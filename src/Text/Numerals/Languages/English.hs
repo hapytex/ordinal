@@ -1,6 +1,27 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
-module Text.Numerals.Languages.English where
+{-|
+Module      : Text.Numerals.Languages.English
+Description : A module to convert numbers to words in the /English/ language.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains logic to convert numbers to words in the /English/ language.
+-}
+
+module Text.Numerals.Languages.English (
+    -- * Num to word algorithm
+    english
+    -- * Convert to ordinal
+  , ordinize'
+    -- * Constant words
+  , negativeWord', zeroWord', oneWord'
+    -- * Names for numbers
+  , lowWords', midWords', highWords'
+    -- * Merge function
+  , merge'
+  ) where
 
 import Data.Text(Text, isSuffixOf)
 import Data.Vector(Vector)

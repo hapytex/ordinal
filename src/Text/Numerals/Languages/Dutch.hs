@@ -1,10 +1,25 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
+{-|
+Module      : Text.Numerals.Languages.Dutch
+Description : A module to convert numbers to words in the /Dutch/ language.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains logic to convert numbers to words in the /Dutch/ language.
+-}
+
 module Text.Numerals.Languages.Dutch (
+    -- * Num to word algorithm
     dutch
+    -- * Convert to ordinal
   , ordinize'
+    -- * Constant words
   , negativeWord', zeroWord', oneWord'
+    -- * Names for numbers
   , lowWords', midWords', highWords'
+    -- * Merge function
   , merge'
   ) where
 

@@ -1,6 +1,27 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 
-module Text.Numerals.Languages.French where
+{-|
+Module      : Text.Numerals.Languages.French
+Description : A module to convert numbers to words in the /French/ language.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains logic to convert numbers to words in the /French/ language.
+-}
+
+module Text.Numerals.Languages.French (
+    -- * Num to word algorithm
+    french
+    -- * Convert to ordinal
+  , ordinize'
+    -- * Constant words
+  , negativeWord', zeroWord', oneWord'
+    -- * Names for numbers
+  , lowWords', midWords', highWords'
+    -- * Merge function
+  , merge'
+  ) where
 
 import Data.Text(Text)
 import Data.Vector(Vector)
