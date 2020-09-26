@@ -31,7 +31,8 @@ import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWith')
 
-french :: NumeralsAlgorithm
+-- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
+french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text

@@ -55,7 +55,8 @@ $(pure [ordinizeFromDict "_ordinize'" [
 ordinize' :: Text -> Text
 ordinize' = (`snoc` 'e') . _ordinize'
 
-dutch :: NumeralsAlgorithm
+-- | A 'NumeralsAlgorithm' to convert numbers to words in the /Dutch/ language.
+dutch :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text

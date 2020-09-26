@@ -46,7 +46,8 @@ $(pure [ordinizeFromDict "ordinize'" [
   , ("twelve", "twelfth")
   ]])
 
-english :: NumeralsAlgorithm
+-- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
+english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
 negativeWord' :: Text

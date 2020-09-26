@@ -1,5 +1,16 @@
 {-# LANGUAGE RankNTypes, TupleSections #-}
 
+{-|
+Module      : Text.Numerals.Algorithm
+Description : A module that contains functions to construct algorithmic conversions from numbers to words.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+A module that contains data types and functions to automatically convert a number to words. It has tooling for a 'NumeralsAlgorithm'
+as well as a 'HighNumberAlgorithm' that is used to generate a 'ShortScale' or 'LongScale'.
+-}
+
 module Text.Numerals.Algorithm where
 
 import Control.Applicative(liftA2)
