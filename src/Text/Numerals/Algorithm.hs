@@ -99,24 +99,24 @@ toSegmentLow' vs = go
           nvs = fromIntegral (V.length vs) - 1
           tl = _maybeSegment go
 
-_splitRecurse :: Integral i => (i -> NumberSegment i) -> (i -> NumberSegment i) -> i -> i -> Text -> i -> NumberSegment i
-_splitRecurse f g dv im v md = NumberSegment hd im v (_maybeSegment g md)
+_splitRecurse :: Integral i => (i -> NumberSegment i) -> (i -> NumberSegment i) -> i -> Text -> i -> NumberSegment i
+_splitRecurse f g im v j = NumberSegment hd im v (_maybeSegment g md)
     where hd | dv == 1 = Nothing
              | otherwise = Just (f dv)
+          ~(dv, md) = divMod j im
 
 toSegmentMid' :: Integral i => Vector Text -> [(Integer, Text)] -> i -> NumberSegment i
 toSegmentMid' lows = go
     where go [] n = toSegmentLow' lows n
           go ma@((m, v) : ms) n
               | im > n = goms n
-              | otherwise = _splitRecurse (go ma) goms dv im v md
+              | otherwise = _splitRecurse (go ma) goms im v n
               where im = fromIntegral m
-                    (dv, md) = divMod n im
                     goms = go ms
 
 toSegmentHigh' :: Integral i => Vector Text -> [(Integer, Text)] -> FreeValueSplitter -> NumberSegmenting i
 toSegmentHigh' lows mids highs = go
-    where go v | Just (i, t) <- highs v = let (dv, md) = divMod v i in _splitRecurse go go dv i t md
+    where go v | Just (i, t) <- highs v = _splitRecurse go go i t v
                | otherwise = toSegmentMid' lows mids v
 
 toSegments :: Integral i => Vector Text -> [(Integer, Text)] -> FreeValueSplitter -> NumberSegmenting i
