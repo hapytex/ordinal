@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, Safe #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, RankNTypes, Safe #-}
 
 {-|
 Module      : Text.Numerals.Class
@@ -15,6 +15,8 @@ module Text.Numerals.Class (
     -- * Typeclasses
     NumToWord(toCardinal, toOrdinal, toWords)
   , ValueSplit(valueSplit)
+    -- * Types of numbers
+  , NumberType(Cardinal, Ordinal)
     -- * Segmenting a number
   , NumberSegment(NumberSegment, segmentDivision, segmentValue, segmentText, segmentRemainder)
   , MNumberSegment
@@ -28,7 +30,7 @@ import Data.Text(Text)
 -- to gramatical rules. The type parameter is the type of the numbers to merge.
 type MergerFunction i = i -> i -> Text -> Text -> Text
 
--- | A type alias of a 'MergeFunction' function with a free 'Integral' variable.
+-- | A type alias of a 'MergerFunction' function with a free 'Integral' variable.
 type FreeMergerFunction = forall i . Integral i => MergerFunction i
 
 -- | A type alias of a function that maps a number to a 2-tuple that contains a
@@ -52,7 +54,7 @@ data NumberSegment i = NumberSegment {
   , segmentValue :: i  -- ^ The value of the given segment.
   , segmentText :: Text  -- ^ The name of the value of the given segment, in a specific language.
   , segmentRemainder ::  MNumberSegment i  -- ^ The optional remainder part. 'Nothing' if the remainder is equal to zero.
-  } deriving (Eq, Ord, Read, Show)
+  } deriving (Foldable, Functor, Eq, Ord, Read, Show)
 
 -- | A 'Maybe' variant of the 'NumberSegment' data type. This is used since the
 -- division part can be one, or the remainder part can be zero.

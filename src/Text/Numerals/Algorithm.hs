@@ -11,7 +11,19 @@ A module that contains data types and functions to automatically convert a numbe
 as well as a 'HighNumberAlgorithm' that is used to generate a 'ShortScale' or 'LongScale'.
 -}
 
-module Text.Numerals.Algorithm where
+module Text.Numerals.Algorithm (
+    -- * Data types for number algorithms
+    NumeralsAlgorithm
+  , numeralsAlgorithm
+    -- * Large number algorithms
+  , HighNumberAlgorithm(ShortScale, LongScale)
+  , shortScale, longScale
+    -- * Conversion to a 'NumberSegment'
+  , toSegments
+  , toSegmentLow, toSegmentMid, toSegmentHigh
+    -- * Segment compression
+  , compressSegments
+  ) where
 
 import Control.Applicative(liftA2)
 
@@ -22,19 +34,20 @@ import Data.Text(Text, cons, isSuffixOf, pack, snoc)
 import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
-import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), FreeMergerFunction, FreeValueSplitter, MergerFunction, MNumberSegment, NumberSegment(NumberSegment), NumberSegmenting, ValueSplit(valueSplit))
+import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), FreeMergerFunction, FreeValueSplitter, MergerFunction, MNumberSegment, NumberSegment(NumberSegment), NumberSegmenting, ValueSplit(valueSplit), ValueSplitter)
 import Text.Numerals.Internal(_million, _replaceSuffix, _thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefix)
 
-
+-- | A data type for algorithmic number to word conversions. Most western
+-- languages likely can work with this data type.
 data NumeralsAlgorithm = NumeralsAlgorithm {
-    minusWord :: Text
-  , oneWord :: Text
-  , lowWords :: Vector Text
-  , midWords :: [(Integer, Text)]
-  , highWords :: FreeValueSplitter
-  , mergeFunction :: FreeMergerFunction
-  , ordinize :: Text -> Text
+    minusWord :: Text  -- ^ The word used as prefix to denote negative numbers.
+  , oneWord :: Text  -- ^ The word used to denote /one/ in the language.
+  , lowWords :: Vector Text  -- ^ A 'Vector' of small numbers, the first item is the word for /two/ and each successor is the word for the next number.
+  , midWords :: [(Integer, Text)]  -- ^ A list of 2-tuples where the first item contains the value, and the second the corresponding word, the values are ordered in descending value order.
+  , highWords :: FreeValueSplitter  -- ^ A function that is used to generate words for large values (greater than or equal to one /million/), often constructed with the /short scale/ or /long scale/.
+  , mergeFunction :: FreeMergerFunction  -- ^ A function that specifies how to merge words based on the grammar of that specific language.
+  , ordinize :: Text -> Text  -- ^ A function to conver the /cardinal/ form of a number in an /ordinal/ one.
   }
 
 
@@ -43,7 +56,7 @@ instance NumToWord NumeralsAlgorithm where
        where cardinal i
                   | i < 0 = minusWord <> cons ' ' (go (-i))
                   | otherwise = go i
-                  where go = compressSegments' oneWord mergeFunction . toSegments lowWords midWords highWords
+                  where go = compressSegments oneWord mergeFunction . toSegments lowWords midWords highWords
 
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
@@ -52,13 +65,21 @@ _toNumberScale :: (Integral i, Integral j) => i -> (j, i)
 _toNumberScale i = (l, k)
     where ~(_, l, k) = _iLogFloor _thousand i
 
+-- | A data type used for to map larger numbers to words. This data type
+-- supports the /short scale/ and /long scale/ with /Latin/ prefixes, and
+-- custom suffixes.
 data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
+  deriving (Eq, Ord, Read, Show)
 
+-- | Construct a 'FreeValueSplitter' function for the given suffix for a /short
+-- scale/.
 shortScale :: Text -> FreeValueSplitter
 shortScale = valueSplit . ShortScale
 
+-- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long
+-- scale/.
 longScale :: Text -> Text -> FreeValueSplitter
 longScale suf1 = valueSplit . LongScale suf1
 
@@ -78,18 +99,24 @@ instance ValueSplit HighNumberAlgorithm where
                  | otherwise = (m,) <$> _highToText vs j
               ~(j, m) = _toNumberScale i
 
+-- | A /smart constructor/ for the 'NumeralsAlgorithm' type. This constructor
+-- allows one to use an arbitrary 'Foldable' type for the low words and mid
+-- words. It will also order the midwords accordingly.
 numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one lowWords midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords))
-
-
 
 _maybeSegment :: Integral i => (i -> NumberSegment i) -> i -> MNumberSegment i
 _maybeSegment f = go
     where go 0 = Nothing
           go i = Just (f i)
 
-toSegmentLow' :: Integral i => Vector Text -> i -> NumberSegment i
-toSegmentLow' vs = go
+-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of
+-- low numbers. Mid words and large numbers are not taken into account. This
+-- is often the next step after the 'toSegmentMid'.
+toSegmentLow :: Integral i
+  => Vector Text  -- ^ A 'Vector' of low words.
+  -> NumberSegmenting i  -- ^ The function that maps the number to the 'NumberSegment'.
+toSegmentLow vs = go
     where go i | i >= nvs = NumberSegment (Just (go dv)) nvs lv (tl md)
                | otherwise = NumberSegment Nothing i (vs ! fromIntegral i) Nothing
                where (dv, md) = divMod i nvs
@@ -103,25 +130,51 @@ _splitRecurse f g im v j = NumberSegment hd im v (_maybeSegment g md)
              | otherwise = Just (f dv)
           ~(dv, md) = divMod j im
 
-toSegmentMid' :: Integral i => Vector Text -> [(Integer, Text)] -> i -> NumberSegment i
-toSegmentMid' lows = go
-    where go [] n = toSegmentLow' lows n
+-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of
+-- low numbers, and the /sorted/ list of mid numbers. Large numbers are not
+-- taken into account. This is often the next step after the 'toSegmentHigh'.
+toSegmentMid :: Integral i
+  => Vector Text  -- ^ A 'Vector' of low words.
+  -> [(Integer, Text)]  -- ^ The list of name and the names of these numbers in /descending/ order for the mid words.
+  -> NumberSegmenting i  -- ^ The function that maps the number to the 'NumberSegment'.
+toSegmentMid lows = go
+    where go [] n = toSegmentLow lows n
           go ma@((m, v) : ms) n
               | im > n = goms n
               | otherwise = _splitRecurse (go ma) goms im v n
               where im = fromIntegral m
                     goms = go ms
 
-toSegmentHigh' :: Integral i => Vector Text -> [(Integer, Text)] -> FreeValueSplitter -> NumberSegmenting i
-toSegmentHigh' lows mids highs = go
+-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of
+-- low numbers, the /sorted/ list of mid numbers, and a 'FreeValueSplitter' for
+-- large numbers.
+toSegmentHigh :: Integral i
+  => Vector Text  -- ^ A 'Vector' of low words.
+  -> [(Integer, Text)]  -- ^ The list of name and the names of these numbers in /descending/ order for the mid words.
+  -> ValueSplitter i  -- ^ The 'ValueSplitter' used for large numbers, likely a splitter from a /short scale/ or /long scale/.
+  -> NumberSegmenting i  -- ^ The function that maps the number to the 'NumberSegment'.
+toSegmentHigh lows mids highs = go
     where go v | Just (i, t) <- highs v = _splitRecurse go go i t v
-               | otherwise = toSegmentMid' lows mids v
+               | otherwise = toSegmentMid lows mids v
 
-toSegments :: Integral i => Vector Text -> [(Integer, Text)] -> FreeValueSplitter -> NumberSegmenting i
-toSegments = toSegmentHigh'
+-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of
+-- low numbers, the /sorted/ list of mid numbers, and a 'FreeValueSplitter' for
+-- large numbers.
+toSegments :: Integral i
+  => Vector Text  -- ^ A 'Vector' of low words.
+  -> [(Integer, Text)]  -- ^ The list of name and the names of these numbers in /descending/ order for the mid words.
+  -> ValueSplitter i  -- ^ The 'ValueSplitter' used for large numbers, likely a splitter from a /short scale/ or /long scale/.
+  -> NumberSegmenting i  -- ^ The function that maps the number to the 'NumberSegment'.
+toSegments = toSegmentHigh
 
-compressSegments' :: Integral i => Text -> MergerFunction i -> NumberSegment i -> Text
-compressSegments' one' merger = snd . go
+-- | Use the given 'MergerFunction' to compress the 'NumberSegment' to a single
+-- 'Text' object that represents the given number.
+compressSegments :: Integral i
+  => Text  -- ^ The value used for /one/ in the specific language.
+  -> MergerFunction i  -- ^ The 'MergerFunction' for the specific language that implements the grammar rules how to merge values.
+  -> NumberSegment i  -- ^ The given 'NumberSegment' value to turn into a 'Text' object.
+  -> Text  -- ^ The 'Text' object that contains the name of the number stored in the 'NumberSegment'.
+compressSegments one' merger = snd . go
     where go (NumberSegment dv' i t md') = _mergeTail md' (dvi * i, merger dvi i dv t)
               where (dvi, dv) = _unwrap dv'
           _unwrap = maybe (1, one') go

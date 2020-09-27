@@ -31,6 +31,8 @@ import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix)
 
+-- | A function that converts a number in words in /cardinal/ form to /ordinal/
+-- form according to the /English/ language rules.
 $(pure [ordinizeFromDict "ordinize'" [
     ("one", "first")
   , ("two", "second")
@@ -50,15 +52,19 @@ $(pure [ordinizeFromDict "ordinize'" [
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
+-- | The words used to mark a negative number in the /English/ language.
 negativeWord' :: Text
 negativeWord' = "minus"
 
+-- | The word used for the number /zero/ in the /English/ language.
 zeroWord' :: Text
 zeroWord' = "zero"
 
+-- | The word used for the number /one/ in the /English/ language.
 oneWord' :: Text
 oneWord' = "one"
 
+-- | A 'Vector' that contains the word used for the numbers /two/ to /twenty/ in the /English/ language.
 lowWords' :: Vector Text
 lowWords' = [
     "two"
@@ -82,6 +88,8 @@ lowWords' = [
   , "twenty"
   ]
 
+-- | A list of 2-tuples that contains the names of values between /thirty/ and
+-- /thousand/ in the /English/ language.
 midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "thousand")
@@ -95,15 +103,8 @@ midWords' = [
   , (30, "thirty")
   ]
 
-ordinalSuffix :: Integral i => i -> Text
-ordinalSuffix n
-    | _rem10 (_div10 n) == 1 = "th"
-    | otherwise = go (_rem10 n)
-    where go 1 = "st"
-          go 2 = "nd"
-          go 3 = "rd"
-          go _ = "th"
-
+-- | A merge function that is used to combine the names of words together to
+-- larger words, according to the /English/ grammar rules.
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < 100 = const id
 merge' l r | 100 > l && l > r = _mergeWithHyphen
@@ -111,5 +112,7 @@ merge' l r | 100 > l && l > r = _mergeWithHyphen
            | r > l = _mergeWithSpace
 merge' _ _ = _mergeWith ", "
 
+-- | An algorithm to obtain the names of /large/ numbers (one million or larger)
+-- in /English/. English uses a /short scale/ with the @illion@ suffix.
 highWords' :: HighNumberAlgorithm
 highWords' = ShortScale "illion"

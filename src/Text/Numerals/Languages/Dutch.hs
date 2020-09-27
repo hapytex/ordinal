@@ -52,6 +52,8 @@ $(pure [ordinizeFromDict "_ordinize'" [
   , ("rd", "rdst")
   ]])
 
+-- | A function that converts a number in words in /cardinal/ form to /ordinal/
+-- form according to the /Dutch/ language rules.
 ordinize' :: Text -> Text
 ordinize' = (`snoc` 'e') . _ordinize'
 
@@ -59,15 +61,19 @@ ordinize' = (`snoc` 'e') . _ordinize'
 dutch :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
+-- | The words used to mark a negative number in the /Dutch/ language.
 negativeWord' :: Text
 negativeWord' = "min"
 
+-- | The word used for the number /zero/ in the /Dutch/ language.
 zeroWord' :: Text
 zeroWord' = "nul"
 
+-- | The word used for the number /one/ in the /Dutch/ language.
 oneWord' :: Text
 oneWord' = "één"
 
+-- | A 'Vector' that contains the word used for the numbers /two/ to /twenty/ in the /Dutch/ language.
 lowWords' :: Vector Text
 lowWords' = [
     "twee"
@@ -91,6 +97,8 @@ lowWords' = [
   , "twintig"
   ]
 
+-- | A list of 2-tuples that contains the names of values between /thirty/ and
+-- /thousand/ in the /Dutch/ language.
 midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "duizend")
@@ -115,6 +123,8 @@ _leftAnd n | 2 <- n = addE
            | otherwise = (<> "en")
            where addE = (<> "ën")
 
+-- | A merge function that is used to combine the names of words together to
+-- larger words, according to the /Dutch/ grammar rules.
 merge' :: Integral i => i -> i -> Text -> Text -> Text
 merge' 1 r | r < _million = const id
 merge' l r | r > l && r > _million = _mergeWithSpace
@@ -124,5 +134,8 @@ merge' l r | r > l && r > _million = _mergeWithSpace
            | otherwise = (<>)
     where go tl tr = _leftAnd r tr <> _rightAnd l tl
 
+-- | An algorithm to obtain the names of /large/ numbers (one million or larger)
+-- in /Dutch/. Dutch uses a /long scale/ with the @iljoen@ and @iljard@
+-- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' = LongScale "iljoen" "iljard"
