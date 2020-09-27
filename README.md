@@ -1,4 +1,5 @@
 # ordinal
+
 [![Build Status of the package by Travis](https://travis-ci.com/hapytex/ordinal.svg?branch=master)](https://travis-ci.com/hapytex/ordinal)
 [![Build Status of the package by Hackage](https://matrix.hackage.haskell.org/api/v2/packages/ordinal/badge)](https://matrix.hackage.haskell.org/#/package/ordinal)
 [![Hackage version badge](https://img.shields.io/hackage/v/ordinal.svg)](https://hackage.haskell.org/package/ordinal)
@@ -8,6 +9,14 @@ algorithmic conversion that can convert the number for *most* languages.
 It converts numbers to its *canonical* and *ordinal* format.
 
 The package is based on Python's [**`num2words`** package \[GitHub\]](https://github.com/savoirfairelinux/num2words).
+
+The following languages are currently supported (in *alphabetical* order):
+
+ 1. Dutch (nl)
+ 2. English (en)
+ 3. French (fr)
+
+## Module structure
 
 ## `ordinal` is not *safe* Haskell
 
@@ -22,3 +31,6 @@ repository*](https://github.com/hapytex/ordinal).
 You can contact the package maintainer by sending a mail to
 [`hapytexeu+gh@gmail.com`](mailto:hapytexeu+gh@gmail.com).
 
+---
+
+This package is dedicated to ???

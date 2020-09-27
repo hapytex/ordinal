@@ -29,7 +29,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(valueSplit)
+import Text.Numerals.Class(FreeMergerFunction, valueSplit)
 import Text.Numerals.Internal(_divisable100, _hundred, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _million, _stripLastIf, _thousand)
 
 $(pure [ordinizeFromDict "_ordinize'" [
@@ -41,15 +41,19 @@ $(pure [ordinizeFromDict "_ordinize'" [
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
 
+-- | The words used to mark a negative number in the /French/ language.
 negativeWord' :: Text
 negativeWord' = "moins"
 
+-- | The word used for the number /zero/ in the /French/ language.
 zeroWord' :: Text
 zeroWord' = "zéro"
 
+-- | The word used for the number /one/ in the /French/ language.
 oneWord' :: Text
 oneWord' = "un"
 
+-- | A 'Vector' that contains the word used for the numbers /two/ to /twenty/ in the /French/ language.
 lowWords' :: Vector Text
 lowWords' = [
     "deux"
@@ -73,6 +77,8 @@ lowWords' = [
   , "vingt"
   ]
 
+-- | A list of 2-tuples that contains the names of values between /thirty/ and
+-- /thousand/ in the /French/ language.
 midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "mille")
@@ -84,7 +90,9 @@ midWords' = [
   , (30, "trente")
   ]
 
-merge' :: Integral i => i -> i -> Text -> Text -> Text
+-- | A merge function that is used to combine the names of words together to
+-- larger words, according to the /French/ grammar rules.
+merge' :: FreeMergerFunction
 merge' 1 r | r < _million = const id
            | otherwise = _merge' 1 r
 merge' l r = \ta tb -> _merge' l r (_firstWithoutS l r ta) (_secondWithS l r tb)
@@ -104,9 +112,14 @@ _merge' l r | r >= l || l >= 100 = _mergeWithSpace
             | r `mod` 10 == 1 && l /= 80 = _mergeWith " et "
             | otherwise = _mergeWithHyphen
 
+-- | A function that converts a number in words in /cardinal/ form to /ordinal/
+-- form according to the /French/ language rules.
 ordinize' :: Text -> Text
 ordinize' "zéro" = "premier"
 ordinize' t = _stripLastIf 'e' (_ordinize' t) <> "ième"
 
+-- | An algorithm to obtain the names of /large/ numbers (one million or larger)
+-- in /French/. French uses a /long scale/ with the @illion@ and @illiard@
+-- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
