@@ -50,7 +50,7 @@ $(pure [ordinizeFromDict "_ordinize'" [
   , ("end", "endst")
   , ("joen", "joenst")
   , ("rd", "rdst")
-  ]])
+  ] 'id])
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /Dutch/ language rules.

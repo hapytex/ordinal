@@ -35,7 +35,7 @@ import Text.Numerals.Internal(_divisable100, _hundred, _mergeWith, _mergeWithSpa
 $(pure [ordinizeFromDict "_ordinize'" [
     ("cinq", "cinqu")
   , ("neuf", "neuv")
-  ]])
+  ] 'id])
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.

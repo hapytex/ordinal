@@ -24,12 +24,18 @@ module Text.Numerals.Languages.English (
   ) where
 
 import Data.Text(Text, isSuffixOf)
+import qualified Data.Text as T
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix)
+
+_ordinizepp :: Text -> Text
+_ordinizepp t
+    | isSuffixOf "y" t = T.init t <> "ieth"
+    | otherwise = t <> "th"
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /English/ language rules.
@@ -46,7 +52,7 @@ $(pure [ordinizeFromDict "ordinize'" [
   , ("ten", "tenth")
   , ("eleven", "eleventh")
   , ("twelve", "twelfth")
-  ]])
+  ] '_ordinizepp])
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.

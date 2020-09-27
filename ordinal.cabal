@@ -41,11 +41,17 @@ test-suite             cardinal
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   hs-source-dirs:      test
+  other-modules:
+      Text.Numerals.LanguageTest
+      Text.Numerals.Languages.DutchSpec
+      Text.Numerals.Languages.EnglishSpec
+      Text.Numerals.Languages.FrenchSpec
   build-depends:
       base
     , ordinal
     , hspec ==2.*
     , QuickCheck >=2.13 && <2.14
+    , text >= 0.1
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   default-language:    Haskell2010
   default-extensions:
