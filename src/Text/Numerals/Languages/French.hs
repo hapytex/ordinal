@@ -105,7 +105,8 @@ _merge' l r | r >= l || l >= 100 = _mergeWithSpace
             | otherwise = _mergeWithHyphen
 
 ordinize' :: Text -> Text
-ordinize' = (<> "ième") . _stripLastIf 'e' . _ordinize'
+ordinize' "zéro" = "premier"
+ordinize' t = _stripLastIf 'e' (_ordinize' t) <> "ième"
 
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
