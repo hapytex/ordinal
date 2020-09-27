@@ -18,6 +18,26 @@ The following languages are currently supported (in *alphabetical* order):
 
 ## Module structure
 
+The modules are all located under `Text.Numerals` module. The Text.Numerals`
+module exports the main modules.
+
+The `Text.Numerals.Class` module defines classes, data types and synonyms that
+provide an interface to convert numbers to words.
+
+The `Text.Numerals.Algorithm` module contains algorithms to make converting
+numbers to words more convienient. The module `Text.Numerals.Algorithm.Template`
+contains functions for *template Haskell*, at the moment this only contains a
+function to make an `ordinize` function.
+
+The `Text.Numerals.Prefix` module contains numerical prefixes. At the moment
+only *Latin* prefixes. These are used for *short scale* and *long scale*
+algorithms to specify millions, billions, etc. in languages.
+
+The `Text.Numerals.Languages` module exports for each implemented language its
+algorithm, this makes working with multiple languages more convienient. Under
+this module there are dedicated modules per language that do not only export the
+algorithm for that language, but also helper functions and constants.
+
 ## `ordinal` is not *safe* Haskell
 
 The package uses the `Data.Vector` module which is not safe, and therefore
