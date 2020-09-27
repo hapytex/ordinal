@@ -23,13 +23,14 @@ module Text.Numerals.Languages.French (
   , merge'
   ) where
 
-import Data.Text(Text)
+import Data.Text(Text, isSuffixOf, snoc)
+import qualified Data.Text as T
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWith')
+import Text.Numerals.Internal(_divisable100, _hundred, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _million, _stripLastIf, _thousand)
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
@@ -78,16 +79,28 @@ midWords' = [
   , (30, "trente")
   ]
 
--- TODO
 merge' :: Integral i => i -> i -> Text -> Text -> Text
-merge' 1 r | r < 100 = const id
-merge' l r | 100 > l && l > r = _mergeWith' '-'
-           | l >= 100 && 100 > r = _mergeWith " et "
-           | r > l = _mergeWithSpace
-merge' _ _ = _mergeWithSpace
+merge' 1 r | r < _million = const id
+           | otherwise = _merge' 1 r
+merge' l r = \ta tb -> _merge' l r (_firstWithoutS l r ta) (_secondWithS l r tb)
+
+_firstWithoutS :: Integral i => i -> i -> Text -> Text
+_firstWithoutS l r t
+    | (_divisable100 (l + 20) || (_divisable100 l && l < _thousand)) && r < _million = _stripLastIf 's' t
+    | otherwise = t
+
+_secondWithS :: Integral i => i -> i -> Text -> Text
+_secondWithS l r t
+    | l < _thousand && r /= _thousand && (_divisable100 r) && not (isSuffixOf "s" t) = snoc t 's'
+    | otherwise = t
+
+_merge' :: Integral i => i -> i -> Text -> Text -> Text
+_merge' l r | r >= l || l >= 100 = _mergeWithSpace
+            | r `mod` 10 == 1 && l /= 80 = _mergeWith " et "
+            | otherwise = _mergeWithHyphen
 
 ordinize' :: Text -> Text
-ordinize' t = t
+ordinize' = (<> "ième") . _stripLastIf 'e'
 
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"

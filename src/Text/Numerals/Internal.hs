@@ -1,15 +1,22 @@
 {-# LANGUAGE NumericUnderscores, Safe #-}
 
 module Text.Numerals.Internal (
-    _div10, _rem10
+    _div10, _rem10, _divisableBy, _divisable100
   , _showText
   , _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix
-  , _thousand, _million, _billion, _trillion
+  , _hundred, _thousand, _million, _billion, _trillion
   , _iLog, _iLogFloor
+  , _stripLastIf
   ) where
 
-import Data.Text(Text, cons, dropEnd, pack)
+import Data.Text(Text, cons, dropEnd, isSuffixOf, singleton, pack)
 import qualified Data.Text as T
+
+
+_stripLastIf :: Char -> Text -> Text
+_stripLastIf c t
+    | isSuffixOf (singleton c) t = T.init t
+    | otherwise = t
 
 _mergeWith' :: Char -> Text -> Text -> Text
 _mergeWith' m = (. cons m) . (<>)
@@ -26,11 +33,23 @@ _mergeWith m = (<>) . (<> m)
 _showText :: Show a => a -> Text
 _showText = pack . show
 
+_divisableBy :: Integral i => i -> i -> Bool
+_divisableBy n = (0 ==) . (`mod` n)
+
+_divisable100 :: Integral i => i -> Bool
+_divisable100 = _divisableBy _hundred
+
 _div10 :: Integral i => i -> i
-_div10 = (`div` 10)
+_div10 = (`div` _ten)
 
 _rem10 :: Integral i => i -> i
-_rem10 = (`rem` 10)
+_rem10 = (`rem` _ten)
+
+_ten :: Integral i => i
+_ten = 10
+
+_hundred :: Integral i => i
+_hundred = 100
 
 _thousand :: Integral i => i
 _thousand = 1000
