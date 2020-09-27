@@ -1,13 +1,22 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
 
+{-|
+Module      : Text.Numerals.Algorithm.Template
+Description : A module that constructs template Haskell to make defining an ordinize function more convenient.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+The module is designed to construct an 'Exp' based on the mapping data provided. It will check if the text object
+ends with the given suffix, and replace the suffix with another suffix. It aims to compile this into an efficient function.
+-}
+
 module Text.Numerals.Algorithm.Template (
     ordinizeFromDict
   ) where
 
-import Control.Applicative(liftA2)
-
 import Data.Map.Strict(Map, elems, fromListWith)
-import Data.Text(Text, isSuffixOf, pack, snoc)
+import Data.Text(isSuffixOf, pack, snoc)
 
 import Text.Numerals.Internal(_replaceSuffix)
 
@@ -43,7 +52,13 @@ _ordinizeMap n = fromListWith f . map (uncurry (_ordinizeSingle n))
 _toGuard :: ([Exp], Exp) -> (Guard, Exp)
 _toGuard (gs, es) = (_orCondition gs, es)
 
-ordinizeFromDict :: String -> [(String, String)] -> Dec
+-- | Construct a function with the given name that maps suffixes in the first
+-- item of the 2-tuples to the second item of the 2-tuples. It turns this into a
+-- declaration.
+ordinizeFromDict
+  :: String  -- ^ The name of the function, often this is just @ordinize'@
+  -> [(String, String)]  -- ^ The list of suffixes and their corresponding mapping, the suffixes should be non-overlapping.
+  -> Dec  -- ^ The corresponding declaration.
 ordinizeFromDict nm ts = FunD (mkName nm) [Clause [VarP t] (GuardedB (map _toGuard (elems (_ordinizeMap t' ts)) ++ [(NormalG (ConE 'True), t')])) []]
     where t = mkName "t"
           t' = VarE t
