@@ -91,7 +91,7 @@ _firstWithoutS l r t
 
 _secondWithS :: Integral i => i -> i -> Text -> Text
 _secondWithS l r t
-    | l < _thousand && r /= _thousand && (_divisable100 r) && not (isSuffixOf "s" t) = snoc t 's'
+    | l < _thousand && r /= _thousand && _divisable100 r && not ("s" `isSuffixOf` t) = snoc t 's'
     | otherwise = t
 
 _merge' :: Integral i => i -> i -> Text -> Text -> Text

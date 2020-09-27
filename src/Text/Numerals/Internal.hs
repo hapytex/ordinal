@@ -15,7 +15,7 @@ import qualified Data.Text as T
 
 _stripLastIf :: Char -> Text -> Text
 _stripLastIf c t
-    | isSuffixOf (singleton c) t = T.init t
+    | singleton c `isSuffixOf` t = T.init t
     | otherwise = t
 
 _mergeWith' :: Char -> Text -> Text -> Text
