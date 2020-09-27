@@ -22,24 +22,18 @@ import Data.Text(Text, cons, isSuffixOf, pack, snoc)
 import Data.Vector(Vector, (!), fromList)
 import qualified Data.Vector as V
 
-import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), ValueSplit(valueSplit))
+import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), FreeMergerFunction, FreeValueSplitter, MergerFunction, MNumberSegment, NumberSegment(NumberSegment), NumberSegmenting, ValueSplit(valueSplit))
 import Text.Numerals.Internal(_million, _replaceSuffix, _thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefix)
 
-
-type MergerFunction i = i -> i -> Text -> Text -> Text
-type FreeMergerFunction = forall i . Integral i => MergerFunction i
-type ValueSplitter i = i -> Maybe (i, Text)
-type FreeValueSplitter = forall i . Integral i => ValueSplitter i
-type NumberSegmenting i = i -> NumberSegment i
 
 data NumeralsAlgorithm = NumeralsAlgorithm {
     minusWord :: Text
   , oneWord :: Text
   , lowWords :: Vector Text
   , midWords :: [(Integer, Text)]
-  , highWords :: forall i . Integral i => i -> Maybe (i, Text)
-  , mergeFunction :: forall i . Integral i => MergerFunction i
+  , highWords :: FreeValueSplitter
+  , mergeFunction :: FreeMergerFunction
   , ordinize :: Text -> Text
   }
 
@@ -87,14 +81,7 @@ instance ValueSplit HighNumberAlgorithm where
 numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one lowWords midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords))
 
-data NumberSegment i = NumberSegment {
-      segmentDivision :: MNumberSegment i
-    , segmentValue :: i
-    , segmentText :: Text
-    , segmentRemainder ::  MNumberSegment i
-    } deriving (Eq, Ord, Read, Show)
 
-type MNumberSegment i = Maybe (NumberSegment i)
 
 _maybeSegment :: Integral i => (i -> NumberSegment i) -> i -> MNumberSegment i
 _maybeSegment f = go
