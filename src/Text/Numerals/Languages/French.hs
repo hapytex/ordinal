@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.French
@@ -31,6 +31,11 @@ import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_divisable100, _hundred, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _million, _stripLastIf, _thousand)
+
+$(pure [ordinizeFromDict "_ordinize'" [
+    ("cinq", "cinqu")
+  , ("neuf", "neuv")
+  ]])
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
@@ -100,7 +105,7 @@ _merge' l r | r >= l || l >= 100 = _mergeWithSpace
             | otherwise = _mergeWithHyphen
 
 ordinize' :: Text -> Text
-ordinize' = (<> "ième") . _stripLastIf 'e'
+ordinize' = (<> "ième") . _stripLastIf 'e' . _ordinize'
 
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
