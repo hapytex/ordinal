@@ -33,4 +33,5 @@ You can contact the package maintainer by sending a mail to
 
 ---
 
-This package is dedicated to ???
+This package is dedicated to *Wouter Folens* (\* 2019), in the hope that he will
+learn about transforming numbers into words.
