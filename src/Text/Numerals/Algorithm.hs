@@ -38,7 +38,7 @@ import Text.Numerals.Internal(_thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefixes)
 
 -- | A data type for algorithmic number to word conversions. Most western
--- languages likely can work with this data type.
+-- languages /likely/ can work with this data type.
 data NumeralsAlgorithm = NumeralsAlgorithm {
     minusWord :: Text  -- ^ The word used as prefix to denote negative numbers.
   , oneWord :: Text  -- ^ The word used to denote /one/ in the language.
@@ -72,13 +72,11 @@ data HighNumberAlgorithm
   | LongScale Text Text
   deriving (Eq, Ord, Read, Show)
 
--- | Construct a 'FreeValueSplitter' function for the given suffix for a /short
--- scale/.
+-- | Construct a 'FreeValueSplitter' function for the given suffix for a /short scale/.
 shortScale :: Text -> FreeValueSplitter
 shortScale = valueSplit . ShortScale
 
--- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long
--- scale/.
+-- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long scale/.
 longScale :: Text -> Text -> FreeValueSplitter
 longScale suf1 = valueSplit . LongScale suf1
 

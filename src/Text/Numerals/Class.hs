@@ -67,8 +67,8 @@ data NumberType
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   deriving (Bounded, Enum, Eq, Ord)
 
--- | A type class used for num to word algorithms. It maps an 'Integral' type i
--- to 'Text'.
+-- | A type class used for num to word algorithms. It maps an 'Integral' type
+-- @i@ to 'Text'.
 class NumToWord a where
     -- | Convert the given number to a 'Text' object that is the given number in
     -- words.
