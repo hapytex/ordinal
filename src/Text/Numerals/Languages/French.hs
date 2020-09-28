@@ -30,7 +30,7 @@ import Data.Vector(Vector)
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction, valueSplit)
-import Text.Numerals.Internal(_divisable100, _hundred, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _million, _stripLastIf, _thousand)
+import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 
 $(pure [ordinizeFromDict "_ordinize'" [
     ("cinq", "cinqu")

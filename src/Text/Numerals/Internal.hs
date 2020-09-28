@@ -12,7 +12,6 @@ module Text.Numerals.Internal (
 import Data.Text(Text, cons, dropEnd, isSuffixOf, singleton, pack)
 import qualified Data.Text as T
 
-
 _stripLastIf :: Char -> Text -> Text
 _stripLastIf c t
     | singleton c `isSuffixOf` t = T.init t

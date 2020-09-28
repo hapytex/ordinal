@@ -1,4 +1,6 @@
-module Text.Numerals.Languages.DutchSpec where
+module Text.Numerals.Languages.DutchSpec (
+    spec
+  ) where
 
 import Data.Text(Text)
 

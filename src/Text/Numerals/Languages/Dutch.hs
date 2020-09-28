@@ -23,13 +23,13 @@ module Text.Numerals.Languages.Dutch (
   , merge'
   ) where
 
-import Data.Text(Text, isSuffixOf, snoc)
+import Data.Text(Text, snoc)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_million, _mergeWith, _mergeWithSpace, _mergeWith')
+import Text.Numerals.Internal(_million, _mergeWithSpace)
 
 $(pure [ordinizeFromDict "_ordinize'" [
     ("nul", "nuld")

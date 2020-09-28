@@ -26,17 +26,15 @@ module Text.Numerals.Algorithm (
 --  , _toNumberScale
   ) where
 
-import Control.Applicative(liftA2)
-
 import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
-import Data.Text(Text, cons, isSuffixOf, pack, snoc)
+import Data.Text(Text, cons)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
 import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), FreeMergerFunction, FreeValueSplitter, MergerFunction, MNumberSegment, NumberSegment(NumberSegment), NumberSegmenting, ValueSplit(valueSplit), ValueSplitter)
-import Text.Numerals.Internal(_million, _replaceSuffix, _thousand, _iLogFloor)
+import Text.Numerals.Internal(_thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefixes)
 
 -- | A data type for algorithmic number to word conversions. Most western

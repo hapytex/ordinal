@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 {-|
 Module      : Text.Numerals.Prefix
@@ -10,7 +10,6 @@ Portability : POSIX
 A module that defines /Latin/ prefixes. These prefixes are used to construct names for the /long/ and /short scales/.
 So the /m/, /b/, /tr/ in /million/, /billion/, /trillion/.
 -}
-
 
 module Text.Numerals.Prefix (
     -- * Latin prefixes

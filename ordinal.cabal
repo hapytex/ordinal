@@ -1,7 +1,13 @@
 name:                ordinal
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis:            Convert numbers to words in different languages.
+description:
+    A package based on Python's num2words package that converts numbers
+    to words in different languages.
+
+    It contains functions and data types to create a numbers-to-words
+    algorithm for different languages, and converts numbers both to
+    cardinal numbers and ordinal numbers.
 homepage:            https://github.com/hapytex/ordinal#readme
 license:             BSD3
 license-file:        LICENSE
@@ -27,8 +33,6 @@ library
     , Text.Numerals.Prefix
   other-modules:
       Text.Numerals.Internal
-  ghc-options:
-      -ddump-splices
   build-depends:
       base >= 4.7 && < 5
     , text >= 0.1

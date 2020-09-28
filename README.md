@@ -34,7 +34,7 @@ the source code of the language modules.
 
 ## Package structure
 
-The modules are all located under `Text.Numerals` module. The Text.Numerals`
+The modules are all located under `Text.Numerals` module. The `Text.Numerals`
 module exports the main modules.
 
 The `Text.Numerals.Class` module defines classes, data types and synonyms that
@@ -45,7 +45,7 @@ numbers to words more convienient. The module `Text.Numerals.Algorithm.Template`
 contains functions for *template Haskell*, at the moment this only contains a
 function to make an `ordinize` function.
 
-The `Text.Numerals.Prefix` module contains numerical prefixes. At the moment
+The `Text.Numerals.Prefix` module contains numerical prefixes, at the moment
 only *Latin* prefixes. These are used for *short scale* and *long scale*
 algorithms to specify millions, billions, etc. in languages.
 

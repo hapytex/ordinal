@@ -30,7 +30,7 @@ import Data.Vector(Vector)
 import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix)
+import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWithHyphen)
 
 _ordinizepp :: Text -> Text
 _ordinizepp t

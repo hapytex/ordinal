@@ -1,4 +1,6 @@
-module Text.Numerals.Languages.EnglishSpec where
+module Text.Numerals.Languages.EnglishSpec (
+    spec
+  ) where
 
 import Data.Text(Text)
 

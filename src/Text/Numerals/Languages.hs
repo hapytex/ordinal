@@ -8,7 +8,6 @@ Portability : POSIX
 This module imports the /num to word/ algorithms and re-exports these algorithms. The module thus can be used to conveniently import algorithms for all supported languages.
 -}
 
-
 module Text.Numerals.Languages (
     dutch, english, french
   ) where

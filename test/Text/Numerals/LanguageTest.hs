@@ -1,9 +1,11 @@
-module Text.Numerals.LanguageTest where
+module Text.Numerals.LanguageTest (
+    testLanguage
+  ) where
 
 import Data.Text(Text)
 
-import Test.Hspec
-import Test.QuickCheck
+import Test.Hspec(SpecWith, describe, it, shouldBe)
+import Test.QuickCheck(property)
 
 import Text.Numerals.Class(toCardinal, toOrdinal)
 import Text.Numerals.Algorithm(NumeralsAlgorithm)
