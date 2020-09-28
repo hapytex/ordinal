@@ -12,20 +12,20 @@ The package is based on Python's [**`num2words`** package \[GitHub\]](https://gi
 
 The following languages are currently supported (in *alphabetical* order):
 
- 1. Dutch (nl)
- 2. English (en)
+ 1. Dutch (nl);
+ 2. English (en); and
  3. French (fr)
 
 ## Usage
 
-One can import the `Text.Numerals.Languages` module, and use the `toCardinal`
+One can import the `Text.Numerals` module, and use the `toCardinal`
 and `toOrdinal` functions with a number-to-word algorithm that is exported by
 the `Text.Numerals.Languages` module, for example:
 
 ```
-Prelude Text.Numerals.Languages Data.Text.IO> Data.Text.IO.putStrLn (toCardinal english 42)
+Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toCardinal english 42)
 forty-two
-Prelude Text.Numerals.Languages Data.Text.IO> Data.Text.IO.putStrLn (toOrdinal french 42)
+Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toOrdinal french 42)
 quarante-deuxième
 ```
 

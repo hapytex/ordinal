@@ -115,7 +115,7 @@ _merge' l r | r >= l || l >= 100 = _mergeWithSpace
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /French/ language rules.
 ordinize' :: Text -> Text
-ordinize' "zéro" = "premier"
+ordinize' "un" = "premier"
 ordinize' t = _stripLastIf 'e' (_ordinize' t) <> "ième"
 
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)
