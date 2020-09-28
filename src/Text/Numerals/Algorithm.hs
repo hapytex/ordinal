@@ -23,6 +23,7 @@ module Text.Numerals.Algorithm (
   , toSegmentLow, toSegmentMid, toSegmentHigh
     -- * Segment compression
   , compressSegments
+--  , _toNumberScale
   ) where
 
 import Control.Applicative(liftA2)
@@ -31,12 +32,12 @@ import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
 import Data.Text(Text, cons, isSuffixOf, pack, snoc)
-import Data.Vector(Vector, (!), fromList)
+import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
 import Text.Numerals.Class(NumToWord(toCardinal, toOrdinal), FreeMergerFunction, FreeValueSplitter, MergerFunction, MNumberSegment, NumberSegment(NumberSegment), NumberSegmenting, ValueSplit(valueSplit), ValueSplitter)
 import Text.Numerals.Internal(_million, _replaceSuffix, _thousand, _iLogFloor)
-import Text.Numerals.Prefix(latinPrefix)
+import Text.Numerals.Prefix(latinPrefixes)
 
 -- | A data type for algorithmic number to word conversions. Most western
 -- languages likely can work with this data type.
@@ -84,7 +85,7 @@ longScale :: Text -> Text -> FreeValueSplitter
 longScale suf1 = valueSplit . LongScale suf1
 
 _highWithSuffix :: Text -> Int -> Maybe Text
-_highWithSuffix suf = fmap (<> suf) . latinPrefix
+_highWithSuffix suf = fmap (<> suf) . (latinPrefixes !?)
 
 _highToText :: HighNumberAlgorithm -> Int -> Maybe Text
 _highToText (ShortScale suf) j = _highWithSuffix suf j
@@ -94,10 +95,8 @@ _highToText (LongScale suf1 suf2) j
     where k = div j 2
 
 instance ValueSplit HighNumberAlgorithm where
-    valueSplit vs i = go
-        where go | j < 0 = Nothing
-                 | otherwise = (m,) <$> _highToText vs j
-              ~(j, m) = _toNumberScale i
+    valueSplit vs i = (m,) <$> _highToText vs (j-2)
+        where ~(j, m) = _toNumberScale i
 
 -- | A /smart constructor/ for the 'NumeralsAlgorithm' type. This constructor
 -- allows one to use an arbitrary 'Foldable' type for the low words and mid

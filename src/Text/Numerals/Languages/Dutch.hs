@@ -92,7 +92,7 @@ lowWords' = [
   , "vijftien"
   , "zestien"
   , "zeventien"
-  , "achtien"
+  , "achttien"
   , "negentien"
   , "twintig"
   ]
@@ -126,12 +126,18 @@ _leftAnd n | 2 <- n = addE
 -- | A merge function that is used to combine the names of words together to
 -- larger words, according to the /Dutch/ grammar rules.
 merge' :: Integral i => i -> i -> Text -> Text -> Text
-merge' 1 r | r < _million = const id
-merge' l r | r > l && r > _million = _mergeWithSpace
-           | r > l = (<>)
-           | r < 10 && 10 < l && l < 100 = go
-           | l > _million = _mergeWithSpace
-           | otherwise = (<>)
+merge' 1 r
+    | r < _million = const id
+    | otherwise = const (_merge' 1 r "een")
+merge' l r = _merge' l r
+
+_merge' :: Integral i => i -> i -> Text -> Text -> Text
+_merge' l r
+    | r > l && r >= _million = _mergeWithSpace
+    | r > l = (<>)
+    | r < 10 && 10 < l && l < 100 = go
+    | l >= _million = _mergeWithSpace
+    | otherwise = (<>)
     where go tl tr = _leftAnd r tr <> _rightAnd l tl
 
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)

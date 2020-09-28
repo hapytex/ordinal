@@ -6,7 +6,7 @@
 
 A package to convert numbers to the words. It contains a datatype for
 algorithmic conversion that can convert the number for *most* languages.
-It converts numbers to its *canonical* and *ordinal* format.
+It converts numbers to its *cardinal* and *ordinal* format.
 
 The package is based on Python's [**`num2words`** package \[GitHub\]](https://github.com/savoirfairelinux/num2words).
 
@@ -16,7 +16,23 @@ The following languages are currently supported (in *alphabetical* order):
  2. English (en)
  3. French (fr)
 
-## Module structure
+## Usage
+
+One can import the `Text.Numerals.Languages` module, and use the `toCardinal`
+and `toOrdinal` functions with a number-to-word algorithm that is exported by
+the `Text.Numerals.Languages` module, for example:
+
+```
+Prelude Text.Numerals.Languages Data.Text.IO> Data.Text.IO.putStrLn (toCardinal english 42)
+forty-two
+Prelude Text.Numerals.Languages Data.Text.IO> Data.Text.IO.putStrLn (toOrdinal french 42)
+quarante-deuxième
+```
+
+One can also define a language algorithm themselves, for this one can look at
+the source code of the language modules.
+
+## Package structure
 
 The modules are all located under `Text.Numerals` module. The Text.Numerals`
 module exports the main modules.
