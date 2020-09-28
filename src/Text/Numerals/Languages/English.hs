@@ -34,7 +34,7 @@ import Text.Numerals.Internal(_div10, _rem10, _showText, _mergeWith, _mergeWithS
 
 _ordinizepp :: Text -> Text
 _ordinizepp t
-    | isSuffixOf "y" t = T.init t <> "ieth"
+    | "y" `isSuffixOf` t = T.init t <> "ieth"
     | otherwise = t <> "th"
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
