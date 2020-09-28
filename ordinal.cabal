@@ -16,7 +16,9 @@ maintainer:          hapytexteu+gh@gmail.com
 copyright:           2020 Willem Van Onsem
 category:            utils
 build-type:          Simple
-extra-source-files:  README.md
+extra-source-files:
+    README.md
+  , CHANGELOG.md
 cabal-version:       >=1.10
 
 library
