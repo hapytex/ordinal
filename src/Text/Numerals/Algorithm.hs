@@ -23,7 +23,6 @@ module Text.Numerals.Algorithm (
   , toSegmentLow, toSegmentMid, toSegmentHigh
     -- * Segment compression
   , compressSegments
---  , _toNumberScale
   ) where
 
 import Data.Foldable(toList)
@@ -56,7 +55,7 @@ instance NumToWord NumeralsAlgorithm where
                   | i < 0 = minusWord <> cons ' ' (go (-j))
                   | otherwise = go j
                   where go = compressSegments oneWord mergeFunction . toSegments lowWords midWords highWords
-                        j = (fromIntegral i) :: Integer
+                        j = fromIntegral i :: Integer
 
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
