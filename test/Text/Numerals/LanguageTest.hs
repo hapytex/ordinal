@@ -2,7 +2,9 @@ module Text.Numerals.LanguageTest (
     testLanguage
   ) where
 
+import Data.Int(Int8, Int16, Int32, Int64)
 import Data.Text(Text)
+import Data.Word(Word8, Word16, Word32, Word64)
 
 import Test.Hspec(SpecWith, describe, it, shouldBe)
 import Test.QuickCheck(property)
@@ -25,6 +27,12 @@ testDifferCardinalOrdinal' al n1 n2 = toCardinal al n1 /= toOrdinal al n2
 testNumberConversion :: (Integer -> Text) -> Integer -> Text -> SpecWith ()
 testNumberConversion f n t = it (show n) (f n `shouldBe` t)
 
+testEquivalenceCardinal :: Integral i => NumeralsAlgorithm -> i -> Bool
+testEquivalenceCardinal al i = toCardinal al i == toCardinal al (fromIntegral i :: Integer)
+
+testEquivalenceOrdinal :: Integral i => NumeralsAlgorithm -> i -> Bool
+testEquivalenceOrdinal al i = toOrdinal al i == toOrdinal al (fromIntegral i :: Integer)
+
 testLanguage :: String -> NumeralsAlgorithm -> [(Integer, Text)] -> [(Integer, Text)] -> SpecWith ()
 testLanguage languageName al cs os = describe languageName $ do
     describe "Automatied tests" $ do
@@ -32,5 +40,25 @@ testLanguage languageName al cs os = describe languageName $ do
         it "Different ordinal names" (property (testDifferOrdinal al))
         it "Difference between cardinal and ordinal names" (property (testDifferCardinalOrdinal al))
         it "Difference between cardinal and ordinal names with different number" (property (testDifferCardinalOrdinal' al))
+        it "Check toCardinal algorithm with Int" (property (testEquivalenceCardinal al :: Int -> Bool))
+        it "Check toCardinal algorithm with Int8" (property (testEquivalenceCardinal al :: Int8 -> Bool))
+        it "Check toCardinal algorithm with Int16" (property (testEquivalenceCardinal al :: Int16 -> Bool))
+        it "Check toCardinal algorithm with Int32" (property (testEquivalenceCardinal al :: Int32 -> Bool))
+        it "Check toCardinal algorithm with Int64" (property (testEquivalenceCardinal al :: Int64 -> Bool))
+        it "Check toCardinal algorithm with Word" (property (testEquivalenceCardinal al :: Word -> Bool))
+        it "Check toCardinal algorithm with Word8" (property (testEquivalenceCardinal al :: Word8 -> Bool))
+        it "Check toCardinal algorithm with Word16" (property (testEquivalenceCardinal al :: Word16 -> Bool))
+        it "Check toCardinal algorithm with Word32" (property (testEquivalenceCardinal al :: Word32 -> Bool))
+        it "Check toCardinal algorithm with Word64" (property (testEquivalenceCardinal al :: Word64 -> Bool))
+        it "Check toOrdinal algorithm with Int" (property (testEquivalenceOrdinal al :: Int -> Bool))
+        it "Check toOrdinal algorithm with Int8" (property (testEquivalenceOrdinal al :: Int8 -> Bool))
+        it "Check toOrdinal algorithm with Int16" (property (testEquivalenceOrdinal al :: Int16 -> Bool))
+        it "Check toOrdinal algorithm with Int32" (property (testEquivalenceOrdinal al :: Int32 -> Bool))
+        it "Check toOrdinal algorithm with Int64" (property (testEquivalenceOrdinal al :: Int64 -> Bool))
+        it "Check toOrdinal algorithm with Word" (property (testEquivalenceOrdinal al :: Word -> Bool))
+        it "Check toOrdinal algorithm with Word8" (property (testEquivalenceOrdinal al :: Word8 -> Bool))
+        it "Check toOrdinal algorithm with Word16" (property (testEquivalenceOrdinal al :: Word16 -> Bool))
+        it "Check toOrdinal algorithm with Word32" (property (testEquivalenceOrdinal al :: Word32 -> Bool))
+        it "Check toOrdinal algorithm with Word64" (property (testEquivalenceOrdinal al :: Word64 -> Bool))
     describe "Test cardinal numbers" (mapM_ (uncurry (testNumberConversion (toCardinal al))) cs)
     describe "Test ordinal numbers" (mapM_ (uncurry (testNumberConversion (toOrdinal al))) os)

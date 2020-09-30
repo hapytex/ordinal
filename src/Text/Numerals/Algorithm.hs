@@ -53,9 +53,10 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
 instance NumToWord NumeralsAlgorithm where
     toCardinal NumeralsAlgorithm { minusWord=minusWord, oneWord=oneWord, lowWords=lowWords, midWords=midWords, highWords=highWords, mergeFunction=mergeFunction } = cardinal
        where cardinal i
-                  | i < 0 = minusWord <> cons ' ' (go (-i))
-                  | otherwise = go i
+                  | i < 0 = minusWord <> cons ' ' (go (-j))
+                  | otherwise = go j
                   where go = compressSegments oneWord mergeFunction . toSegments lowWords midWords highWords
+                        j = (fromIntegral i) :: Integer
 
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
