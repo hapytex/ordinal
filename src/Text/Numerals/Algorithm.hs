@@ -56,7 +56,7 @@ instance NumToWord NumeralsAlgorithm where
                   | i < 0 = minusWord <> cons ' ' (go (-j))
                   | otherwise = go j
                   where go = compressSegments oneWord mergeFunction . toSegments lowWords midWords highWords
-                        j = (fromIntegral i) :: Integer
+                        j = fromIntegral i :: Integer
 
     toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
 
