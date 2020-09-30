@@ -23,7 +23,6 @@ module Text.Numerals.Algorithm (
   , toSegmentLow, toSegmentMid, toSegmentHigh
     -- * Segment compression
   , compressSegments
---  , _toNumberScale
   ) where
 
 import Data.Foldable(toList)
