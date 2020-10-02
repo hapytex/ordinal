@@ -67,6 +67,14 @@ repository*](https://github.com/hapytex/ordinal).
 You can contact the package maintainer by sending a mail to
 [`hapytexeu+gh@gmail.com`](mailto:hapytexeu+gh@gmail.com).
 
+### Adding a new language
+
+There is a `src/Text/Numerals/Languages/Language.hs.template` template file to
+include a new language. This includes a list of tasks to do in order to add the
+language. The `test/` directory contains a `test/Text/Numerals/Languages/LanguageSpec.hs.template`
+file to test the new language. In these templates, one needs to fill in the
+`???` parts.
+
 ---
 
 This package is dedicated to *Wouter Folens* (\* 2019), in the hope that he will
