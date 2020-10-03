@@ -25,6 +25,7 @@ module Text.Numerals.Languages.German (
   , merge'
   ) where
 
+import Data.Bool(bool)
 import Data.Text(Text, isSuffixOf, snoc)
 import qualified Data.Text as T
 import Data.Vector(Vector)
@@ -68,7 +69,7 @@ oneWord' = "eins"
 lowWords' :: Vector Text
 lowWords' = [
     "zwei"
-  , "drie"
+  , "drei"
   , "vier"
   , "fünf"
   , "sechs"
@@ -112,9 +113,20 @@ merge' 1 r | r < _million = const id
 merge' 1 r = const (_merge' 1 r "eine")
 merge' l r = _merge' l r
 
+_pluralize :: Text -> Text
+_pluralize t
+    | isSuffixOf "e" t = t <> "n"
+    | otherwise = t <> "en"
+
 _merge' :: FreeMergerFunction
-_merge' l r = (<>)
-_merge' l r = _mergeWithSpace
+_merge' l r
+    | r > l && r >= _million = (. bool id _pluralize (l > 1)) . _mergeWithSpace
+    | r > l = (<>)
+_merge' l 1 | 10 < l && l < 100 = const . ("eindund" <> )
+_merge' l r
+    | r < 10 && 10 < l && l < 100 = flip (_mergeWith "und")
+    | l >= _million = _mergeWithSpace
+    | otherwise = (<>)
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /???/ language rules.

@@ -317,7 +317,8 @@ cardinals = [
   ]
 
 ordinals :: [(Integer, Text)]
-ordinals = [
+ordinals = []
+{-
     (0, "nullte")
   , (1, "erste")
   , (2, "zweite")
@@ -620,3 +621,4 @@ ordinals = [
   , (70492524767089125814114, "siebzig trilliarden vierhundertzweiundneunzig trillionen fünfhundertvierundzwanzig billiarden siebenhundertsiebenundsechzig billionen neunundachtzig milliarden hundertfünfundzwanzig millionen achthundertvierzehntausendhundertvierzehnte")
   , (114059301025943970552219, "hundertvierzehn trilliarden neunundfünfzig trillionen dreihunderteins billiarden fünfundzwanzig billionen neunhundertdreiundvierzig milliarden neunhundertsiebzig millionen fünfhundertzweiundfünfzigtausendzweihundertneunzehnte")
   ]
+-}
