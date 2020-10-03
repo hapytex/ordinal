@@ -10,7 +10,7 @@ Portability : POSIX
 This module contains logic to convert numbers to words in the /???/ language.
 -}
 
--- TODO: Add to the Text.Numerals.Language module (remove note after adding it)
+-- TODO: Add to the Text.Numerals.Languages module (remove note after adding it)
 -- TODO: Add extra tests for the language (remove note after adding tests)
 -- TODO: Add the module to the *.cabal file (remove note after adding it)
 -- TODO: Add the language to the README.md (remove note after adding it)

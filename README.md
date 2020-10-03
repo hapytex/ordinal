@@ -13,8 +13,9 @@ The package is based on Python's [**`num2words`** package \[GitHub\]](https://gi
 The following languages are currently supported (in *alphabetical* order):
 
  1. Dutch (nl);
- 2. English (en); and
- 3. French (fr)
+ 2. English (en);
+ 3. French (fr);
+ 4. German (de)
 
 ## Usage
 

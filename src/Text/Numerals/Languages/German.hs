@@ -10,6 +10,8 @@ Portability : POSIX
 This module contains logic to convert numbers to words in the /German/ language.
 -}
 
+-- TODO: Add extra tests for the language (remove note after adding tests)
+
 module Text.Numerals.Languages.German (
     -- * Num to word algorithm
     german
@@ -107,16 +109,21 @@ merge' :: FreeMergerFunction
 merge' 1 100 = const ("ein" <>)
 merge' 1 1000 = const ("ein" <>)
 merge' 1 r | r < _million = const id
-merge' 1 r = const (_merge' l r "eine")
+merge' 1 r = const (_merge' 1 r "eine")
+merge' l r = _merge' l r
 
-_merge :: FreeMergerFunction
-_merge l r = (<>)
-_merge l r = _mergeWithSpace
+_merge' :: FreeMergerFunction
+_merge' l r = (<>)
+_merge' l r = _mergeWithSpace
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /???/ language rules.
 ordinize' :: Text -> Text
-ordinize' = ???
+ordinize' = postprocess . (<> "te") . _ordinize'
+    where postprocess "eintausendste" = "tausendste"
+          postprocess "einhundertste" = "hundertste"
+          -- TODO: millionste/miljardste
+          postprocess t = t
 
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)
 -- in /???/. ??? uses a /long scale/ with the @???@ and @???@
