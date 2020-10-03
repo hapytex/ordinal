@@ -53,6 +53,7 @@ test-suite             cardinal
       Text.Numerals.Languages.DutchSpec
       Text.Numerals.Languages.EnglishSpec
       Text.Numerals.Languages.FrenchSpec
+      Text.Numerals.Languages.GermanSpec
   build-depends:
       base
     , ordinal
