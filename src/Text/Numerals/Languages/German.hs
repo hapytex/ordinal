@@ -26,13 +26,13 @@ module Text.Numerals.Languages.German (
   ) where
 
 import Data.Bool(bool)
-import Data.Text(Text, isSuffixOf, snoc)
+import Data.Text(Text, isSuffixOf, snoc, toLower, toTitle)
 import qualified Data.Text as T
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
+import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm, valueSplit')
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit)
+import Text.Numerals.Class(FreeMergerFunction)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 
 $(pure [ordinizeFromDict "_ordinize'" [
@@ -51,7 +51,7 @@ $(pure [ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /German/ language.
 german :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit' toTitle highWords') merge' ordinize'
 
 -- | The words used to mark a negative number in the /German/ language.
 negativeWord' :: Text
@@ -122,7 +122,7 @@ _merge' :: FreeMergerFunction
 _merge' l r
     | r > l && r >= _million = (. bool id _pluralize (l > 1)) . _mergeWithSpace
     | r > l = (<>)
-_merge' l 1 | 10 < l && l < 100 = const . ("eindund" <> )
+_merge' l 1 | 10 < l && l < 100 = const . ("einund" <> )
 _merge' l r
     | r < 10 && 10 < l && l < 100 = flip (_mergeWith "und")
     | l >= _million = _mergeWithSpace
@@ -131,7 +131,7 @@ _merge' l r
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /???/ language rules.
 ordinize' :: Text -> Text
-ordinize' = postprocess . (<> "te") . _ordinize'
+ordinize' = postprocess . (<> "te") . _ordinize' . toLower
     where postprocess "eintausendste" = "tausendste"
           postprocess "einhundertste" = "hundertste"
           -- TODO: millionste/miljardste
