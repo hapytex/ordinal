@@ -100,6 +100,9 @@ first hundred Fibonacci numbers greater than 200, so:
  ,70492524767089125814114,114059301025943970552219
 ]
 ```
+
+and powers of ten until *10<sup>24</sup>*.
+
 ---
 
 This package is dedicated to *Wouter Folens* (\* 2019), in the hope that he will

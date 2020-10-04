@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings, QuasiQuotes, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.German
@@ -9,8 +9,6 @@ Portability : POSIX
 
 This module contains logic to convert numbers to words in the /German/ language.
 -}
-
--- TODO: Add extra tests for the language (remove note after adding tests)
 
 module Text.Numerals.Languages.German (
     -- * Num to word algorithm
@@ -34,6 +32,7 @@ import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
+import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
 $(pure [ordinizeFromDict "_ordinize'" [
     ("eins", "ers")
@@ -128,17 +127,19 @@ _merge' l r
     | l >= _million = _mergeWithSpace
     | otherwise = (<>)
 
+_ordinalSuffixRe :: SearchReplace RE Text
+_ordinalSuffixRe = [ed|(eine)? ([a-z]+(illion|illiard)ste)$///${2}|]
+
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /???/ language rules.
 ordinize' :: Text -> Text
 ordinize' = postprocess . (<> "te") . _ordinize' . toLower
     where postprocess "eintausendste" = "tausendste"
           postprocess "einhundertste" = "hundertste"
-          -- TODO: millionste/miljardste
-          postprocess t = t
+          postprocess t = t *=~/ _ordinalSuffixRe
 
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)
 -- in /???/. ??? uses a /long scale/ with the @???@ and @???@
 -- suffixes.
 highWords' :: HighNumberAlgorithm
-highWords' =  LongScale "illion" "illiarde"
+highWords' =  LongScale "illion" "illiard"
