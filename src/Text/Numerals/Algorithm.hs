@@ -18,6 +18,8 @@ module Text.Numerals.Algorithm (
     -- * Large number algorithms
   , HighNumberAlgorithm(ShortScale, LongScale)
   , shortScale, longScale
+  , shortScaleTitle, longScaleTitle
+  , valueSplit'
     -- * Conversion to a 'NumberSegment'
   , toSegments
   , toSegmentLow, toSegmentMid, toSegmentHigh
@@ -28,7 +30,7 @@ module Text.Numerals.Algorithm (
 import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Maybe(maybe)
-import Data.Text(Text, cons)
+import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
@@ -80,6 +82,15 @@ shortScale = valueSplit . ShortScale
 longScale :: Text -> Text -> FreeValueSplitter
 longScale suf1 = valueSplit . LongScale suf1
 
+-- | Construct a 'FreeValueSplitter' function for the given suffix for a /short scale/, the names are written in /title case/.
+shortScaleTitle :: Text -> FreeValueSplitter
+shortScaleTitle = valueSplit' toTitle . ShortScale
+
+-- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long scale/, the names are written in /title case/.
+longScaleTitle :: Text -> Text -> FreeValueSplitter
+longScaleTitle suf1 = valueSplit' toTitle . LongScale suf1
+
+
 _highWithSuffix :: Text -> Int -> Maybe Text
 _highWithSuffix suf = fmap (<> suf) . (latinPrefixes !?)
 
@@ -90,9 +101,17 @@ _highToText (LongScale suf1 suf2) j
     | otherwise = _highWithSuffix suf2 k
     where k = div j 2
 
+-- Generate a /value splitter/ for a 'HighNumberAlgorithm' but where the result
+-- is post-processed by a function.
+valueSplit'
+  :: (Text -> Text)  -- ^ The post-processing function.
+  -> HighNumberAlgorithm  -- ^ The 'HighNumberAlgorithm' that is used.
+  -> FreeValueSplitter  -- ^ The 'FreeValueSplitter' result.
+valueSplit' f vs i = (m,) . f <$> _highToText vs (j-2)
+    where ~(j, m) = _toNumberScale i
+
 instance ValueSplit HighNumberAlgorithm where
-    valueSplit vs i = (m,) <$> _highToText vs (j-2)
-        where ~(j, m) = _toNumberScale i
+    valueSplit = valueSplit' id
 
 -- | A /smart constructor/ for the 'NumeralsAlgorithm' type. This constructor
 -- allows one to use an arbitrary 'Foldable' type for the low words and mid

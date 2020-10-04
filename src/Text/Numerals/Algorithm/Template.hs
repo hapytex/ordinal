@@ -24,6 +24,7 @@ import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, 
 
 _getPrefix :: [Char] -> [Char] -> (Int, [Char])
 _getPrefix [] bs = (0, bs)
+_getPrefix as [] = (length as, [])
 _getPrefix aa@(a:as) ba@(b:bs)
      | a == b = _getPrefix as bs
      | otherwise = (length aa, ba)

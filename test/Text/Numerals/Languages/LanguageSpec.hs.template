@@ -1,0 +1,24 @@
+module Text.Numerals.Languages.???Spec (
+    spec
+  ) where
+
+import Data.Text(Text)
+
+import Test.Hspec(Spec)
+import Text.Numerals.Languages.???(???)
+import Text.Numerals.LanguageTest(testLanguage)
+
+spec :: Spec
+spec = testLanguage "???" ??? cardinals ordinals
+
+cardinals :: [(Integer, Text)]
+cardinals = [
+    (???, "???")
+  , (???, "???")
+  ]
+
+ordinals :: [(Integer, Text)]
+ordinals = [
+    (???, "???")
+  , (???, "???")
+  ]

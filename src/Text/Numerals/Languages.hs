@@ -9,9 +9,10 @@ This module imports the /num to word/ algorithms and re-exports these algorithms
 -}
 
 module Text.Numerals.Languages (
-    dutch, english, french
+    dutch, english, french, german
   ) where
 
 import Text.Numerals.Languages.Dutch(dutch)
 import Text.Numerals.Languages.English(english)
 import Text.Numerals.Languages.French(french)
+import Text.Numerals.Languages.German(german)

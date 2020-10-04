@@ -1,0 +1,90 @@
+{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+
+{-|
+Module      : Text.Numerals.Languages.???
+Description : A module to convert numbers to words in the /???/ language.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains logic to convert numbers to words in the /???/ language.
+-}
+
+-- TODO: Add to the Text.Numerals.Languages module (remove note after adding it)
+-- TODO: Add extra tests for the language (remove note after adding tests)
+-- TODO: Add the module to the *.cabal file (remove note after adding it)
+-- TODO: Add the language to the README.md (remove note after adding it)
+
+module Text.Numerals.Languages.??? (
+    -- * Num to word algorithm
+    ???
+    -- * Convert to ordinal
+  , ordinize'
+    -- * Constant words
+  , negativeWord', zeroWord', oneWord'
+    -- * Names for numbers
+  , lowWords', midWords', highWords'
+    -- * Merge function
+  , merge'
+  ) where
+
+import Data.Text(Text, isSuffixOf, snoc)
+import qualified Data.Text as T
+import Data.Vector(Vector)
+
+import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
+import Text.Numerals.Algorithm.Template(ordinizeFromDict)
+import Text.Numerals.Class(FreeMergerFunction, valueSplit)
+import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
+
+$(pure [ordinizeFromDict "_ordinize'" [
+    ("???", "???")
+  , ("???", "???")
+  ] 'id])
+
+-- | A 'NumeralsAlgorithm' to convert numbers to words in the /???/ language.
+??? :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
+??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+
+-- | The words used to mark a negative number in the /???/ language.
+negativeWord' :: Text
+negativeWord' = "???"
+
+-- | The word used for the number /zero/ in the /???/ language.
+zeroWord' :: Text
+zeroWord' = "???"
+
+-- | The word used for the number /one/ in the /???/ language.
+oneWord' :: Text
+oneWord' = "???"
+
+-- | A 'Vector' that contains the word used for the numbers /two/ to /???/ in the /???/ language.
+lowWords' :: Vector Text
+lowWords' = [
+    "???"
+  , "???"
+  ]
+
+-- | A list of 2-tuples that contains the names of values between /thirty/ and
+-- /thousand/ in the /???/ language.
+midWords' :: [(Integer, Text)]
+midWords' = [
+    (1000, "???")
+  , (100, "???")
+  ]
+
+-- | A merge function that is used to combine the names of words together to
+-- larger words, according to the /???/ grammar rules.
+merge' :: FreeMergerFunction
+merge' = ???
+
+-- | A function that converts a number in words in /cardinal/ form to /ordinal/
+-- form according to the /???/ language rules.
+ordinize' :: Text -> Text
+ordinize' = ???
+
+-- | An algorithm to obtain the names of /large/ numbers (one million or larger)
+-- in /???/. ??? uses a /long scale/ with the @???@ and @???@
+-- suffixes.
+highWords' :: HighNumberAlgorithm
+highWords' =  LongScale "???" "???"
