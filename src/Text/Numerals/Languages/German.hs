@@ -64,7 +64,7 @@ zeroWord' = "null"
 oneWord' :: Text
 oneWord' = "eins"
 
--- | A 'Vector' that contains the word used for the numbers /two/ to /???/ in the /???/ language.
+-- | A 'Vector' that contains the word used for the numbers /two/ to /twenty/ in the /German/ language.
 lowWords' :: Vector Text
 lowWords' = [
     "zwei"
@@ -89,7 +89,7 @@ lowWords' = [
   ]
 
 -- | A list of 2-tuples that contains the names of values between /thirty/ and
--- /thousand/ in the /???/ language.
+-- /thousand/ in the /German/ language.
 midWords' :: [(Integer, Text)]
 midWords' = [
     (1000, "tausend")
@@ -104,7 +104,7 @@ midWords' = [
   ]
 
 -- | A merge function that is used to combine the names of words together to
--- larger words, according to the /???/ grammar rules.
+-- larger words, according to the /German/ grammar rules.
 merge' :: FreeMergerFunction
 merge' 1 100 = const ("ein" <>)
 merge' 1 1000 = const ("ein" <>)
@@ -131,7 +131,7 @@ _ordinalSuffixRe :: SearchReplace RE Text
 _ordinalSuffixRe = [ed|(eine)? ([a-z]+(illion|illiard)ste)$///${2}|]
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
--- form according to the /???/ language rules.
+-- form according to the /German/ language rules.
 ordinize' :: Text -> Text
 ordinize' = postprocess . (<> "te") . _ordinize' . toLower
     where postprocess "eintausendste" = "tausendste"
@@ -139,7 +139,7 @@ ordinize' = postprocess . (<> "te") . _ordinize' . toLower
           postprocess t = t *=~/ _ordinalSuffixRe
 
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)
--- in /???/. ??? uses a /long scale/ with the @???@ and @???@
+-- in /German/. German uses a /long scale/ with the @illion@ and @illiard@
 -- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
