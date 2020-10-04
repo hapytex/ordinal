@@ -107,7 +107,7 @@ valueSplit'
   :: (Text -> Text)  -- ^ The post-processing function.
   -> HighNumberAlgorithm  -- ^ The 'HighNumberAlgorithm' that is used.
   -> FreeValueSplitter  -- ^ The 'FreeValueSplitter' result.
-valueSplit' f vs i = ((m,) . f) <$> _highToText vs (j-2)
+valueSplit' f vs i = (m,) . f <$> _highToText vs (j-2)
     where ~(j, m) = _toNumberScale i
 
 instance ValueSplit HighNumberAlgorithm where

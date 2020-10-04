@@ -114,7 +114,7 @@ merge' l r = _merge' l r
 
 _pluralize :: Text -> Text
 _pluralize t
-    | isSuffixOf "e" t = t <> "n"
+    | "e" `isSuffixOf` t = t <> "n"
     | otherwise = t <> "en"
 
 _merge' :: FreeMergerFunction
