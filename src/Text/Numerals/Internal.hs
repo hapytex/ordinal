@@ -75,9 +75,9 @@ _iLog b m = snd <$> go b
              | Just (q, e) <- go (i*i) = go' i q e
              | otherwise = Nothing
         go' i q e | q < i = Just (q, 2 * e)
-                  | m == 0 = Just (d, 2 * e + 1)
+                  | md == 0 = Just (d, 2 * e + 1)
                   | otherwise = Nothing
-            where (d, m) = divMod q i
+            where (d, md) = divMod q i
 
 _replaceSuffix :: Int -> Text -> Text -> Text
 _replaceSuffix n s = (<> s) . dropEnd n

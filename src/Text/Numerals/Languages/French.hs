@@ -24,7 +24,6 @@ module Text.Numerals.Languages.French (
   ) where
 
 import Data.Text(Text, isSuffixOf, snoc)
-import qualified Data.Text as T
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
@@ -32,10 +31,10 @@ import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction, valueSplit)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 
-$(pure [ordinizeFromDict "_ordinize'" [
+$(pure (ordinizeFromDict "_ordinize'" [
     ("cinq", "cinqu")
   , ("neuf", "neuv")
-  ] 'id])
+  ] 'id))
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.

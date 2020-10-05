@@ -31,7 +31,7 @@ import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_million, _mergeWithSpace)
 
-$(pure [ordinizeFromDict "_ordinize'" [
+$(pure (ordinizeFromDict "_ordinize'" [
     ("nul", "nuld")
   , ("één", "eerst")
   , ("twee", "tweed")
@@ -50,7 +50,7 @@ $(pure [ordinizeFromDict "_ordinize'" [
   , ("end", "endst")
   , ("joen", "joenst")
   , ("rd", "rdst")
-  ] 'id])
+  ] 'id))
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /Dutch/ language rules.
