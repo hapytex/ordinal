@@ -29,7 +29,6 @@ module Text.Numerals.Algorithm (
 
 import Data.Foldable(toList)
 import Data.List(sortOn)
-import Data.Maybe(maybe)
 import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
@@ -52,14 +51,14 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
 
 
 instance NumToWord NumeralsAlgorithm where
-    toCardinal NumeralsAlgorithm { minusWord=minusWord, oneWord=oneWord, lowWords=lowWords, midWords=midWords, highWords=highWords, mergeFunction=mergeFunction } = cardinal
+    toCardinal NumeralsAlgorithm { minusWord=_minusWord, oneWord=_oneWord, lowWords=_lowWords, midWords=_midWords, highWords=_highWords, mergeFunction=_mergeFunction } = cardinal
        where cardinal i
-                  | i < 0 = minusWord <> cons ' ' (go (-j))
+                  | i < 0 = _minusWord <> cons ' ' (go (-j))
                   | otherwise = go j
-                  where go = compressSegments oneWord mergeFunction . toSegments lowWords midWords highWords
+                  where go = compressSegments _oneWord _mergeFunction . toSegments _lowWords _midWords _highWords
                         j = fromIntegral i :: Integer
 
-    toOrdinal na@NumeralsAlgorithm { ordinize=ordinize } = ordinize . toCardinal na
+    toOrdinal na@NumeralsAlgorithm { ordinize=_ordinize } = _ordinize . toCardinal na
 
 
 _toNumberScale :: (Integral i, Integral j) => i -> (j, i)
@@ -117,7 +116,7 @@ instance ValueSplit HighNumberAlgorithm where
 -- allows one to use an arbitrary 'Foldable' type for the low words and mid
 -- words. It will also order the midwords accordingly.
 numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> NumeralsAlgorithm
-numeralsAlgorithm minus zero one lowWords midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList lowWords)) (sortOn (negate . fst) (toList midWords))
+numeralsAlgorithm minus zero one _lowWords _midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList _lowWords)) (sortOn (negate . fst) (toList _midWords))
 
 _maybeSegment :: Integral i => (i -> NumberSegment i) -> i -> MNumberSegment i
 _maybeSegment f = go
