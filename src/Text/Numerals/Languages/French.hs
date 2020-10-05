@@ -24,7 +24,6 @@ module Text.Numerals.Languages.French (
   ) where
 
 import Data.Text(Text, isSuffixOf, snoc)
-import qualified Data.Text as T
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)

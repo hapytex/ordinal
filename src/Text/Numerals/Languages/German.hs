@@ -24,14 +24,13 @@ module Text.Numerals.Languages.German (
   ) where
 
 import Data.Bool(bool)
-import Data.Text(Text, isSuffixOf, snoc, toLower, toTitle)
-import qualified Data.Text as T
+import Data.Text(Text, isSuffixOf, toLower, toTitle)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm, valueSplit')
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction)
-import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
+import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _million)
 import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
 $(pure (ordinizeFromDict "_ordinize'" [
