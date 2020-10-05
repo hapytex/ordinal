@@ -39,7 +39,7 @@ _ordinizepp t
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /English/ language rules.
-$(pure [ordinizeFromDict "ordinize'" [
+$(pure (ordinizeFromDict "ordinize'" [
     ("one", "first")
   , ("two", "second")
   , ("three", "third")
@@ -52,7 +52,7 @@ $(pure [ordinizeFromDict "ordinize'" [
   , ("ten", "tenth")
   , ("eleven", "eleventh")
   , ("twelve", "twelfth")
-  ] '_ordinizepp])
+  ] '_ordinizepp))
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.

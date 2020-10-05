@@ -16,11 +16,11 @@ module Text.Numerals.Algorithm.Template (
   ) where
 
 import Data.Map.Strict(Map, elems, fromListWith)
-import Data.Text(isSuffixOf, pack, snoc)
+import Data.Text(Text, isSuffixOf, pack, snoc)
 
 import Text.Numerals.Internal(_replaceSuffix)
 
-import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(CharL, IntegerL, StringL), Name, Pat(VarP), mkName)
+import Language.Haskell.TH(Body(GuardedB), Clause(Clause), Dec(FunD, SigD), Exp(AppE, ConE, LitE, VarE), Guard(NormalG), Lit(CharL, IntegerL, StringL), Name, Pat(VarP), Type(ConT, AppT, ArrowT), mkName)
 
 _getPrefix :: [Char] -> [Char] -> (Int, [Char])
 _getPrefix [] bs = (0, bs)
@@ -60,7 +60,9 @@ ordinizeFromDict
   :: String  -- ^ The name of the function, often this is just @ordinize'@
   -> [(String, String)]  -- ^ The list of suffixes and their corresponding mapping, the suffixes should be non-overlapping.
   -> Name  -- ^ The name of the post-processing function in case there was no match, one can for example use 'id'.
-  -> Dec  -- ^ The corresponding declaration.
-ordinizeFromDict nm ts pp = FunD (mkName nm) [Clause [VarP t] (GuardedB (map _toGuard (elems (_ordinizeMap t' ts)) ++ [(NormalG (ConE 'True), AppE (VarE pp) t')])) []]
+  -> [Dec]  -- ^ The corresponding declaration.
+ordinizeFromDict nm ts pp = [SigD nnm (tText (tText ArrowT)), FunD nnm [Clause [VarP t] (GuardedB (map _toGuard (elems (_ordinizeMap t' ts)) ++ [(NormalG (ConE 'True), AppE (VarE pp) t')])) []]]
     where t = mkName "t"
           t' = VarE t
+          nnm = mkName nm
+          tText = (`AppT` ConT ''Text)

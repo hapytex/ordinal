@@ -34,7 +34,7 @@ import Text.Numerals.Class(FreeMergerFunction)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
-$(pure [ordinizeFromDict "_ordinize'" [
+$(pure (ordinizeFromDict "_ordinize'" [
     ("eins", "ers")
   , ("drei", "drit")
   , ("acht", "ach")
@@ -46,7 +46,7 @@ $(pure [ordinizeFromDict "_ordinize'" [
   , ("nen", "ns")
   , ("rde", "rds")
   , ("rden", "rds")
-  ] 'id])
+  ] 'id))
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /German/ language.
 german :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
