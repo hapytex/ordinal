@@ -60,6 +60,15 @@ algorithm for that language, but also helper functions and constants.
 The package uses the `Data.Vector` module which is not safe, and therefore
 `ordinal` is not safe either.
 
+## Continuous Integration
+
+The commits on GitHub are validated by [*Travis*](https://travis-ci.com/hapytex/ordinal).
+The build will validate that the system is building, that the compiler does not
+generate any *errors* or *warnings*. It will also run the test-suite and will
+run `hlint` on the source code to check for improvements. Finally it will run
+`grep` on the Haskell files in the `src/` directory to check for missing
+elements (`???`) and `TODO`s.
+
 ## Contribute
 
 You can contribute by making a pull request on the [*GitHub
