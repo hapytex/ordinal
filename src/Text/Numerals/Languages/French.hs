@@ -23,13 +23,13 @@ module Text.Numerals.Languages.French (
   , merge'
   ) where
 
-import Data.Text(Text, isSuffixOf, snoc)
+import Data.Text(Text, isSuffixOf, pack, snoc)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction, valueSplit)
-import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
+import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _showIntegral, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
     ("cinq", "cinqu")
@@ -38,7 +38,7 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
 
 -- | The words used to mark a negative number in the /French/ language.
 negativeWord' :: Text
@@ -122,3 +122,9 @@ ordinize' t = _stripLastIf 'e' (_ordinize' t) <> "ième"
 -- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
+
+-- | A function to convert a number to its /short ordinal/ form in /French/.
+shortOrdinal' :: Integral i
+  => i  -- ^ The number to convert to /short ordinal/ form.
+  -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
+shortOrdinal' = pack . (`_showIntegral` "e")

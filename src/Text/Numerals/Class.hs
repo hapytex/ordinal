@@ -13,18 +13,26 @@ is the typeclass that is used by all algorithmic conversion tools.
 
 module Text.Numerals.Class (
     -- * Typeclasses
-    NumToWord(toCardinal, toOrdinal, toWords)
+    NumToWord(toCardinal, toOrdinal, toShortOrdinal, toWords)
   , ValueSplit(valueSplit)
     -- * Types of numbers
-  , NumberType(Cardinal, Ordinal)
+  , NumberType(Cardinal, Ordinal, ShortOrdinal)
     -- * Segmenting a number
   , NumberSegment(NumberSegment, segmentDivision, segmentValue, segmentText, segmentRemainder)
   , MNumberSegment
     -- * Utility type synonyms
+  , NumberToWords,  FreeNumberToWords
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
   ) where
 
 import Data.Text(Text)
+
+-- | A type alias for a function that maps a number to a 'Text' object.
+type NumberToWords i = i -> Text
+
+-- | A type alias for a 'NumberToWords' function, with a free 'Integral'
+-- variable.
+type FreeNumberToWords = forall i . Integral i => NumberToWords i
 
 -- | A type alias of a function that is used to merge the names of two numbers according
 -- to gramatical rules. The type parameter is the type of the numbers to merge.
@@ -65,23 +73,38 @@ type MNumberSegment i = Maybe (NumberSegment i)
 data NumberType
   = Cardinal  -- ^ /Cardinal/ numbers like one, two, three, etc.
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
+  | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
   deriving (Bounded, Enum, Eq, Ord)
 
 -- | A type class used for num to word algorithms. It maps an 'Integral' type
 -- @i@ to 'Text'.
 class NumToWord a where
     -- | Convert the given number to a 'Text' object that is the given number in
-    -- words.
+    -- words in /cardinal/ form.
     toCardinal :: Integral i
       => a  -- ^ The conversion algorithm that transforms the number into words.
       -> i  -- ^ The number to transform into a /cardinal/ form.
       -> Text  -- ^ The number in words in a /cardinal/ form.
     toCardinal = toWords Cardinal
+
+    -- | Convert the given number to a 'Text' object that is the given number in
+    -- words in /cardinal/ form.
     toOrdinal :: Integral i
       => a  -- ^ The conversion algorithm that transforms the number into words.
       -> i  -- ^ The number to transform into a /ordinal/ form.
       -> Text  -- ^ The number in words in a /ordinal/ form.
     toOrdinal = toWords Ordinal
+
+    -- | Convert the given number to a 'Text' object that is the given number
+    -- in words in /short cardinal/ form.
+    toShortOrdinal :: Integral i
+      => a  -- ^ The conversion algorithm that transforms the number into words.
+      -> i  -- ^ The number to transform into a /ordinal/ form.
+      -> Text  -- ^ The number in words in a /ordinal/ form.
+    toShortOrdinal = toWords Ordinal
+
+    -- | Convert the given number to a 'Text' object that is the given number in
+    -- words in the given 'NumberType'.
     toWords :: Integral i
       => NumberType  -- ^ The given format to convert the number to.
       -> a  -- ^ The conversion algorithm that transforms the number into words.
@@ -89,7 +112,8 @@ class NumToWord a where
       -> Text  -- ^ The number in words in the given form.
     toWords Cardinal = toCardinal
     toWords Ordinal = toOrdinal
-    {-# MINIMAL toCardinal, toOrdinal | toWords #-}
+    toWords ShortOrdinal = toShortOrdinal
+    {-# MINIMAL toCardinal, toOrdinal, toShortOrdinal | toWords #-}
 
 -- | A type class used to split a value, based on the name of a number in a
 -- specific language. The value that is used to split, is often, depending on

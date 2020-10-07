@@ -7,8 +7,11 @@ module Text.Numerals.Internal (
   , _hundred, _thousand, _million, _billion, _trillion
   , _iLog, _iLogFloor
   , _stripLastIf
+  , _showIntegral
+  , _showPositive
   ) where
 
+import Data.Char(intToDigit)
 import Data.Text(Text, cons, dropEnd, isSuffixOf, singleton, pack)
 import qualified Data.Text as T
 
@@ -81,3 +84,15 @@ _iLog b m = snd <$> go b
 
 _replaceSuffix :: Int -> Text -> Text -> Text
 _replaceSuffix n s = (<> s) . dropEnd n
+
+_showIntegral :: Integral i => i -> String -> String
+_showIntegral n s
+    | n < 0 = '-' : _showPositive (-(fromIntegral n :: Integer)) s
+    | otherwise = _showPositive n s
+
+_showPositive :: Integral i => i -> String -> String
+_showPositive n s
+    | q == 0 = tl
+    | otherwise = _showPositive q tl
+    where (q, r) = quotRem n 10
+          tl = intToDigit (fromIntegral r) : s

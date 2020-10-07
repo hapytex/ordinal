@@ -23,14 +23,14 @@ module Text.Numerals.Languages.English (
   , merge'
   ) where
 
-import Data.Text(Text, isSuffixOf)
+import Data.Text(Text, isSuffixOf, pack)
 import qualified Data.Text as T
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _mergeWithHyphen)
+import Text.Numerals.Internal(_div10, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _rem10, _showIntegral)
 
 _ordinizepp :: Text -> Text
 _ordinizepp t
@@ -56,7 +56,7 @@ $(pure (ordinizeFromDict "ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
 
 -- | The words used to mark a negative number in the /English/ language.
 negativeWord' :: Text
@@ -122,3 +122,18 @@ merge' _ _ = _mergeWith ", "
 -- in /English/. English uses a /short scale/ with the @illion@ suffix.
 highWords' :: HighNumberAlgorithm
 highWords' = ShortScale "illion"
+
+-- | A function to convert a number to its /short ordinal/ form in /English/.
+shortOrdinal' :: Integral i
+  => i  -- ^ The number to convert to /short ordinal/ form.
+  -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
+shortOrdinal' i = pack (_showIntegral i []) <> _shortOrdinalSuffix i
+
+_shortOrdinalSuffix :: Integral i => i -> Text
+_shortOrdinalSuffix n
+    | _rem10 (_div10 n) == 1 = "th"
+    | otherwise = go' (_rem10 n)
+    where go' 1 = "st"
+          go' 2 = "nd"
+          go' 3 = "rd"
+          go' _ = "th"

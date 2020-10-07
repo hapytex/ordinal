@@ -24,13 +24,13 @@ module Text.Numerals.Languages.German (
   ) where
 
 import Data.Bool(bool)
-import Data.Text(Text, isSuffixOf, toLower, toTitle)
+import Data.Text(Text, isSuffixOf, pack, toLower, toTitle)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm, valueSplit')
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(FreeMergerFunction)
-import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _million)
+import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _million, _showIntegral)
 import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -49,7 +49,7 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /German/ language.
 german :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit' toTitle highWords') merge' ordinize'
+german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit' toTitle highWords') merge' ordinize' shortOrdinal'
 
 -- | The words used to mark a negative number in the /German/ language.
 negativeWord' :: Text
@@ -142,3 +142,9 @@ ordinize' = postprocess . (<> "te") . _ordinize' . toLower
 -- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "illion" "illiard"
+
+-- | A function to convert a number to its /short ordinal/ form in /German/.
+shortOrdinal' :: Integral i
+  => i  -- ^ The number to convert to /short ordinal/ form.
+  -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
+shortOrdinal' = pack . (`_showIntegral` ".")
