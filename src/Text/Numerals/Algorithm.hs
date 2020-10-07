@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TupleSections #-}
+{-# LANGUAGE OverloadedStrings, RankNTypes, TupleSections #-}
 
 {-|
 Module      : Text.Numerals.Algorithm
@@ -27,6 +27,7 @@ module Text.Numerals.Algorithm (
   , compressSegments
   ) where
 
+import Data.Default(Default(def))
 import Data.Foldable(toList)
 import Data.List(sortOn)
 import Data.Text(Text, cons, toTitle)
@@ -75,11 +76,15 @@ _toNumberScale i = (l, k)
 
 -- | A data type used for to map larger numbers to words. This data type
 -- supports the /short scale/ and /long scale/ with /Latin/ prefixes, and
--- custom suffixes.
+-- custom suffixes. The 'Default' value is the /short scale/ with /illion/
+-- as suffix. This is used in /English/ for large numbers.
 data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
   deriving (Eq, Ord, Read, Show)
+
+instance Default HighNumberAlgorithm where
+    def = ShortScale "illion"
 
 -- | Construct a 'FreeValueSplitter' function for the given suffix for a /short scale/.
 shortScale :: Text -> FreeValueSplitter
