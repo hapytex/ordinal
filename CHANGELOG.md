@@ -2,6 +2,11 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/ordinal).
 
+## Version 0.3.0.0
+
+Add support for short ordinal numbers and make `NumberType` and `HighNumberAlgorithm`
+an instance of `Default`.
+
 ## Version 0.2.0.0
 
 Added support for the *German* language.

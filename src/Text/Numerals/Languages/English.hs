@@ -23,11 +23,12 @@ module Text.Numerals.Languages.English (
   , merge'
   ) where
 
+import Data.Default(def)
 import Data.Text(Text, isSuffixOf, pack)
 import qualified Data.Text as T
 import Data.Vector(Vector)
 
-import Text.Numerals.Algorithm(HighNumberAlgorithm(ShortScale), NumeralsAlgorithm, numeralsAlgorithm)
+import Text.Numerals.Algorithm(HighNumberAlgorithm, NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
 import Text.Numerals.Internal(_div10, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _rem10, _showIntegral)
@@ -121,7 +122,7 @@ merge' _ _ = _mergeWith ", "
 -- | An algorithm to obtain the names of /large/ numbers (one million or larger)
 -- in /English/. English uses a /short scale/ with the @illion@ suffix.
 highWords' :: HighNumberAlgorithm
-highWords' = ShortScale "illion"
+highWords' = def
 
 -- | A function to convert a number to its /short ordinal/ form in /English/.
 shortOrdinal' :: Integral i

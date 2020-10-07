@@ -25,6 +25,7 @@ module Text.Numerals.Class (
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
   ) where
 
+import Data.Default(Default(def))
 import Data.Text(Text)
 
 -- | A type alias for a function that maps a number to a 'Text' object.
@@ -69,12 +70,15 @@ data NumberSegment i = NumberSegment {
 type MNumberSegment i = Maybe (NumberSegment i)
 
 -- | A data type that specifies the different types of numbers. These can be
--- used to specify the "target format".
+-- used to specify the "target format". The 'Default' number type is 'Cardinal'.
 data NumberType
   = Cardinal  -- ^ /Cardinal/ numbers like one, two, three, etc.
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
-  deriving (Bounded, Enum, Eq, Ord)
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Default NumberType where
+    def = Cardinal
 
 -- | A type class used for num to word algorithms. It maps an 'Integral' type
 -- @i@ to 'Text'.

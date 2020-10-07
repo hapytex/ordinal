@@ -39,6 +39,7 @@ library
   build-depends:
       base >= 4.7 && < 5
     , containers >=0.5
+    , data-default >=0.2
     , regex >=1.0
     , text >= 0.1
     , template-haskell >=2.2.0.0
