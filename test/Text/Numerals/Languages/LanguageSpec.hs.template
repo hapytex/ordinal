@@ -9,7 +9,7 @@ import Text.Numerals.Languages.???(???)
 import Text.Numerals.LanguageTest(testLanguage)
 
 spec :: Spec
-spec = testLanguage "???" ??? cardinals ordinals
+spec = testLanguage "???" ??? cardinals ordinals shortOrdinals
 
 cardinals :: [(Integer, Text)]
 cardinals = [
@@ -19,6 +19,12 @@ cardinals = [
 
 ordinals :: [(Integer, Text)]
 ordinals = [
+    (???, "???")
+  , (???, "???")
+  ]
+
+shortOrdinals :: [(Integer, Text)]
+shortOrdinals = [
     (???, "???")
   , (???, "???")
   ]
