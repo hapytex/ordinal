@@ -44,7 +44,7 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /???/ language.
 ??? :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
 
 -- | The words used to mark a negative number in the /???/ language.
 negativeWord' :: Text
@@ -88,3 +88,9 @@ ordinize' = ???
 -- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' =  LongScale "???" "???"
+
+-- | A function to convert a number to its /short ordinal/ form in /???/.
+shortOrdinal' :: Integral i
+  => i  -- ^ The number to convert to /short ordinal/ form.
+  -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
+shortOrdinal' = ???

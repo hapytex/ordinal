@@ -23,13 +23,13 @@ module Text.Numerals.Languages.Dutch (
   , merge'
   ) where
 
-import Data.Text(Text, snoc)
+import Data.Text(Text, pack, snoc)
 import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
 import Text.Numerals.Class(valueSplit)
-import Text.Numerals.Internal(_million, _mergeWithSpace)
+import Text.Numerals.Internal(_million, _mergeWithSpace, _showIntegral)
 
 $(pure (ordinizeFromDict "_ordinize'" [
     ("nul", "nuld")
@@ -59,7 +59,7 @@ ordinize' = (`snoc` 'e') . _ordinize'
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /Dutch/ language.
 dutch :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize'
+dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
 
 -- | The words used to mark a negative number in the /Dutch/ language.
 negativeWord' :: Text
@@ -145,3 +145,9 @@ _merge' l r
 -- suffixes.
 highWords' :: HighNumberAlgorithm
 highWords' = LongScale "iljoen" "iljard"
+
+-- | A function to convert a number to its /short ordinal/ form in /Dutch/.
+shortOrdinal' :: Integral i
+  => i  -- ^ The number to convert to /short ordinal/ form.
+  -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
+shortOrdinal' = pack . (`_showIntegral` "e")
