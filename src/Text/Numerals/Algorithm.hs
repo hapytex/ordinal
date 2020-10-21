@@ -113,7 +113,7 @@ _highToText (LongScale suf1 suf2) j
     | otherwise = _highWithSuffix suf2 k
     where k = div j 2
 
--- Generate a /value splitter/ for a 'HighNumberAlgorithm' but where the result
+-- | Generate a /value splitter/ for a 'HighNumberAlgorithm' but where the result
 -- is post-processed by a function.
 valueSplit'
   :: (Text -> Text)  -- ^ The post-processing function.
