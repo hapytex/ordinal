@@ -127,13 +127,11 @@ highWords' = ShortScale "illion"
 shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
-shortOrdinal' i = pack (_showIntegral i []) <> _shortOrdinalSuffix i
-
-_shortOrdinalSuffix :: Integral i => i -> Text
-_shortOrdinalSuffix n
-    | _rem10 (_div10 n) == 1 = "th"
-    | otherwise = go' (_rem10 n)
-    where go' 1 = "st"
+shortOrdinal' i = pack (_showIntegral i (_shortOrdinalSuffix i))
+    where _shortOrdinalSuffix n
+              | _rem10 (_div10 n) == 1 = "th"
+              | otherwise = go' (_rem10 n)
+          go' 1 = "st"
           go' 2 = "nd"
           go' 3 = "rd"
           go' _ = "th"
