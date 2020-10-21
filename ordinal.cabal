@@ -1,5 +1,5 @@
 name:                ordinal
-version:             0.3.0.0
+version:             0.3.1.0
 synopsis:            Convert numbers to words in different languages.
 description:
     A package based on Python's num2words package that converts numbers
