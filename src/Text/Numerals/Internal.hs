@@ -1,4 +1,4 @@
-{-# LANGUAGE NumericUnderscores, Safe #-}
+{-# LANGUAGE Safe #-}
 
 module Text.Numerals.Internal (
     _div10, _rem10, _divisableBy, _divisable100
@@ -57,13 +57,13 @@ _thousand :: Integral i => i
 _thousand = 1000
 
 _million :: Integral i => i
-_million = 1_000_000
+_million = 1000000
 
 _billion :: Integral i => i
-_billion = 1_000_000_000
+_billion = 1000000000
 
 _trillion :: Integral i => i
-_trillion = 1_000_000_000_000
+_trillion = 1000000000000
 
 _iLogFloor :: (Integral i, Integral j) => i -> i -> (i, j, i)
 _iLogFloor b m = go b

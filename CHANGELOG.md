@@ -2,6 +2,11 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/ordinal).
 
+## Version 0.3.1.0
+
+Remove the `NumericUnderscores` extension to allow building the package for more
+versions of GHC.
+
 ## Version 0.3.0.0
 
 Add support for short ordinal numbers and make `NumberType` and `HighNumberAlgorithm`
