@@ -13,7 +13,7 @@ is the typeclass that is used by all algorithmic conversion tools.
 
 module Text.Numerals.Class (
     -- * Typeclasses
-    NumToWord(toCardinal, toOrdinal, toShortOrdinal, toWords)
+    NumToWord(toCardinal, toOrdinal, toShortOrdinal, toWords, toTimeText, toTimeText')
   , ValueSplit(valueSplit)
     -- * Types of numbers
   , NumberType(Cardinal, Ordinal, ShortOrdinal)
@@ -27,6 +27,7 @@ module Text.Numerals.Class (
 
 import Data.Default(Default(def))
 import Data.Text(Text)
+import Data.Time.LocalTime(TimeOfDay(TimeOfDay))
 
 -- | A type alias for a function that maps a number to a 'Text' object.
 type NumberToWords i = i -> Text
@@ -117,7 +118,22 @@ class NumToWord a where
     toWords Cardinal = toCardinal
     toWords Ordinal = toOrdinal
     toWords ShortOrdinal = toShortOrdinal
-    {-# MINIMAL toCardinal, toOrdinal, toShortOrdinal | toWords #-}
+
+    -- | Convert the given time of the day to text describing that time.
+    toTimeText
+      :: a  -- ^ The conversion algorithm to transform numbers into words.
+      -> TimeOfDay  -- ^ The time of the day to convert to words.
+      -> Text  -- ^ The time as /text/.
+    toTimeText gen (TimeOfDay h m _) = toTimeText' gen h m
+
+    -- | Convert the given hours and minutes to text that describes the time.
+    toTimeText'
+      :: a  -- ^ The conversion algorithm to transform numbers into words.
+      -> Int  -- ^ The number of hours, between 0 and 23 (both inclusive)
+      -> Int  -- ^ The number of minutes, beween 0 and 59 (both inclusive)
+      -> Text  -- ^ The time as /text/.
+    toTimeText' gen h m = toTimeText gen (TimeOfDay h m 0)
+    {-# MINIMAL ((toCardinal, toOrdinal, toShortOrdinal) | toWords), (toTimeText | toTimeText') #-}
 
 -- | A type class used to split a value, based on the name of a number in a
 -- specific language. The value that is used to split, is often, depending on
