@@ -13,6 +13,8 @@ This module contains logic to convert numbers to words in the /German/ language.
 module Text.Numerals.Languages.German (
     -- * Num to word algorithm
     german
+    -- * Convert numbers to cardinal
+  , toCardinal'
     -- * Convert to ordinal
   , ordinize'
     -- * Constant words
@@ -29,7 +31,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm, valueSplit')
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction)
+import Text.Numerals.Class(ClockText, FreeMergerFunction)
 import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _million, _showIntegral)
 import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
@@ -49,7 +51,13 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /German/ language.
 german :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit' toTitle highWords') merge' ordinize' shortOrdinal'
+german = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit' toTitle highWords') merge' ordinize' shortOrdinal' clockText'
+
+-- | Convert numers to their cardinal counterpart in /German/.
+toCardinal' :: Integral i
+  => i  -- ^ The number to convert to text.
+  -> Text  -- ^ The cardinal counterpart in /German/.
+toCardinal' = toCardinal german
 
 -- | The words used to mark a negative number in the /German/ language.
 negativeWord' :: Text
@@ -148,3 +156,6 @@ shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` ".")
+
+clockText' :: ClockText
+clockText' _ _ h m = toCardinal h <> " Uhr " <> toCardinal m

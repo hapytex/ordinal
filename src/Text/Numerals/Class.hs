@@ -26,6 +26,7 @@ module Text.Numerals.Class (
     -- * Utility type synonyms
   , NumberToWords,  FreeNumberToWords
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
+  , ClockText
   ) where
 
 import Data.Default(Default(def))
@@ -80,6 +81,8 @@ data NumberType
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+type ClockText = ClockSegment -> DaySegment -> Int -> Int -> Text
 
 data ClockSegment
   = OClock
