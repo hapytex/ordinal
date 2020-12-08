@@ -46,7 +46,7 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /???/ language.
 ??? :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
 
 -- | Convert numers to their cardinal counterpart in /???/.
 toCardinal' :: Integral i
@@ -102,3 +102,7 @@ shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = ???
+
+-- | Converting the time to a text that describes that time in /German/.
+clockText' :: ClockText
+clockText' cs ds h m = ???
