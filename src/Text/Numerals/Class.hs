@@ -20,6 +20,9 @@ module Text.Numerals.Class (
     -- * Segmenting a number
   , NumberSegment(NumberSegment, segmentDivision, segmentValue, segmentText, segmentRemainder)
   , MNumberSegment
+    -- * Segments of time
+  , DaySegment(Morning, Afternoon), ClockSegment(..)
+  , toDaySegment, toClockSegment
     -- * Utility type synonyms
   , NumberToWords,  FreeNumberToWords
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
@@ -77,6 +80,38 @@ data NumberType
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+data ClockSegment
+  = OClock
+  | Past Int
+  | QuarterPast
+  | ToHalf Int
+  | Half
+  | PastHalf Int
+  | QuarterTo
+  | To Int
+  deriving (Eq, Ord, Read, Show)
+
+data DaySegment
+  = Morning Int
+  | Afternoon Int
+  deriving (Eq, Ord, Read, Show)
+
+toClockSegment :: Int -> ClockSegment
+toClockSegment 0 = OClock
+toClockSegment 15 = QuarterPast
+toClockSegment 30 = Half
+toClockSegment 45 = QuarterTo
+toClockSegment n
+    | n <= 15 = Past n
+    | n <= 30 = ToHalf (30-n)
+    | n <= 45 = PastHalf (n-30)
+    | otherwise = To (60-n)
+
+toDaySegment :: Int -> DaySegment
+toDaySegment n
+    | n <= 12 = Morning n
+    | otherwise = Afternoon (n-12)
 
 instance Default NumberType where
     def = Cardinal
