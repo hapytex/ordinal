@@ -13,6 +13,8 @@ This module contains logic to convert numbers to words in the /French/ language.
 module Text.Numerals.Languages.French (
     -- * Num to word algorithm
     french
+    -- * Convert a cardinal number to text
+  , toCardinal'
     -- * Convert to ordinal
   , ordinize'
     -- * Constant words
@@ -28,7 +30,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit)
+import Text.Numerals.Class(FreeMergerFunction, valueSplit, toCardinal)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _showIntegral, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -39,6 +41,12 @@ $(pure (ordinizeFromDict "_ordinize'" [
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+
+-- | Convert numers to their cardinal counterpart in /French/.
+toCardinal' :: Integral i
+  => i  -- ^ The number to convert to text.
+  -> Text  -- ^ The cardinal counterpart in /French/.
+toCardinal' = toCardinal french
 
 -- | The words used to mark a negative number in the /French/ language.
 negativeWord' :: Text

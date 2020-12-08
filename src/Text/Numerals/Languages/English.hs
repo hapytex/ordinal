@@ -13,6 +13,8 @@ This module contains logic to convert numbers to words in the /English/ language
 module Text.Numerals.Languages.English (
     -- * Num to word algorithm
     english
+    -- * Convert a cardinal number to text
+  , toCardinal'
     -- * Convert to ordinal
   , ordinize'
     -- * Constant words
@@ -30,7 +32,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm, NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(valueSplit)
+import Text.Numerals.Class(valueSplit, toCardinal)
 import Text.Numerals.Internal(_div10, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _rem10, _showIntegral)
 
 _ordinizepp :: Text -> Text
@@ -58,6 +60,12 @@ $(pure (ordinizeFromDict "ordinize'" [
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+
+-- | Convert numers to their cardinal counterpart in /English/.
+toCardinal' :: Integral i
+  => i  -- ^ The number to convert to text.
+  -> Text  -- ^ The cardinal counterpart in /English/.
+toCardinal' = toCardinal english
 
 -- | The words used to mark a negative number in the /English/ language.
 negativeWord' :: Text

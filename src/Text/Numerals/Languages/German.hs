@@ -13,7 +13,7 @@ This module contains logic to convert numbers to words in the /German/ language.
 module Text.Numerals.Languages.German (
     -- * Num to word algorithm
     german
-    -- * Convert numbers to cardinal
+    -- * Convert a cardinal number to text
   , toCardinal'
     -- * Convert to ordinal
   , ordinize'
@@ -31,7 +31,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm, valueSplit')
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(ClockText, FreeMergerFunction)
+import Text.Numerals.Class(ClockText, FreeMergerFunction, toCardinal)
 import Text.Numerals.Internal(_mergeWith, _mergeWithSpace, _million, _showIntegral)
 import Text.RE.TDFA.Text(RE, SearchReplace, (*=~/), ed)
 
@@ -158,4 +158,5 @@ shortOrdinal' :: Integral i
 shortOrdinal' = pack . (`_showIntegral` ".")
 
 clockText' :: ClockText
-clockText' _ _ h m = toCardinal h <> " Uhr " <> toCardinal m
+clockText' _ _ h 0 = toCardinal' h <> " Uhr"
+clockText' _ _ h m = toCardinal' h <> " Uhr " <> toCardinal' m
