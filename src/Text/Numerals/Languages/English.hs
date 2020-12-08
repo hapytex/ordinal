@@ -59,7 +59,7 @@ $(pure (ordinizeFromDict "ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
 
 -- | Convert numers to their cardinal counterpart in /English/.
 toCardinal' :: Integral i
@@ -144,3 +144,7 @@ shortOrdinal' i = pack (_showIntegral i (_shortOrdinalSuffix i))
           go' 2 = "nd"
           go' 3 = "rd"
           go' _ = "th"
+
+-- | Converting the time to a text that describes that time in /English/.
+clockText' :: ClockText
+clockText' cs ds h m = undefined

@@ -61,7 +61,7 @@ ordinize' = (`snoc` 'e') . _ordinize'
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /Dutch/ language.
 dutch :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+dutch = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
 
 -- | Convert numers to their cardinal counterpart in /Dutch/.
 toCardinal' :: Integral i
@@ -160,4 +160,6 @@ shortOrdinal' :: Integral i
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` "e")
 
-
+-- | Converting the time to a text that describes that time in /Dutch/.
+clockText' :: ClockText
+clockText' cs ds h m = undefined

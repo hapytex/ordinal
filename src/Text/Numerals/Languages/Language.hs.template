@@ -36,7 +36,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit, toCardinal)
+import Text.Numerals.Class(ClockText, FreeMergerFunction, valueSplit, toCardinal)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -103,6 +103,6 @@ shortOrdinal' :: Integral i
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = ???
 
--- | Converting the time to a text that describes that time in /German/.
+-- | Converting the time to a text that describes that time in /???/.
 clockText' :: ClockText
 clockText' cs ds h m = ???

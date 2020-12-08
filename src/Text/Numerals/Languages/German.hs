@@ -157,6 +157,7 @@ shortOrdinal' :: Integral i
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` ".")
 
+-- | Converting the time to a text that describes that time in /German/.
 clockText' :: ClockText
 clockText' _ _ h 0 = toCardinal' h <> " Uhr"
 clockText' _ _ h m = toCardinal' h <> " Uhr " <> toCardinal' m

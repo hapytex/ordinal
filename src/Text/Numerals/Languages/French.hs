@@ -30,7 +30,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit, toCardinal)
+import Text.Numerals.Class(ClockText, FreeMergerFunction, valueSplit, toCardinal)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _showIntegral, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -40,7 +40,7 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
 
 -- | Convert numers to their cardinal counterpart in /French/.
 toCardinal' :: Integral i
@@ -136,3 +136,7 @@ shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` "e")
+
+-- | Converting the time to a text that describes that time in /French/.
+clockText' :: ClockText
+clockText' cs ds h m = undefined
