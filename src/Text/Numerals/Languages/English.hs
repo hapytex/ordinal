@@ -32,7 +32,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm, NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(valueSplit, toCardinal)
+import Text.Numerals.Class(ClockText, valueSplit, toCardinal)
 import Text.Numerals.Internal(_div10, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _rem10, _showIntegral)
 
 _ordinizepp :: Text -> Text

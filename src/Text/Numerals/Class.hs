@@ -21,8 +21,9 @@ module Text.Numerals.Class (
   , NumberSegment(NumberSegment, segmentDivision, segmentValue, segmentText, segmentRemainder)
   , MNumberSegment
     -- * Segments of time
-  , DaySegment(Morning, Afternoon), ClockSegment(..)
+  , DaySegment(Morning, Afternoon, dayHour), ClockSegment(OClock, Past, QuarterPast, ToHalf, Half, PastHalf, QuarterTo, To)
   , toDaySegment, toClockSegment
+  , hourCorrection
     -- * Utility type synonyms
   , NumberToWords,  FreeNumberToWords
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
@@ -96,8 +97,8 @@ data ClockSegment
   deriving (Eq, Ord, Read, Show)
 
 data DaySegment
-  = Morning Int
-  | Afternoon Int
+  = Morning { dayHour :: Int }
+  | Afternoon { dayHour :: Int }
   deriving (Eq, Ord, Read, Show)
 
 toClockSegment :: Int -> ClockSegment
@@ -113,8 +114,17 @@ toClockSegment n
 
 toDaySegment :: Int -> DaySegment
 toDaySegment n
-    | n <= 12 = Morning n
-    | otherwise = Afternoon (n-12)
+    | n <= 12 = Morning h
+    | otherwise = Afternoon h
+    where h = hourCorrection n
+
+-- | Correct the hour to a 12 number segment.
+-- The input can be any Int number, whereas the
+-- result will be in the @1 .. 12@ range.
+hourCorrection
+  :: Int  -- ^ The value for the number of hours.
+  -> Int  -- ^ The hours in the @1 .. 12@ range.
+hourCorrection h = ((h - 1) `mod` 12) + 1
 
 instance Default NumberType where
     def = Cardinal

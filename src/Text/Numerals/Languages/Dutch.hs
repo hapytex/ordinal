@@ -30,7 +30,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(valueSplit, toCardinal)
+import Text.Numerals.Class(ClockSegment(OClock, Past, QuarterPast, ToHalf, Half, PastHalf, QuarterTo, To), DaySegment(Morning, Afternoon, dayHour), ClockText, hourCorrection, toCardinal, valueSplit)
 import Text.Numerals.Internal(_million, _mergeWithSpace, _showIntegral)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -160,6 +160,30 @@ shortOrdinal' :: Integral i
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` "e")
 
+_segmentOfDay :: Int -> Text
+_segmentOfDay n
+    | n <= 5 = "'s nachts"
+    | n <= 11 = "'s ochtends"
+    | n <= 17 = "'s middags"
+    | otherwise = "'s avonds"
+
+_dayComponent :: Text -> Int -> Int -> Text
+_dayComponent sep dh h = toCardinal' (hourCorrection (h + dh)) <> sep <> _segmentOfDay h
+
+_dayComponent' :: Int -> Int -> Text
+_dayComponent' = _dayComponent " "
+
+_mins :: Int -> Text
+_mins 1 = " minuut "
+_mins _ = " minuten "
+
 -- | Converting the time to a text that describes that time in /Dutch/.
 clockText' :: ClockText
-clockText' cs ds h m = undefined
+clockText' OClock _ h _ = _dayComponent " uur " 0 h
+clockText' (Past m) ds h _ = toCardinal' m <> _mins m <> "na " <> _dayComponent' 0 h
+clockText' QuarterPast ds h m = "kwart na "  <> _dayComponent' 0 h
+clockText' (ToHalf m) ds h _ = toCardinal' m <> _mins m <> "voor half " <> _dayComponent' 1 h
+clockText' Half ds h _ = "half " <> _dayComponent' 1 h
+clockText' (PastHalf m) ds h _ = toCardinal' m <> _mins m <> "na half " <> _dayComponent' 1 h
+clockText' QuarterTo ds h _ = "kwart voor "  <> _dayComponent' 1 h
+clockText' (To m) ds h _ = toCardinal' m <> _mins m <> "voor " <> _dayComponent' 1 h
