@@ -20,16 +20,19 @@ The following languages are currently supported (in *alphabetical* order):
 ## Usage
 
 One can import the `Text.Numerals` module, and use the `toCardinal`,
-`toOrdinal` and `toShortOrdinal` functions with a number-to-word
-algorithm that is exported by the `Text.Numerals.Languages` module, for example:
+`toOrdinal`, `toShortOrdinal`, `toTimeText` and `toTimeText'` functions with a
+number-to-word algorithm that is exported by the `Text.Numerals.Languages` module,
+for example:
 
 ```
 Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toCardinal english 42)
 forty-two
 Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toOrdinal french 42)
 quarante-deuxième
-Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toShortOrdinal dutch 42)
-42e
+Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toShortOrdinal german 42)
+42.
+Prelude Text.Numerals Data.Text.IO> Data.Text.IO.putStrLn (toTimeText' dutch 18 42)
+twaalf minuten na half zeven 's avonds
 ```
 
 One can also define a language algorithm themselves, for this one can look at

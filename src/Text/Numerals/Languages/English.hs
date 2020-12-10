@@ -159,7 +159,7 @@ _dayComponent' = _dayComponent " "
 
 -- | Converting the time to a text that describes that time in /English/.
 clockText' :: ClockText
-clockText' OClock ds h _ = _dayComponent " o'clock " 0 ds
+clockText' OClock ds _ _ = _dayComponent " o'clock " 0 ds
 clockText' (Past m) ds _ _ = toCardinal' m <> " past " <> _dayComponent' 0 ds
 clockText' QuarterPast ds _ _ = "quarter past "  <> _dayComponent' 0 ds
 clockText' (ToHalf _) ds _ m = toCardinal' m <> " past " <> _dayComponent' 0 ds
