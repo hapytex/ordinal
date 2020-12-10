@@ -26,6 +26,8 @@ module Text.Numerals.Class (
   , DaySegment(DaySegment, dayPart, dayHour)
   , toDayPart, toDaySegment, toClockSegment
   , hourCorrection
+    -- * Convert the current time to words
+  , currentTimeText, currentTimeText'
     -- * Utility type synonyms
   , NumberToWords,  FreeNumberToWords
   , MergerFunction, FreeMergerFunction, ValueSplitter, FreeValueSplitter, NumberSegmenting
@@ -34,7 +36,8 @@ module Text.Numerals.Class (
 
 import Data.Default(Default(def))
 import Data.Text(Text)
-import Data.Time.LocalTime(TimeOfDay(TimeOfDay))
+import Data.Time.Clock(getCurrentTime, utctDayTime)
+import Data.Time.LocalTime(TimeOfDay(TimeOfDay), TimeZone, timeToTimeOfDay, utcToLocalTimeOfDay)
 
 -- | A type alias for a function that maps a number to a 'Text' object.
 type NumberToWords i = i -> Text
@@ -218,6 +221,21 @@ class NumToWord a where
       -> Text  -- ^ The time as /text/.
     toTimeText' gen h m = toTimeText gen (TimeOfDay h m 0)
     {-# MINIMAL ((toCardinal, toOrdinal, toShortOrdinal) | toWords), (toTimeText | toTimeText') #-}
+
+-- | Convert the current time in the given 'TimeZone' to the time in words with the given 'NumToWord'
+-- algorithm.
+currentTimeText :: NumToWord a
+  => TimeZone -- ^ The given 'TimeZone'.
+  -> a  -- ^ The 'NumToWord' algorithm that converts time to words.
+  -> IO Text  -- ^ An 'IO' that will generate a 'Text' object that describes the current time in words.
+currentTimeText tz alg = toTimeText alg . snd . utcToLocalTimeOfDay tz . timeToTimeOfDay . utctDayTime <$> getCurrentTime
+
+-- | Convert the current time to the time in words with the given 'NumToWord'
+-- algorithm as UTC time.
+currentTimeText' :: NumToWord a
+  => a  -- ^ The 'NumToWord' algorithm that converts time to words.
+  -> IO Text  -- ^ An 'IO' that will generate a 'Text' object that describes the current time in words.
+currentTimeText' alg = toTimeText alg . timeToTimeOfDay . utctDayTime <$> getCurrentTime
 
 -- | A type class used to split a value, based on the name of a number in a
 -- specific language. The value that is used to split, is often, depending on
