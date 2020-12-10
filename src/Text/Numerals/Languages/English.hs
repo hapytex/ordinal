@@ -32,7 +32,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm, NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(ClockText, valueSplit, toCardinal)
+import Text.Numerals.Class(ClockSegment(OClock, Past, QuarterPast, ToHalf, Half, PastHalf, QuarterTo, To), DayPart(Night, Morning, Afternoon, Evening), DaySegment(dayPart, dayHour), ClockText, hourCorrection, valueSplit, toCardinal)
 import Text.Numerals.Internal(_div10, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _rem10, _showIntegral)
 
 _ordinizepp :: Text -> Text
@@ -145,6 +145,25 @@ shortOrdinal' i = pack (_showIntegral i (_shortOrdinalSuffix i))
           go' 3 = "rd"
           go' _ = "th"
 
+_dayPartText :: DayPart -> Text
+_dayPartText Night = "at night"
+_dayPartText Morning = "in the morning"
+_dayPartText Afternoon = "in the afternoon"
+_dayPartText Evening = "in the evening"
+
+_dayComponent :: Text -> Int -> DaySegment -> Text
+_dayComponent sep dh h = toCardinal' (hourCorrection ((dayHour h) + dh)) <> sep <> _dayPartText (dayPart h)
+
+_dayComponent' :: Int -> DaySegment -> Text
+_dayComponent' = _dayComponent " "
+
 -- | Converting the time to a text that describes that time in /English/.
 clockText' :: ClockText
-clockText' cs ds h m = undefined
+clockText' OClock ds h _ = _dayComponent " o'clock " 0 ds
+clockText' (Past m) ds _ _ = toCardinal' m <> " past " <> _dayComponent' 0 ds
+clockText' QuarterPast ds _ _ = "quarter past "  <> _dayComponent' 0 ds
+clockText' (ToHalf _) ds _ m = toCardinal' m <> " past " <> _dayComponent' 0 ds
+clockText' Half ds _ _ = "half past " <> _dayComponent' 0 ds
+clockText' (PastHalf _) ds _ m = toCardinal' (60 - m) <> " to " <> _dayComponent' 1 ds
+clockText' QuarterTo ds _ _ = "quarter to "  <> _dayComponent' 1 ds
+clockText' (To m) ds _ _ = toCardinal' m <> " to " <> _dayComponent' 1 ds
