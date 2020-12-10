@@ -85,31 +85,49 @@ data NumberType
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
-type ClockText = ClockSegment -> DaySegment -> Int -> Int -> Text
+-- | The type of a function that converts time to its description. The first
+-- two parameters are used to make conversion more convenient.
+type ClockText
+  =  ClockSegment  -- ^ The 'ClockSegment' that describes the state of minutes within an hour.
+  -> DaySegment  -- ^ The 'DaySegment' that describes the state of hours within a day.
+  -> Int  -- ^ The number of hours.
+  -> Int  -- ^ The number of minutes.
+  -> Text  -- ^ A 'Text' object that describes the given time.
 
+-- | A data type that describes the state of the minutes within an hour.
 data ClockSegment
-  = OClock
-  | Past Int
-  | QuarterPast
-  | ToHalf Int
-  | Half
-  | PastHalf Int
-  | QuarterTo
-  | To Int
+  = OClock  -- ^ The number of minutes is zero.
+  | Past Int  -- ^ The parameter is the number of minutes past the hour, this is between @1@ and @14@.
+  | QuarterPast  -- ^ It is a quarter past the hour.
+  | ToHalf Int  -- ^ The parameter is the number of minutes until half, this is between @1@ and @14@.
+  | Half  -- ^ It is half past an hour.
+  | PastHalf Int  -- ^ The parameter is the number of minutes past half, this is between @1@ and @14@.
+  | QuarterTo  -- ^ It is a quarter to an hour.
+  | To Int  -- ^ The parameter is the number of minutes to the next hour, this is between @1@ and @14@.
   deriving (Eq, Ord, Read, Show)
 
+-- | A data type that describes the state of the hours within a day.
 data DayPart
-  = Night
-  | Morning
-  | Afternoon
-  | Evening
+  = Night  -- ^ It is night, this means that it is between @0:00@ and @5:59@.
+  | Morning  -- ^ It is morning, this means that it is between @6:00@ and @11:59@.
+  | Afternoon  -- ^ It is afternoon, this means it is between @12:00@ and @17:59@.
+  | Evening  -- ^ It is evening, this means it is between @18:00@ and @23:59@.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
+-- | A data type that describes the part of the day, and the number of hours on
+-- a 12-hour clock.
 data DaySegment
-  = DaySegment { dayPart :: DayPart, dayHour :: Int }
+  = DaySegment {
+        dayPart :: DayPart  -- ^ The part of the day.
+      , dayHour :: Int  -- ^ The number of hours, between @1@ and @12@ (both inclusive).
+      }
   deriving (Eq, Ord, Read, Show)
 
-toClockSegment :: Int -> ClockSegment
+
+-- | Convert the given number of minutes to the corresponding 'ClockSegment'.
+toClockSegment
+  :: Int  -- ^ The number of minutes.
+  -> ClockSegment  -- ^ The corresponding 'ClockSegment'.
 toClockSegment 0 = OClock
 toClockSegment 15 = QuarterPast
 toClockSegment 30 = Half
@@ -120,14 +138,20 @@ toClockSegment n
     | n <= 45 = PastHalf (n-30)
     | otherwise = To (60-n)
 
-toDayPart :: Int -> DayPart
+-- | Convert the given number of hours to the corresponding 'DayPart'.
+toDayPart
+  :: Int  -- ^ The given number of hours.
+  -> DayPart  -- ^ The corresponding 'DayPart'.
 toDayPart n
     | n <= 5 = Night
     | n <= 11 = Morning
     | n <= 17 = Afternoon
     | otherwise = Evening
 
-toDaySegment :: Int -> DaySegment
+-- | Convert the given number of hours to the corresponding 'DaySegment'.
+toDaySegment
+  :: Int  -- ^ The given number of hours.
+  -> DaySegment  -- ^ The corresponding 'DaySegment'.
 toDaySegment n = DaySegment (toDayPart n) (hourCorrection n)
 
 -- | Correct the hour to a 12 number segment.
@@ -178,14 +202,14 @@ class NumToWord a where
     toWords Cardinal = toCardinal
     toWords Ordinal = toOrdinal
     toWords ShortOrdinal = toShortOrdinal
-
+    
     -- | Convert the given time of the day to text describing that time.
     toTimeText
       :: a  -- ^ The conversion algorithm to transform numbers into words.
       -> TimeOfDay  -- ^ The time of the day to convert to words.
       -> Text  -- ^ The time as /text/.
     toTimeText gen (TimeOfDay h m _) = toTimeText' gen h m
-
+    
     -- | Convert the given hours and minutes to text that describes the time.
     toTimeText'
       :: a  -- ^ The conversion algorithm to transform numbers into words.
