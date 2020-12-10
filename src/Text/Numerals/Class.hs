@@ -21,8 +21,10 @@ module Text.Numerals.Class (
   , NumberSegment(NumberSegment, segmentDivision, segmentValue, segmentText, segmentRemainder)
   , MNumberSegment
     -- * Segments of time
-  , DaySegment(Morning, Afternoon, dayHour), ClockSegment(OClock, Past, QuarterPast, ToHalf, Half, PastHalf, QuarterTo, To)
-  , toDaySegment, toClockSegment
+  , ClockSegment(OClock, Past, QuarterPast, ToHalf, Half, PastHalf, QuarterTo, To)
+  , DayPart(Night, Morning, Afternoon, Evening)
+  , DaySegment(DaySegment, dayPart, dayHour)
+  , toDayPart, toDaySegment, toClockSegment
   , hourCorrection
     -- * Utility type synonyms
   , NumberToWords,  FreeNumberToWords
@@ -96,9 +98,15 @@ data ClockSegment
   | To Int
   deriving (Eq, Ord, Read, Show)
 
+data DayPart
+  = Night
+  | Morning
+  | Afternoon
+  | Evening
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
 data DaySegment
-  = Morning { dayHour :: Int }
-  | Afternoon { dayHour :: Int }
+  = DaySegment { dayPart :: DayPart, dayHour :: Int }
   deriving (Eq, Ord, Read, Show)
 
 toClockSegment :: Int -> ClockSegment
@@ -112,11 +120,15 @@ toClockSegment n
     | n <= 45 = PastHalf (n-30)
     | otherwise = To (60-n)
 
+toDayPart :: Int -> DayPart
+toDayPart n
+    | n <= 5 = Night
+    | n <= 11 = Morning
+    | n <= 17 = Afternoon
+    | otherwise = Evening
+
 toDaySegment :: Int -> DaySegment
-toDaySegment n
-    | n <= 12 = Morning h
-    | otherwise = Afternoon h
-    where h = hourCorrection n
+toDaySegment n = DaySegment (toDayPart n) (hourCorrection n)
 
 -- | Correct the hour to a 12 number segment.
 -- The input can be any Int number, whereas the
