@@ -167,7 +167,7 @@ _dayPartText Afternoon = "'s middags"
 _dayPartText Evening = "'s avonds"
 
 _dayComponent :: Text -> Int -> DaySegment -> Text
-_dayComponent sep dh h = toCardinal' (hourCorrection ((dayHour h) + dh)) <> sep <> _dayPartText (dayPart h)
+_dayComponent sep dh h = toCardinal' (hourCorrection (dayHour h + dh)) <> sep <> _dayPartText (dayPart h)
 
 _dayComponent' :: Int -> DaySegment -> Text
 _dayComponent' = _dayComponent " "
