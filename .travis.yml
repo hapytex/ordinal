@@ -17,6 +17,7 @@ install:
 - stack haddock
 script:
 - "! grep -E -i '[?][?][?]|TODO' $(find src -iname '*.hs')"
+- "! stack haddock --force-dirty 2>&1 | grep -P '^\\s*[0-9]{1,2}%'"
 - stack --no-terminal --skip-ghc-check test
 - curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s .
 deploy:

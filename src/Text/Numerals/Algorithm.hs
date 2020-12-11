@@ -35,11 +35,13 @@ import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
 import Text.Numerals.Class(
-    NumToWord(toCardinal, toOrdinal, toShortOrdinal)
+    NumToWord(toCardinal, toOrdinal, toShortOrdinal, toTimeText')
   , FreeMergerFunction, FreeNumberToWords, FreeValueSplitter
   , MergerFunction, MNumberSegment
   , NumberSegment(NumberSegment), NumberSegmenting
   , ValueSplit(valueSplit), ValueSplitter
+  , ClockText
+  , toClockSegment, toDaySegment
   )
 import Text.Numerals.Internal(_thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefixes)
@@ -55,6 +57,7 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
   , mergeFunction :: FreeMergerFunction  -- ^ A function that specifies how to merge words based on the grammar of that specific language.
   , ordinize :: Text -> Text  -- ^ A function to conver the /cardinal/ form of a number in an /ordinal/ one.
   , shortOrdinal :: FreeNumberToWords -- ^ A function that converts a number to its /short ordinal/ form.
+  , clockText :: ClockText  -- ^ A function that converts the clock segment and day segment to a /Text/ that describes the time of the day in words.
   }
 
 
@@ -68,6 +71,7 @@ instance NumToWord NumeralsAlgorithm where
 
     toOrdinal na@NumeralsAlgorithm { ordinize=_ordinize } = _ordinize . toCardinal na
     toShortOrdinal = shortOrdinal
+    toTimeText' alg h m = clockText alg (toClockSegment m) (toDaySegment h) h m
 
 
 _toNumberScale :: (Integral i, Integral j) => i -> (j, i)
@@ -128,7 +132,7 @@ instance ValueSplit HighNumberAlgorithm where
 -- | A /smart constructor/ for the 'NumeralsAlgorithm' type. This constructor
 -- allows one to use an arbitrary 'Foldable' type for the low words and mid
 -- words. It will also order the midwords accordingly.
-numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> FreeNumberToWords -> NumeralsAlgorithm
+numeralsAlgorithm :: (Foldable f, Foldable g) => Text -> Text -> Text -> f Text -> g (Integer, Text) -> FreeValueSplitter -> FreeMergerFunction -> (Text -> Text) -> FreeNumberToWords -> ClockText -> NumeralsAlgorithm
 numeralsAlgorithm minus zero one _lowWords _midWords = NumeralsAlgorithm minus one (fromList (zero : one : toList _lowWords)) (sortOn (negate . fst) (toList _midWords))
 
 _maybeSegment :: Integral i => (i -> NumberSegment i) -> i -> MNumberSegment i

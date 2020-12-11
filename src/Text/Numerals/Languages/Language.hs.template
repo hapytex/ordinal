@@ -18,6 +18,8 @@ This module contains logic to convert numbers to words in the /???/ language.
 module Text.Numerals.Languages.??? (
     -- * Num to word algorithm
     ???
+    -- * Convert a cardinal number to text
+  , toCardinal'
     -- * Convert to ordinal
   , ordinize'
     -- * Constant words
@@ -34,7 +36,7 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit)
+import Text.Numerals.Class(ClockText, FreeMergerFunction, valueSplit, toCardinal)
 import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
@@ -44,7 +46,13 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /???/ language.
 ??? :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+??? = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
+
+-- | Convert numers to their cardinal counterpart in /???/.
+toCardinal' :: Integral i
+  => i  -- ^ The number to convert to text.
+  -> Text  -- ^ The cardinal counterpart in /???/.
+toCardinal' = toCardinal ???
 
 -- | The words used to mark a negative number in the /???/ language.
 negativeWord' :: Text
@@ -94,3 +102,7 @@ shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = ???
+
+-- | Converting the time to a text that describes that time in /???/.
+clockText' :: ClockText
+clockText' cs ds h m = ???

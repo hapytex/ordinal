@@ -13,6 +13,8 @@ This module contains logic to convert numbers to words in the /French/ language.
 module Text.Numerals.Languages.French (
     -- * Num to word algorithm
     french
+    -- * Convert a cardinal number to text
+  , toCardinal'
     -- * Convert to ordinal
   , ordinize'
     -- * Constant words
@@ -28,8 +30,8 @@ import Data.Vector(Vector)
 
 import Text.Numerals.Algorithm(HighNumberAlgorithm(LongScale), NumeralsAlgorithm, numeralsAlgorithm)
 import Text.Numerals.Algorithm.Template(ordinizeFromDict)
-import Text.Numerals.Class(FreeMergerFunction, valueSplit)
-import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _showIntegral, _stripLastIf, _thousand)
+import Text.Numerals.Class(ClockSegment(OClock, QuarterPast, Half, QuarterTo), DayPart(Night, Morning, Afternoon, Evening), DaySegment(dayPart, dayHour), ClockText, FreeMergerFunction, valueSplit, toCardinal)
+import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _mergeWithHyphen, _million, _pluralize', _showIntegral, _stripLastIf, _thousand)
 
 $(pure (ordinizeFromDict "_ordinize'" [
     ("cinq", "cinqu")
@@ -38,7 +40,13 @@ $(pure (ordinizeFromDict "_ordinize'" [
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /French/ language.
 french :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal'
+french = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
+
+-- | Convert numers to their cardinal counterpart in /French/.
+toCardinal' :: Integral i
+  => i  -- ^ The number to convert to text.
+  -> Text  -- ^ The cardinal counterpart in /French/.
+toCardinal' = toCardinal french
 
 -- | The words used to mark a negative number in the /French/ language.
 negativeWord' :: Text
@@ -128,3 +136,25 @@ shortOrdinal' :: Integral i
   => i  -- ^ The number to convert to /short ordinal/ form.
   -> Text  -- ^ The equivalent 'Text' specifying the number in /short ordinal/ form.
 shortOrdinal' = pack . (`_showIntegral` "e")
+
+_dayPartText :: DayPart -> Text
+_dayPartText Night = " de la nuit"
+_dayPartText Morning = " du matin"
+_dayPartText Afternoon = " de l'après-midi"
+_dayPartText Evening = " du soir"
+
+_heures :: Text -> Int -> DaySegment -> Text
+_heures sep dh ds = toCardinal' h <> _pluralize' "e heure" " heures" h <> sep <> _dayPartText (dayPart ds)
+    where h = dayHour ds + dh
+
+-- | Converting the time to a text that describes that time in /French/.
+clockText' :: ClockText
+clockText' _ _ 0 0 = "minuit"
+clockText' _ _ 12 0 = "midi"
+clockText' OClock ds _ _ = _heures "" 0 ds
+clockText' QuarterPast ds _ _ = _heures " et quart" 0 ds
+clockText' Half ds _ _ = _heures " et demie" 0 ds
+clockText' QuarterTo ds _ _ = _heures " moins le quart" 1 ds
+clockText' _ ds _ m
+    | m <= 30 = _heures (" " <> toCardinal' m) 0 ds
+    | otherwise = _heures (" moins " <> toCardinal' (60 - m)) 1 ds

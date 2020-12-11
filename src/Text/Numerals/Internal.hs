@@ -2,6 +2,7 @@
 
 module Text.Numerals.Internal (
     _div10, _rem10, _divisableBy, _divisable100
+  , _pluralize, _pluralize'
   , _showText
   , _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix
   , _hundred, _thousand, _million, _billion, _trillion
@@ -14,6 +15,17 @@ module Text.Numerals.Internal (
 import Data.Char(intToDigit)
 import Data.Text(Text, cons, dropEnd, isSuffixOf, singleton, pack)
 import qualified Data.Text as T
+
+_pluralize :: a -> a -> Int -> a
+_pluralize sing plur = go
+    where go 1 = sing
+          go (-1) = sing
+          go _ = plur
+
+_pluralize' :: a -> a -> Int -> a
+_pluralize' sing plur = go
+    where go 1 = sing
+          go _ = plur
 
 _stripLastIf :: Char -> Text -> Text
 _stripLastIf c t
