@@ -1,6 +1,6 @@
 # ordinal
 
-[![Build Status of the package by Travis](https://travis-ci.com/hapytex/ordinal.svg?branch=master)](https://travis-ci.com/hapytex/ordinal)
+[![Build Status of the package by GitHub actions](https://github.com/hapytex/ordinal/actions/workflows/build-ci.yml/badge.svg)](https://github.com/hapytex/ordinal/actions/workflows/build-ci.yml)
 [![Build Status of the package by Hackage](https://matrix.hackage.haskell.org/api/v2/packages/ordinal/badge)](https://matrix.hackage.haskell.org/#/package/ordinal)
 [![Hackage version badge](https://img.shields.io/hackage/v/ordinal.svg)](https://hackage.haskell.org/package/ordinal)
 
