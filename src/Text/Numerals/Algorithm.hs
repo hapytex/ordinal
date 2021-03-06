@@ -34,6 +34,9 @@ import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
+import Test.QuickCheck(oneof)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink))
+
 import Text.Numerals.Class(
     NumToWord(toCardinal, toOrdinal, toShortOrdinal, toTimeText')
   , FreeMergerFunction, FreeNumberToWords, FreeValueSplitter
@@ -43,7 +46,7 @@ import Text.Numerals.Class(
   , ClockText
   , toClockSegment, toDaySegment
   )
-import Text.Numerals.Internal(_thousand, _iLogFloor)
+import Text.Numerals.Internal(_genText, _shrinkText, _thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefixes)
 
 -- | A data type for algorithmic number to word conversions. Most western
@@ -86,6 +89,11 @@ data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
   deriving (Eq, Ord, Read, Show)
+
+instance Arbitrary HighNumberAlgorithm where
+  arbitrary = oneof [ShortScale <$> _genText, LongScale <$> _genText <*> _genText]
+  shrink (ShortScale t) = ShortScale <$> _shrinkText t
+  shrink (LongScale ta tb) = ((`LongScale` tb) <$> _shrinkText ta) <> (LongScale ta <$> _shrinkText tb)
 
 instance Default HighNumberAlgorithm where
     def = ShortScale "illion"
