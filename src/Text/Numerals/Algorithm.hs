@@ -34,6 +34,10 @@ import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
 
+import Test.QuickCheck(oneof)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink))
+
+import Text.Numerals.Internal(_genText, _shrinkText)
 import Text.Numerals.Class(
     NumToWord(toCardinal, toOrdinal, toShortOrdinal, toTimeText')
   , FreeMergerFunction, FreeNumberToWords, FreeValueSplitter
@@ -86,6 +90,11 @@ data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
   deriving (Eq, Ord, Read, Show)
+
+instance Arbitrary HighNumberAlgorithm where
+  arbitrary = oneof [ShortScale <$> _genText, LongScale <$> _genText <*> _genText]
+  shrink (ShortScale t) = ShortScale <$> _shrinkText t
+  shrink (LongScale ta tb) = ((`LongScale` tb) <$> _shrinkText ta) <> (LongScale ta <$> _shrinkText tb)
 
 instance Default HighNumberAlgorithm where
     def = ShortScale "illion"

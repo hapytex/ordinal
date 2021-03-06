@@ -39,6 +39,11 @@ import Data.Text(Text)
 import Data.Time.Clock(getCurrentTime, utctDayTime)
 import Data.Time.LocalTime(TimeOfDay(TimeOfDay), TimeZone, timeToTimeOfDay, utcToLocalTimeOfDay)
 
+import Test.QuickCheck(choose)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
+
+import Text.Numerals.Internal(_genText, _shrinkText)
+
 -- | A type alias for a function that maps a number to a 'Text' object.
 type NumberToWords i = i -> Text
 
@@ -76,6 +81,19 @@ data NumberSegment i = NumberSegment {
   , segmentRemainder ::  MNumberSegment i  -- ^ The optional remainder part. 'Nothing' if the remainder is equal to zero.
   } deriving (Foldable, Functor, Eq, Ord, Read, Show)
 
+instance Arbitrary1 NumberSegment where
+  liftArbitrary gen = go
+      where go = NumberSegment <$> liftArbitrary go <*> gen <*> _genText <*> liftArbitrary go
+
+instance Arbitrary i => Arbitrary (NumberSegment i) where
+  arbitrary = arbitrary1
+  shrink (NumberSegment dv val txt rm) =
+    ((\x -> NumberSegment x val txt rm) <$> shrink dv) <>
+    ((\x -> NumberSegment dv x txt rm) <$> shrink val) <>
+    ((\x -> NumberSegment dv val x rm) <$> _shrinkText txt) <>
+    (NumberSegment dv val txt <$> shrink rm)
+
+
 -- | A 'Maybe' variant of the 'NumberSegment' data type. This is used since the
 -- division part can be one, or the remainder part can be zero.
 type MNumberSegment i = Maybe (NumberSegment i)
@@ -87,6 +105,9 @@ data NumberType
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary NumberType where
+  arbitrary = arbitraryBoundedEnum
 
 -- | The type of a function that converts time to its description. The first
 -- two parameters are used to make conversion more convenient.
@@ -109,6 +130,9 @@ data ClockSegment
   | To Int  -- ^ The parameter is the number of minutes to the next hour, this is between @1@ and @14@.
   deriving (Eq, Ord, Read, Show)
 
+instance Arbitrary ClockSegment where
+  arbitrary = toClockSegment <$> choose (0, 59)
+
 -- | A data type that describes the state of the hours within a day.
 data DayPart
   = Night  -- ^ It is night, this means that it is between @0:00@ and @5:59@.
@@ -116,6 +140,9 @@ data DayPart
   | Afternoon  -- ^ It is afternoon, this means it is between @12:00@ and @17:59@.
   | Evening  -- ^ It is evening, this means it is between @18:00@ and @23:59@.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary DayPart where
+  arbitrary = arbitraryBoundedEnum
 
 -- | A data type that describes the part of the day, and the number of hours on
 -- a 12-hour clock.
@@ -126,6 +153,8 @@ data DaySegment
       }
   deriving (Eq, Ord, Read, Show)
 
+instance Arbitrary DaySegment where
+  arbitrary = toDaySegment <$> choose (0, 23)
 
 -- | Convert the given number of minutes to the corresponding 'ClockSegment'.
 toClockSegment
@@ -205,14 +234,14 @@ class NumToWord a where
     toWords Cardinal = toCardinal
     toWords Ordinal = toOrdinal
     toWords ShortOrdinal = toShortOrdinal
-    
+
     -- | Convert the given time of the day to text describing that time.
     toTimeText
       :: a  -- ^ The conversion algorithm to transform numbers into words.
       -> TimeOfDay  -- ^ The time of the day to convert to words.
       -> Text  -- ^ The time as /text/.
     toTimeText gen (TimeOfDay h m _) = toTimeText' gen h m
-    
+
     -- | Convert the given hours and minutes to text that describes the time.
     toTimeText'
       :: a  -- ^ The conversion algorithm to transform numbers into words.

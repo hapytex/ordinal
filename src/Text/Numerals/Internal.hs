@@ -10,11 +10,18 @@ module Text.Numerals.Internal (
   , _stripLastIf
   , _showIntegral
   , _showPositive
+  , _genText, _shrinkText
   ) where
 
+import Control.Applicative(liftA2)
+
 import Data.Char(intToDigit)
-import Data.Text(Text, cons, dropEnd, isSuffixOf, singleton, pack)
+import Data.Text(Text, cons, dropEnd, inits, isSuffixOf, singleton, tails, pack)
 import qualified Data.Text as T
+
+import Test.QuickCheck(listOf)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary))
+import Test.QuickCheck.Gen(Gen)
 
 _pluralize :: a -> a -> Int -> a
 _pluralize sing plur = go
@@ -108,3 +115,9 @@ _showPositive n s
     | otherwise = _showPositive q tl
     where (q, r) = quotRem n 10
           tl = intToDigit (fromIntegral r) : s
+
+_genText :: Gen Text
+_genText = pack <$> listOf arbitrary
+
+_shrinkText :: Text -> [Text]
+_shrinkText = liftA2 (zipWith (<>)) inits (tails . T.drop 1)
