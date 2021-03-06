@@ -37,7 +37,6 @@ import qualified Data.Vector as V
 import Test.QuickCheck(oneof)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink))
 
-import Text.Numerals.Internal(_genText, _shrinkText)
 import Text.Numerals.Class(
     NumToWord(toCardinal, toOrdinal, toShortOrdinal, toTimeText')
   , FreeMergerFunction, FreeNumberToWords, FreeValueSplitter
@@ -47,7 +46,7 @@ import Text.Numerals.Class(
   , ClockText
   , toClockSegment, toDaySegment
   )
-import Text.Numerals.Internal(_thousand, _iLogFloor)
+import Text.Numerals.Internal(_genText, _shrinkText, _thousand, _iLogFloor)
 import Text.Numerals.Prefix(latinPrefixes)
 
 -- | A data type for algorithmic number to word conversions. Most western
