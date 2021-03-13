@@ -88,7 +88,9 @@ There is a `src/Text/Numerals/Languages/Language.hs.template` template file to
 include a new language. This includes a list of tasks to do in order to add the
 language. The `test/` directory contains a `test/Text/Numerals/Languages/LanguageSpec.hs.template`
 file to test the new language. In these templates, one needs to fill in the
-`???` parts.
+`???` parts. One can make use of the `new-language.sh` script to automatically
+copy the templates and open the editor to add the language. In that case the name
+of the language is passed as first parameter.
 
 Normally the languages are tested for all numbers in the 0-200 range, and the
 first hundred Fibonacci numbers greater than 200, so:
