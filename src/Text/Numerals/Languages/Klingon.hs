@@ -10,14 +10,11 @@ Portability : POSIX
 This module contains logic to convert numbers to words in the /Klingon/ language.
 -}
 
--- TODO: Add to the Text.Numerals.Languages module (remove note after adding it)
 -- TODO: Add extra tests for the language (remove note after adding tests)
--- TODO: Add the module to the *.cabal file (remove note after adding it)
--- TODO: Add the language to the README.md (remove note after adding it)
 
 module Text.Numerals.Languages.Klingon (
     -- * Num to word algorithm
-    ???
+    klingon
     -- * Convert a cardinal number to text
   , toCardinal'
     -- * Convert to ordinal
@@ -25,10 +22,13 @@ module Text.Numerals.Languages.Klingon (
     -- * Constant words
   , negativeWord', zeroWord', oneWord'
     -- * Names for numbers
-  , lowWords', midWords', highWords'
+  , lowWords', midWords'
     -- * Merge function
   , merge'
   ) where
+
+
+import Debug.Trace(trace)
 
 import Data.Text(Text, isSuffixOf, snoc)
 import qualified Data.Text as T
@@ -41,7 +41,7 @@ import Text.Numerals.Internal(_divisable100, _mergeWith, _mergeWithSpace, _merge
 
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /Klingon/ language.
 klingon :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
-klingon = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
+klingon = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (const Nothing) merge' ordinize' shortOrdinal' clockText'
 
 -- | Convert numers to their cardinal counterpart in /Klingon/.
 toCardinal' :: Integral i
@@ -89,20 +89,14 @@ midWords' = [
 -- | A merge function that is used to combine the names of words together to
 -- larger words, according to the /Klingon/ grammar rules.
 merge' :: FreeMergerFunction
-merge' a b
-  | a < b = (<>)
-  | otherwise = _mergeWithSpace
+merge' 1 b | b < 10 = const id
+merge' a b | a < b = (<>)
+           | otherwise = _mergeWithSpace
 
 -- | A function that converts a number in words in /cardinal/ form to /ordinal/
 -- form according to the /Klingon/ language rules.
 ordinize' :: Text -> Text
 ordinize' = (<> "DIch")
-
--- | An algorithm to obtain the names of /large/ numbers (one million or larger)
--- in /Klingon/. Klingon uses a /long scale/ with the @???@ and @???@
--- suffixes.
-highWords' :: HighNumberAlgorithm
-highWords' =  LongScale "???" "???"
 
 -- | A function to convert a number to its /short ordinal/ form in /Klingon/.
 shortOrdinal' :: Integral i
