@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Text.Numerals.Languages.???Spec (
     spec
   ) where

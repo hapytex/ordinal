@@ -1,5 +1,5 @@
 module Text.Numerals.LanguageTest (
-    testLanguage
+    testLanguage, testTimeLanguage
   ) where
 
 import Data.Int(Int8, Int16, Int32, Int64)
@@ -9,7 +9,7 @@ import Data.Word(Word8, Word16, Word32, Word64)
 import Test.Hspec(SpecWith, describe, it, shouldBe)
 import Test.QuickCheck(property)
 
-import Text.Numerals.Class(toCardinal, toOrdinal, toShortOrdinal)
+import Text.Numerals.Class(toCardinal, toOrdinal, toShortOrdinal, toTimeText')
 import Text.Numerals.Algorithm(NumeralsAlgorithm)
 
 testDifferCardinal :: NumeralsAlgorithm -> Integer -> Integer -> Bool
@@ -26,6 +26,9 @@ testDifferCardinalOrdinal' al n1 n2 = toCardinal al n1 /= toOrdinal al n2
 
 testNumberConversion :: (Integer -> Text) -> Integer -> Text -> SpecWith ()
 testNumberConversion f n t = it (show n) (f n `shouldBe` t)
+
+testTimeConversion :: (Int -> Int -> Text) -> Int -> Int -> Text -> SpecWith ()
+testTimeConversion f h m t = it (show (h, m)) (f h m `shouldBe` t)
 
 testEquivalenceCardinal :: Integral i => NumeralsAlgorithm -> i -> Bool
 testEquivalenceCardinal al i = toCardinal al i == toCardinal al (fromIntegral i :: Integer)
@@ -78,3 +81,6 @@ testLanguage languageName al cs os ss = describe languageName $ do
     describe "Test cardinal numbers" (mapM_ (uncurry (testNumberConversion (toCardinal al))) cs)
     describe "Test ordinal numbers" (mapM_ (uncurry (testNumberConversion (toOrdinal al))) os)
     describe "Test short ordinal numbers" (mapM_ (uncurry (testNumberConversion (toShortOrdinal al))) ss)
+
+testTimeLanguage :: String -> NumeralsAlgorithm -> [(Int, Int, Text)] -> SpecWith ()
+testTimeLanguage languageName al ts = describe languageName (describe "test time to text" (mapM_ (\(h, m, t) -> testTimeConversion (toTimeText' al) h m t) ts))

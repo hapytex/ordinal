@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 
 {-|
 Module      : Text.Numerals.Languages.Klingon
@@ -106,4 +106,6 @@ shortOrdinal' = undefined
 
 -- | Converting the time to a text that describes that time in /Klingon/.
 clockText' :: ClockText
-clockText' cs ds h m = undefined
+-- clockText' _ _ h 0 = toCardinal' h <> "vatlh rep"
+-- clockText' _ _ 0 m | m > 0 = "pagh " <> toCardinal' m <> " rep"
+clockText' _ _ h m = toCardinal' h <> "maH " <> toCardinal' m <> " rep"
