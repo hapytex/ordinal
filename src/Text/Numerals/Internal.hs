@@ -16,9 +16,6 @@ module Text.Numerals.Internal (
 import Control.Applicative(liftA2)
 
 import Data.Char(intToDigit)
-#if __GLASGOW_HASKELL__ < 803
-import Data.Semigroup((<>))
-#endif
 import Data.Text(Text, cons, dropEnd, inits, isSuffixOf, singleton, tails, pack)
 import qualified Data.Text as T
 
