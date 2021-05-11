@@ -28,6 +28,12 @@ cabal.project.local~
 
 *.dot
 
+# liquid data
+**/.liquid/
+*/.liquid/
+.liquid
+
+# sample data
 samples
 samples/
 samples/*
