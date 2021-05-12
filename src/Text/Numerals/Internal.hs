@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE CPP, Safe #-}
 
 module Text.Numerals.Internal (
     _div10, _rem10, _divisableBy, _divisable100
