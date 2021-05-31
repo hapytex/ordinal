@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, RankNTypes, TupleSections #-}
+{-# LANGUAGE CPP, OverloadedStrings, RankNTypes, TupleSections #-}
 
 {-|
 Module      : Text.Numerals.Algorithm

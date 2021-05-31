@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, QuasiQuotes, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedLists, OverloadedStrings, QuasiQuotes, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.German

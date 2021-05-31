@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskellQuotes #-}
+{-# LANGUAGE CPP, TemplateHaskellQuotes #-}
 
 {-|
 Module      : Text.Numerals.Algorithm.Template

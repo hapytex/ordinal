@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.French
