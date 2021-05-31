@@ -26,6 +26,9 @@ module Text.Numerals.Languages.English (
   ) where
 
 import Data.Default(def)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, isSuffixOf, pack)
 import qualified Data.Text as T
 import Data.Vector(Vector)

@@ -26,6 +26,9 @@ module Text.Numerals.Languages.German (
   ) where
 
 import Data.Bool(bool)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, isSuffixOf, pack, toLower, toTitle)
 import Data.Vector(Vector)
 
