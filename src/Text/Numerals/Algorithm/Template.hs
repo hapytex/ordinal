@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskellQuotes #-}
+{-# LANGUAGE CPP, TemplateHaskellQuotes #-}
 
 {-|
 Module      : Text.Numerals.Algorithm.Template
@@ -16,6 +16,9 @@ module Text.Numerals.Algorithm.Template (
   ) where
 
 import Data.Map.Strict(Map, elems, fromListWith)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, isSuffixOf, pack, snoc)
 
 import Text.Numerals.Internal(_replaceSuffix)
