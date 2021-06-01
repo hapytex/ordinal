@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, RankNTypes, Safe #-}
+{-# LANGUAGE CPP, DeriveFunctor, DeriveFoldable, RankNTypes, Safe #-}
 
 {-|
 Module      : Text.Numerals.Class
@@ -35,6 +35,9 @@ module Text.Numerals.Class (
   ) where
 
 import Data.Default(Default(def))
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text)
 import Data.Time.Clock(getCurrentTime, utctDayTime)
 import Data.Time.LocalTime(TimeOfDay(TimeOfDay), TimeZone, timeToTimeOfDay, utcToLocalTimeOfDay)
