@@ -152,7 +152,7 @@ ordinize' = postprocess . (<> "te") . _ordinize' . toLower
 -- in /German/. German uses a /long scale/ with the @illion@ and @illiard@
 -- suffixes.
 highWords' :: HighNumberAlgorithm
-highWords' =  LongScale "illion" "illiard"
+highWords' =  LongScale "illion" "illiarde"
 
 -- | A function to convert a number to its /short ordinal/ form in /German/.
 shortOrdinal' :: Integral i
