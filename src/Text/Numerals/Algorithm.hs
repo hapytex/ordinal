@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, OverloadedStrings, RankNTypes, TupleSections #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, OverloadedStrings, RankNTypes, TupleSections #-}
 
 {-|
 Module      : Text.Numerals.Algorithm
@@ -27,6 +27,9 @@ module Text.Numerals.Algorithm (
   , compressSegments
   ) where
 
+import Control.DeepSeq(NFData)
+
+import Data.Data(Data)
 import Data.Default(Default(def))
 import Data.Foldable(toList)
 import Data.List(sortOn)
@@ -36,6 +39,8 @@ import Data.Semigroup((<>))
 import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck(oneof)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink))
@@ -66,7 +71,6 @@ data NumeralsAlgorithm = NumeralsAlgorithm {
   , clockText :: ClockText  -- ^ A function that converts the clock segment and day segment to a /Text/ that describes the time of the day in words.
   }
 
-
 instance NumToWord NumeralsAlgorithm where
     toCardinal NumeralsAlgorithm { minusWord=_minusWord, oneWord=_oneWord, lowWords=_lowWords, midWords=_midWords, highWords=_highWords, mergeFunction=_mergeFunction } = cardinal
        where cardinal i
@@ -91,7 +95,9 @@ _toNumberScale i = (l, k)
 data HighNumberAlgorithm
   = ShortScale Text
   | LongScale Text Text
-  deriving (Eq, Ord, Read, Show)
+  deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance NFData HighNumberAlgorithm
 
 instance Arbitrary HighNumberAlgorithm where
   arbitrary = oneof [ShortScale <$> _genText, LongScale <$> _genText <*> _genText]

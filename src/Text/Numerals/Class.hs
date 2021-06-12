@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveFunctor, DeriveFoldable, RankNTypes, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveGeneric, RankNTypes, Safe #-}
 
 {-|
 Module      : Text.Numerals.Class
@@ -34,6 +34,9 @@ module Text.Numerals.Class (
   , ClockText
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
+
+import Data.Data(Data)
 import Data.Default(Default(def))
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
@@ -41,6 +44,8 @@ import Data.Semigroup((<>))
 import Data.Text(Text)
 import Data.Time.Clock(getCurrentTime, utctDayTime)
 import Data.Time.LocalTime(TimeOfDay(TimeOfDay), TimeZone, timeToTimeOfDay, utcToLocalTimeOfDay)
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck(choose)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary, shrink), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
@@ -82,7 +87,11 @@ data NumberSegment i = NumberSegment {
   , segmentValue :: i  -- ^ The value of the given segment.
   , segmentText :: Text  -- ^ The name of the value of the given segment, in a specific language.
   , segmentRemainder ::  MNumberSegment i  -- ^ The optional remainder part. 'Nothing' if the remainder is equal to zero.
-  } deriving (Foldable, Functor, Eq, Ord, Read, Show)
+  } deriving (Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show)
+
+instance NFData a => NFData (NumberSegment a)
+
+instance NFData1 NumberSegment
 
 instance Arbitrary1 NumberSegment where
   liftArbitrary gen = go
@@ -107,10 +116,12 @@ data NumberType
   = Cardinal  -- ^ /Cardinal/ numbers like one, two, three, etc.
   | Ordinal  -- ^ /Ordinal/ numbers like first, second, third, etc.
   | ShortOrdinal -- ^ /Short ordinal/ numbers like 1st, 2nd, 3rd, etc.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary NumberType where
   arbitrary = arbitraryBoundedEnum
+
+instance NFData NumberType
 
 -- | The type of a function that converts time to its description. The first
 -- two parameters are used to make conversion more convenient.
@@ -131,7 +142,9 @@ data ClockSegment
   | PastHalf Int  -- ^ The parameter is the number of minutes past half, this is between @1@ and @14@.
   | QuarterTo  -- ^ It is a quarter to an hour.
   | To Int  -- ^ The parameter is the number of minutes to the next hour, this is between @1@ and @14@.
-  deriving (Eq, Ord, Read, Show)
+  deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance NFData ClockSegment
 
 instance Arbitrary ClockSegment where
   arbitrary = toClockSegment <$> choose (0, 59)
@@ -142,10 +155,12 @@ data DayPart
   | Morning  -- ^ It is morning, this means that it is between @6:00@ and @11:59@.
   | Afternoon  -- ^ It is afternoon, this means it is between @12:00@ and @17:59@.
   | Evening  -- ^ It is evening, this means it is between @18:00@ and @23:59@.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary DayPart where
   arbitrary = arbitraryBoundedEnum
+
+instance NFData DayPart
 
 -- | A data type that describes the part of the day, and the number of hours on
 -- a 12-hour clock.
@@ -154,10 +169,12 @@ data DaySegment
         dayPart :: DayPart  -- ^ The part of the day.
       , dayHour :: Int  -- ^ The number of hours, between @1@ and @12@ (both inclusive).
       }
-  deriving (Eq, Ord, Read, Show)
+  deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary DaySegment where
   arbitrary = toDaySegment <$> choose (0, 23)
+
+instance NFData DaySegment
 
 -- | Convert the given number of minutes to the corresponding 'ClockSegment'.
 toClockSegment
