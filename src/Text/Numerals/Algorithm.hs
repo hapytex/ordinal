@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, RankNTypes, TupleSections #-}
+{-# LANGUAGE CPP, OverloadedStrings, RankNTypes, TupleSections #-}
 
 {-|
 Module      : Text.Numerals.Algorithm
@@ -30,6 +30,9 @@ module Text.Numerals.Algorithm (
 import Data.Default(Default(def))
 import Data.Foldable(toList)
 import Data.List(sortOn)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, cons, toTitle)
 import Data.Vector(Vector, (!), (!?), fromList)
 import qualified Data.Vector as V

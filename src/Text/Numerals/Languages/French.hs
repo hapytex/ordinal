@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedLists, OverloadedStrings, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.French
@@ -25,6 +25,9 @@ module Text.Numerals.Languages.French (
   , merge'
   ) where
 
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, isSuffixOf, pack, snoc)
 import Data.Vector(Vector)
 

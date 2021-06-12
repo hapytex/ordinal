@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings, QuasiQuotes, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedLists, OverloadedStrings, QuasiQuotes, TemplateHaskell #-}
 
 {-|
 Module      : Text.Numerals.Languages.German
@@ -26,6 +26,9 @@ module Text.Numerals.Languages.German (
   ) where
 
 import Data.Bool(bool)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, isSuffixOf, pack, toLower, toTitle)
 import Data.Vector(Vector)
 
@@ -149,7 +152,7 @@ ordinize' = postprocess . (<> "te") . _ordinize' . toLower
 -- in /German/. German uses a /long scale/ with the @illion@ and @illiard@
 -- suffixes.
 highWords' :: HighNumberAlgorithm
-highWords' =  LongScale "illion" "illiard"
+highWords' =  LongScale "illion" "illiarde"
 
 -- | A function to convert a number to its /short ordinal/ form in /German/.
 shortOrdinal' :: Integral i

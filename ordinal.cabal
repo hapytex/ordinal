@@ -1,5 +1,5 @@
 name:                ordinal
-version:             0.4.0.0
+version:             0.4.0.6
 synopsis:            Convert numbers to words in different languages.
 description:
     A package based on Python's num2words package that converts numbers
@@ -41,7 +41,7 @@ library
       base >= 4.7 && < 5
     , containers >=0.5
     , data-default >=0.2
-    , QuickCheck >=2.13 && <2.14
+    , QuickCheck >=2.8
     , regex >=1.0
     , text >= 0.1
     , time >=1.0
@@ -64,8 +64,9 @@ test-suite             cardinal
       base
     , ordinal
     , hspec ==2.*
-    , QuickCheck >=2.13 && <2.14
+    , QuickCheck >=2.8
     , text >= 0.1
+    , time >=1.0
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   default-language:    Haskell2010
   default-extensions:
