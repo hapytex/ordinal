@@ -1,0 +1,1061 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_J3LqS7qwAYc05yjFhHFSiy"></span><span class="hs-pragma">{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, OverloadedStrings, RankNTypes, TupleSections #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module      : Text.Numerals.Algorithm
+Description : A module that contains functions to construct algorithmic conversions from numbers to words.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+A module that contains data types and functions to automatically convert a number to words. It has tooling for a 'NumeralsAlgorithm'
+as well as a 'HighNumberAlgorithm' that is used to generate a 'ShortScale' or 'LongScale'.
+-}</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.Numerals.Algorithm</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Data types for number algorithms</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier">NumeralsAlgorithm</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#numeralsAlgorithm"><span class="hs-identifier">numeralsAlgorithm</span></a></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Large number algorithms</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier">HighNumberAlgorithm</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier">ShortScale</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier">LongScale</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#shortScale"><span class="hs-identifier">shortScale</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#longScale"><span class="hs-identifier">longScale</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#shortScaleTitle"><span class="hs-identifier">shortScaleTitle</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#longScaleTitle"><span class="hs-identifier">longScaleTitle</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier">valueSplit'</span></a></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Conversion to a 'NumberSegment'</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegments"><span class="hs-identifier">toSegments</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentLow"><span class="hs-identifier">toSegmentLow</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentMid"><span class="hs-identifier">toSegmentMid</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentHigh"><span class="hs-identifier">toSegmentHigh</span></a></span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Segment compression</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#compressSegments"><span class="hs-identifier">compressSegments</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Default</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Default</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">def</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Foldable</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toList</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sortOn</span></span><span class="hs-special">)</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">cons</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">toTitle</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Vector</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Vector</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">!</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(!?)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromList</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Vector</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">V</span></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">oneof</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shrink</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html"><span class="hs-identifier">Text.Numerals.Class</span></a></span><span class="hs-special">(</span><span>
+</span><span id="line-49"></span><span>    </span><span class="annot"><a href="Text.Numerals.Class.html#NumToWord"><span class="hs-identifier">NumToWord</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#toCardinal"><span class="hs-identifier">toCardinal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toOrdinal"><span class="hs-identifier">toOrdinal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toShortOrdinal"><span class="hs-identifier">toShortOrdinal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toTimeText%27"><span class="hs-identifier">toTimeText'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeMergerFunction"><span class="hs-identifier">FreeMergerFunction</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeNumberToWords"><span class="hs-identifier">FreeNumberToWords</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier">FreeValueSplitter</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#MergerFunction"><span class="hs-identifier">MergerFunction</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#MNumberSegment"><span class="hs-identifier">MNumberSegment</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier">NumberSegment</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier">NumberSegment</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegmenting"><span class="hs-identifier">NumberSegmenting</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ValueSplit"><span class="hs-identifier">ValueSplit</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#valueSplit"><span class="hs-identifier">valueSplit</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ValueSplitter"><span class="hs-identifier">ValueSplitter</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ClockText"><span class="hs-identifier">ClockText</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toClockSegment"><span class="hs-identifier">toClockSegment</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toDaySegment"><span class="hs-identifier">toDaySegment</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html"><span class="hs-identifier">Text.Numerals.Internal</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Internal.html#_genText"><span class="hs-identifier">_genText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_shrinkText"><span class="hs-identifier">_shrinkText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_thousand"><span class="hs-identifier">_thousand</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_iLogFloor"><span class="hs-identifier">_iLogFloor</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Prefix.html"><span class="hs-identifier">Text.Numerals.Prefix</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Prefix.html#latinPrefixes"><span class="hs-identifier">latinPrefixes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- | A data type for algorithmic number to word conversions. Most western</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- languages /likely/ can work with this data type.</span><span>
+</span><span id="line-62"></span><span class="hs-keyword">data</span><span> </span><span id="NumeralsAlgorithm"><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-var">NumeralsAlgorithm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NumeralsAlgorithm"><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-var">NumeralsAlgorithm</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-63"></span><span>    </span><span id="minusWord"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#minusWord"><span class="hs-identifier hs-var hs-var">minusWord</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ The word used as prefix to denote negative numbers.</span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="oneWord"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#oneWord"><span class="hs-identifier hs-var hs-var">oneWord</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ The word used to denote /one/ in the language.</span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="lowWords"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; Vector Text
+</span><a href="Text.Numerals.Algorithm.html#lowWords"><span class="hs-identifier hs-var hs-var">lowWords</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Vector' of small numbers, the first item is the word for /two/ and each successor is the word for the next number.</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="midWords"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; [(Integer, Text)]
+</span><a href="Text.Numerals.Algorithm.html#midWords"><span class="hs-identifier hs-var hs-var">midWords</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ A list of 2-tuples where the first item contains the value, and the second the corresponding word, the values are ordered in descending value order.</span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="highWords"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#highWords"><span class="hs-identifier hs-var hs-var">highWords</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>  </span><span class="hs-comment">-- ^ A function that is used to generate words for large values (greater than or equal to one /million/), often constructed with the /short scale/ or /long scale/.</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mergeFunction"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; forall i. Integral i =&gt; MergerFunction i
+</span><a href="Text.Numerals.Algorithm.html#mergeFunction"><span class="hs-identifier hs-var hs-var">mergeFunction</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeMergerFunction"><span class="hs-identifier hs-type">FreeMergerFunction</span></a></span><span>  </span><span class="hs-comment">-- ^ A function that specifies how to merge words based on the grammar of that specific language.</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="ordinize"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#ordinize"><span class="hs-identifier hs-var hs-var">ordinize</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A function to conver the /cardinal/ form of a number in an /ordinal/ one.</span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="shortOrdinal"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; forall i. Integral i =&gt; NumberToWords i
+</span><a href="Text.Numerals.Algorithm.html#shortOrdinal"><span class="hs-identifier hs-var hs-var">shortOrdinal</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeNumberToWords"><span class="hs-identifier hs-type">FreeNumberToWords</span></a></span><span> </span><span class="hs-comment">-- ^ A function that converts a number to its /short ordinal/ form.</span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="clockText"><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; ClockText
+</span><a href="Text.Numerals.Algorithm.html#clockText"><span class="hs-identifier hs-var hs-var">clockText</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ClockText"><span class="hs-identifier hs-type">ClockText</span></a></span><span>  </span><span class="hs-comment">-- ^ A function that converts the clock segment and day segment to a /Text/ that describes the time of the day in words.</span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679205648"><span id="local-6989586621679205650"><span class="annot"><a href="Text.Numerals.Class.html#NumToWord"><span class="hs-identifier hs-type">NumToWord</span></a></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-type">NumeralsAlgorithm</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-75"></span><span>    </span><span id="local-6989586621679205645"><span class="annot"><span class="annottext">toCardinal :: NumeralsAlgorithm -&gt; i -&gt; Text
+</span><a href="#local-6989586621679205645"><span class="hs-identifier hs-var hs-var hs-var hs-var">toCardinal</span></a></span></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-type">NumeralsAlgorithm</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">minusWord :: NumeralsAlgorithm -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#minusWord"><span class="hs-identifier hs-var">minusWord</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205644"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205644"><span class="hs-identifier hs-var">_minusWord</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">oneWord :: NumeralsAlgorithm -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#oneWord"><span class="hs-identifier hs-var">oneWord</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205643"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205643"><span class="hs-identifier hs-var">_oneWord</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">lowWords :: NumeralsAlgorithm -&gt; Vector Text
+</span><a href="Text.Numerals.Algorithm.html#lowWords"><span class="hs-identifier hs-var">lowWords</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205642"><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205642"><span class="hs-identifier hs-var">_lowWords</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">midWords :: NumeralsAlgorithm -&gt; [(Integer, Text)]
+</span><a href="Text.Numerals.Algorithm.html#midWords"><span class="hs-identifier hs-var">midWords</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205641"><span class="annot"><span class="annottext">[(Integer, Text)]
+</span><a href="#local-6989586621679205641"><span class="hs-identifier hs-var">_midWords</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">highWords :: NumeralsAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#highWords"><span class="hs-identifier hs-var">highWords</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205640"><span class="annot"><span class="annottext">forall i. Integral i =&gt; ValueSplitter i
+</span><a href="#local-6989586621679205640"><span class="hs-identifier hs-var">_highWords</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">mergeFunction :: NumeralsAlgorithm -&gt; forall i. Integral i =&gt; MergerFunction i
+</span><a href="Text.Numerals.Algorithm.html#mergeFunction"><span class="hs-identifier hs-var">mergeFunction</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205639"><span class="annot"><span class="annottext">forall i. Integral i =&gt; MergerFunction i
+</span><a href="#local-6989586621679205639"><span class="hs-identifier hs-var">_mergeFunction</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; Text
+forall i. Integral i =&gt; NumberToWords i
+</span><a href="#local-6989586621679205638"><span class="hs-identifier hs-var">cardinal</span></a></span><span>
+</span><span id="line-76"></span><span>       </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205638"><span class="annot"><span class="annottext">cardinal :: a -&gt; Text
+</span><a href="#local-6989586621679205638"><span class="hs-identifier hs-var hs-var">cardinal</span></a></span></span><span> </span><span id="local-6989586621679205637"><span class="annot"><span class="annottext">i :: a
+</span><a href="#local-6989586621679205637"><span class="hs-identifier hs-var">i</span></a></span></span><span>
+</span><span id="line-77"></span><span>                  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679205637"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205644"><span class="hs-identifier hs-var">_minusWord</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span> </span><span class="annot"><span class="hs-char">' '</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; Text
+</span><a href="#local-6989586621679205635"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679205634"><span class="hs-identifier hs-var">j</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>                  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Text
+</span><a href="#local-6989586621679205635"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679205634"><span class="hs-identifier hs-var">j</span></a></span><span>
+</span><span id="line-79"></span><span>                  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205635"><span class="annot"><span class="annottext">go :: Integer -&gt; Text
+</span><a href="#local-6989586621679205635"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; MergerFunction Integer -&gt; NumberSegment Integer -&gt; Text
+forall i.
+Integral i =&gt;
+Text -&gt; MergerFunction i -&gt; NumberSegment i -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#compressSegments"><span class="hs-identifier hs-var">compressSegments</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205643"><span class="hs-identifier hs-var">_oneWord</span></a></span><span> </span><span class="annot"><span class="annottext">MergerFunction Integer
+forall i. Integral i =&gt; MergerFunction i
+</span><a href="#local-6989586621679205639"><span class="hs-identifier hs-var">_mergeFunction</span></a></span><span> </span><span class="annot"><span class="annottext">(NumberSegment Integer -&gt; Text)
+-&gt; (Integer -&gt; NumberSegment Integer) -&gt; Integer -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Vector Text
+-&gt; [(Integer, Text)]
+-&gt; ValueSplitter Integer
+-&gt; Integer
+-&gt; NumberSegment Integer
+forall i.
+Integral i =&gt;
+Vector Text
+-&gt; [(Integer, Text)] -&gt; ValueSplitter i -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegments"><span class="hs-identifier hs-var">toSegments</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205642"><span class="hs-identifier hs-var">_lowWords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Integer, Text)]
+</span><a href="#local-6989586621679205641"><span class="hs-identifier hs-var">_midWords</span></a></span><span> </span><span class="annot"><span class="annottext">ValueSplitter Integer
+forall i. Integral i =&gt; ValueSplitter i
+</span><a href="#local-6989586621679205640"><span class="hs-identifier hs-var">_highWords</span></a></span><span>
+</span><span id="line-80"></span><span>                        </span><span id="local-6989586621679205634"><span class="annot"><span class="annottext">j :: Integer
+</span><a href="#local-6989586621679205634"><span class="hs-identifier hs-var hs-var">j</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Integer
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679205637"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679205632"><span class="annot"><span class="annottext">toOrdinal :: NumeralsAlgorithm -&gt; i -&gt; Text
+</span><a href="#local-6989586621679205632"><span class="hs-identifier hs-var hs-var hs-var hs-var">toOrdinal</span></a></span></span><span> </span><span id="local-6989586621679205631"><span class="annot"><span class="annottext">na :: NumeralsAlgorithm
+</span><a href="#local-6989586621679205631"><span class="hs-identifier hs-var">na</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-type">NumeralsAlgorithm</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">ordinize :: NumeralsAlgorithm -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#ordinize"><span class="hs-identifier hs-var">ordinize</span></a></span><span class="hs-glyph">=</span><span id="local-6989586621679205630"><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="#local-6989586621679205630"><span class="hs-identifier hs-var">_ordinize</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="#local-6989586621679205630"><span class="hs-identifier hs-var">_ordinize</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (i -&gt; Text) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; i -&gt; Text
+forall a i. (NumToWord a, Integral i) =&gt; a -&gt; i -&gt; Text
+</span><a href="Text.Numerals.Class.html#toCardinal"><span class="hs-identifier hs-var">toCardinal</span></a></span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm
+</span><a href="#local-6989586621679205631"><span class="hs-identifier hs-var">na</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span id="local-6989586621679205629"><span class="annot"><span class="annottext">toShortOrdinal :: NumeralsAlgorithm -&gt; i -&gt; Text
+</span><a href="#local-6989586621679205629"><span class="hs-identifier hs-var hs-var hs-var hs-var">toShortOrdinal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; i -&gt; Text
+NumeralsAlgorithm -&gt; forall i. Integral i =&gt; NumberToWords i
+</span><a href="Text.Numerals.Algorithm.html#shortOrdinal"><span class="hs-identifier hs-var hs-var">shortOrdinal</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span id="local-6989586621679205628"><span class="annot"><span class="annottext">toTimeText' :: NumeralsAlgorithm -&gt; Int -&gt; Int -&gt; Text
+</span><a href="#local-6989586621679205628"><span class="hs-identifier hs-var hs-var hs-var hs-var">toTimeText'</span></a></span></span><span> </span><span id="local-6989586621679205627"><span class="annot"><span class="annottext">alg :: NumeralsAlgorithm
+</span><a href="#local-6989586621679205627"><span class="hs-identifier hs-var">alg</span></a></span></span><span> </span><span id="local-6989586621679205626"><span class="annot"><span class="annottext">h :: Int
+</span><a href="#local-6989586621679205626"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span id="local-6989586621679205625"><span class="annot"><span class="annottext">m :: Int
+</span><a href="#local-6989586621679205625"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; ClockText
+</span><a href="Text.Numerals.Algorithm.html#clockText"><span class="hs-identifier hs-var hs-var">clockText</span></a></span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm
+</span><a href="#local-6989586621679205627"><span class="hs-identifier hs-var">alg</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; ClockSegment
+</span><a href="Text.Numerals.Class.html#toClockSegment"><span class="hs-identifier hs-var">toClockSegment</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205625"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; DaySegment
+</span><a href="Text.Numerals.Class.html#toDaySegment"><span class="hs-identifier hs-var">toDaySegment</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205626"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205626"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205625"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span id="local-6989586621679205740"><span id="local-6989586621679205741"><span class="annot"><a href="Text.Numerals.Algorithm.html#_toNumberScale"><span class="hs-identifier hs-type">_toNumberScale</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205741"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205740"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205741"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679205740"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679205741"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-88"></span><span id="_toNumberScale"><span class="annot"><span class="annottext">_toNumberScale :: i -&gt; (j, i)
+</span><a href="Text.Numerals.Algorithm.html#_toNumberScale"><span class="hs-identifier hs-var hs-var">_toNumberScale</span></a></span></span><span> </span><span id="local-6989586621679205623"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205623"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679205622"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205621"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="hs-identifier">_</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205622"><span class="annot"><span class="annottext">l :: j
+</span><a href="#local-6989586621679205622"><span class="hs-identifier hs-var">l</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205621"><span class="annot"><span class="annottext">k :: i
+</span><a href="#local-6989586621679205621"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; (i, j, i)
+forall i j. (Integral i, Integral j) =&gt; i -&gt; i -&gt; (i, j, i)
+</span><a href="Text.Numerals.Internal.html#_iLogFloor"><span class="hs-identifier hs-var">_iLogFloor</span></a></span><span> </span><span class="annot"><span class="annottext">i
+forall i. Integral i =&gt; i
+</span><a href="Text.Numerals.Internal.html#_thousand"><span class="hs-identifier hs-var">_thousand</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205623"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- | A data type used for to map larger numbers to words. This data type</span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- supports the /short scale/ and /long scale/ with /Latin/ prefixes, and</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- custom suffixes. The 'Default' value is the /short scale/ with /illion/</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- as suffix. This is used in /English/ for large numbers.</span><span>
+</span><span id="line-95"></span><span id="local-6989586621679205619"><span id="local-6989586621679205620"></span></span><span class="hs-keyword">data</span><span> </span><span id="HighNumberAlgorithm"><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-var">HighNumberAlgorithm</span></a></span></span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="ShortScale"><span class="annot"><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LongScale"><span class="annot"><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="%24cLongScale"><span id="%24cShortScale"><span id="%24tHighNumberAlgorithm"><span id="local-6989586621679205590"><span id="local-6989586621679205592"><span id="local-6989586621679205594"><span id="local-6989586621679205596"><span id="local-6989586621679205598"><span id="local-6989586621679205600"><span id="local-6989586621679205602"><span id="local-6989586621679205604"><span id="local-6989586621679205606"><span id="local-6989586621679205608"><span id="local-6989586621679205610"><span id="local-6989586621679205612"><span id="local-6989586621679205614"><span id="local-6989586621679205616"><span class="annot"><span class="annottext">Typeable HighNumberAlgorithm
+DataType
+Constr
+Typeable HighNumberAlgorithm =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g)
+ -&gt; HighNumberAlgorithm
+ -&gt; c HighNumberAlgorithm)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c HighNumberAlgorithm)
+-&gt; (HighNumberAlgorithm -&gt; Constr)
+-&gt; (HighNumberAlgorithm -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c HighNumberAlgorithm))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c HighNumberAlgorithm))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm)
+-&gt; Data HighNumberAlgorithm
+HighNumberAlgorithm -&gt; DataType
+HighNumberAlgorithm -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b)
+-&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; HighNumberAlgorithm
+-&gt; c HighNumberAlgorithm
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c HighNumberAlgorithm
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; u
+forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c HighNumberAlgorithm
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; HighNumberAlgorithm
+-&gt; c HighNumberAlgorithm
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c HighNumberAlgorithm)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c HighNumberAlgorithm)
+$cLongScale :: Constr
+$cShortScale :: Constr
+$tHighNumberAlgorithm :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+gmapM :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; HighNumberAlgorithm -&gt; m HighNumberAlgorithm
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; u
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; [u]
+$cgmapQ :: forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; HighNumberAlgorithm -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; HighNumberAlgorithm -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c HighNumberAlgorithm)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c HighNumberAlgorithm)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c HighNumberAlgorithm)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c HighNumberAlgorithm)
+dataTypeOf :: HighNumberAlgorithm -&gt; DataType
+$cdataTypeOf :: HighNumberAlgorithm -&gt; DataType
+toConstr :: HighNumberAlgorithm -&gt; Constr
+$ctoConstr :: HighNumberAlgorithm -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c HighNumberAlgorithm
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c HighNumberAlgorithm
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; HighNumberAlgorithm
+-&gt; c HighNumberAlgorithm
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; HighNumberAlgorithm
+-&gt; c HighNumberAlgorithm
+$cp1Data :: Typeable HighNumberAlgorithm
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205582"><span id="local-6989586621679205584"><span class="annot"><span class="annottext">HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+(HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; (HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; Eq HighNumberAlgorithm
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c/= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+== :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c== :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. HighNumberAlgorithm -&gt; Rep HighNumberAlgorithm x)
+-&gt; (forall x. Rep HighNumberAlgorithm x -&gt; HighNumberAlgorithm)
+-&gt; Generic HighNumberAlgorithm
+forall x. Rep HighNumberAlgorithm x -&gt; HighNumberAlgorithm
+forall x. HighNumberAlgorithm -&gt; Rep HighNumberAlgorithm x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep HighNumberAlgorithm x -&gt; HighNumberAlgorithm
+$cfrom :: forall x. HighNumberAlgorithm -&gt; Rep HighNumberAlgorithm x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205563"><span id="local-6989586621679205565"><span id="local-6989586621679205567"><span id="local-6989586621679205569"><span id="local-6989586621679205571"><span id="local-6989586621679205573"><span id="local-6989586621679205575"><span class="annot"><span class="annottext">Eq HighNumberAlgorithm
+Eq HighNumberAlgorithm =&gt;
+(HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Ordering)
+-&gt; (HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; (HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; (HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; (HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool)
+-&gt; (HighNumberAlgorithm
+    -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm)
+-&gt; (HighNumberAlgorithm
+    -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm)
+-&gt; Ord HighNumberAlgorithm
+HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Ordering
+HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+$cmin :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+max :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+$cmax :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; HighNumberAlgorithm
+&gt;= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c&gt;= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+&gt; :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c&gt; :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+&lt;= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c&lt;= :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+&lt; :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+$c&lt; :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Bool
+compare :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Ordering
+$ccompare :: HighNumberAlgorithm -&gt; HighNumberAlgorithm -&gt; Ordering
+$cp1Ord :: Eq HighNumberAlgorithm
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205554"><span id="local-6989586621679205556"><span id="local-6989586621679205558"><span id="local-6989586621679205560"><span class="annot"><span class="annottext">ReadPrec [HighNumberAlgorithm]
+ReadPrec HighNumberAlgorithm
+Int -&gt; ReadS HighNumberAlgorithm
+ReadS [HighNumberAlgorithm]
+(Int -&gt; ReadS HighNumberAlgorithm)
+-&gt; ReadS [HighNumberAlgorithm]
+-&gt; ReadPrec HighNumberAlgorithm
+-&gt; ReadPrec [HighNumberAlgorithm]
+-&gt; Read HighNumberAlgorithm
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [HighNumberAlgorithm]
+$creadListPrec :: ReadPrec [HighNumberAlgorithm]
+readPrec :: ReadPrec HighNumberAlgorithm
+$creadPrec :: ReadPrec HighNumberAlgorithm
+readList :: ReadS [HighNumberAlgorithm]
+$creadList :: ReadS [HighNumberAlgorithm]
+readsPrec :: Int -&gt; ReadS HighNumberAlgorithm
+$creadsPrec :: Int -&gt; ReadS HighNumberAlgorithm
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205547"><span id="local-6989586621679205549"><span id="local-6989586621679205551"><span class="annot"><span class="annottext">Int -&gt; HighNumberAlgorithm -&gt; ShowS
+[HighNumberAlgorithm] -&gt; ShowS
+HighNumberAlgorithm -&gt; String
+(Int -&gt; HighNumberAlgorithm -&gt; ShowS)
+-&gt; (HighNumberAlgorithm -&gt; String)
+-&gt; ([HighNumberAlgorithm] -&gt; ShowS)
+-&gt; Show HighNumberAlgorithm
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [HighNumberAlgorithm] -&gt; ShowS
+$cshowList :: [HighNumberAlgorithm] -&gt; ShowS
+show :: HighNumberAlgorithm -&gt; String
+$cshow :: HighNumberAlgorithm -&gt; String
+showsPrec :: Int -&gt; HighNumberAlgorithm -&gt; ShowS
+$cshowsPrec :: Int -&gt; HighNumberAlgorithm -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679205544"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-103"></span><span>  </span><span id="local-6989586621679205539"><span class="annot"><span class="annottext">arbitrary :: Gen HighNumberAlgorithm
+</span><a href="#local-6989586621679205539"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Gen HighNumberAlgorithm] -&gt; Gen HighNumberAlgorithm
+forall a. [Gen a] -&gt; Gen a
+</span><span class="hs-identifier hs-var">oneof</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; HighNumberAlgorithm)
+-&gt; Gen Text -&gt; Gen HighNumberAlgorithm
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen Text
+</span><a href="Text.Numerals.Internal.html#_genText"><span class="hs-identifier hs-var">_genText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text -&gt; HighNumberAlgorithm)
+-&gt; Gen Text -&gt; Gen (Text -&gt; HighNumberAlgorithm)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen Text
+</span><a href="Text.Numerals.Internal.html#_genText"><span class="hs-identifier hs-var">_genText</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Text -&gt; HighNumberAlgorithm)
+-&gt; Gen Text -&gt; Gen HighNumberAlgorithm
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen Text
+</span><a href="Text.Numerals.Internal.html#_genText"><span class="hs-identifier hs-var">_genText</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-104"></span><span>  </span><span id="local-6989586621679205537"><span class="annot"><span class="annottext">shrink :: HighNumberAlgorithm -&gt; [HighNumberAlgorithm]
+</span><a href="#local-6989586621679205537"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-type">ShortScale</span></a></span><span> </span><span id="local-6989586621679205536"><span class="annot"><span class="annottext">t :: Text
+</span><a href="#local-6989586621679205536"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; HighNumberAlgorithm) -&gt; [Text] -&gt; [HighNumberAlgorithm]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text]
+</span><a href="Text.Numerals.Internal.html#_shrinkText"><span class="hs-identifier hs-var">_shrinkText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205536"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-type">LongScale</span></a></span><span> </span><span id="local-6989586621679205535"><span class="annot"><span class="annottext">ta :: Text
+</span><a href="#local-6989586621679205535"><span class="hs-identifier hs-var">ta</span></a></span></span><span> </span><span id="local-6989586621679205534"><span class="annot"><span class="annottext">tb :: Text
+</span><a href="#local-6989586621679205534"><span class="hs-identifier hs-var">tb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-operator hs-var">`LongScale`</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205534"><span class="hs-identifier hs-var">tb</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; HighNumberAlgorithm) -&gt; [Text] -&gt; [HighNumberAlgorithm]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text]
+</span><a href="Text.Numerals.Internal.html#_shrinkText"><span class="hs-identifier hs-var">_shrinkText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205535"><span class="hs-identifier hs-var">ta</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[HighNumberAlgorithm]
+-&gt; [HighNumberAlgorithm] -&gt; [HighNumberAlgorithm]
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205535"><span class="hs-identifier hs-var">ta</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; HighNumberAlgorithm) -&gt; [Text] -&gt; [HighNumberAlgorithm]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text]
+</span><a href="Text.Numerals.Internal.html#_shrinkText"><span class="hs-identifier hs-var">_shrinkText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205534"><span class="hs-identifier hs-var">tb</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Default</span></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679205531"><span class="annot"><span class="annottext">def :: HighNumberAlgorithm
+</span><a href="#local-6989586621679205531"><span class="hs-identifier hs-var hs-var hs-var hs-var">def</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;illion&quot;</span></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- | Construct a 'FreeValueSplitter' function for the given suffix for a /short scale/.</span><span>
+</span><span id="line-111"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#shortScale"><span class="hs-identifier hs-type">shortScale</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>
+</span><span id="line-112"></span><span id="shortScale"><span class="annot"><span class="annottext">shortScale :: Text -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#shortScale"><span class="hs-identifier hs-var hs-var">shortScale</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HighNumberAlgorithm -&gt; ValueSplitter i
+forall a.
+ValueSplit a =&gt;
+a -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Class.html#valueSplit"><span class="hs-identifier hs-var">valueSplit</span></a></span><span> </span><span class="annot"><span class="annottext">(HighNumberAlgorithm -&gt; ValueSplitter i)
+-&gt; (Text -&gt; HighNumberAlgorithm) -&gt; Text -&gt; ValueSplitter i
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long scale/.</span><span>
+</span><span id="line-115"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#longScale"><span class="hs-identifier hs-type">longScale</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>
+</span><span id="line-116"></span><span id="longScale"><span class="annot"><span class="annottext">longScale :: Text -&gt; Text -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#longScale"><span class="hs-identifier hs-var hs-var">longScale</span></a></span></span><span> </span><span id="local-6989586621679205530"><span class="annot"><span class="annottext">suf1 :: Text
+</span><a href="#local-6989586621679205530"><span class="hs-identifier hs-var">suf1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HighNumberAlgorithm -&gt; ValueSplitter i
+forall a.
+ValueSplit a =&gt;
+a -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Class.html#valueSplit"><span class="hs-identifier hs-var">valueSplit</span></a></span><span> </span><span class="annot"><span class="annottext">(HighNumberAlgorithm -&gt; ValueSplitter i)
+-&gt; (Text -&gt; HighNumberAlgorithm) -&gt; Text -&gt; ValueSplitter i
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205530"><span class="hs-identifier hs-var">suf1</span></a></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- | Construct a 'FreeValueSplitter' function for the given suffix for a /short scale/, the names are written in /title case/.</span><span>
+</span><span id="line-119"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#shortScaleTitle"><span class="hs-identifier hs-type">shortScaleTitle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>
+</span><span id="line-120"></span><span id="shortScaleTitle"><span class="annot"><span class="annottext">shortScaleTitle :: Text -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#shortScaleTitle"><span class="hs-identifier hs-var hs-var">shortScaleTitle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text)
+-&gt; HighNumberAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier hs-var">valueSplit'</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">toTitle</span></span><span> </span><span class="annot"><span class="annottext">(HighNumberAlgorithm -&gt; ValueSplitter i)
+-&gt; (Text -&gt; HighNumberAlgorithm) -&gt; Text -&gt; ValueSplitter i
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-var">ShortScale</span></a></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- | Construct a 'FreeValueSplitter' function for the given suffixes for a /long scale/, the names are written in /title case/.</span><span>
+</span><span id="line-123"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#longScaleTitle"><span class="hs-identifier hs-type">longScaleTitle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>
+</span><span id="line-124"></span><span id="longScaleTitle"><span class="annot"><span class="annottext">longScaleTitle :: Text -&gt; Text -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#longScaleTitle"><span class="hs-identifier hs-var hs-var">longScaleTitle</span></a></span></span><span> </span><span id="local-6989586621679205529"><span class="annot"><span class="annottext">suf1 :: Text
+</span><a href="#local-6989586621679205529"><span class="hs-identifier hs-var">suf1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text)
+-&gt; HighNumberAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier hs-var">valueSplit'</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">toTitle</span></span><span> </span><span class="annot"><span class="annottext">(HighNumberAlgorithm -&gt; ValueSplitter i)
+-&gt; (Text -&gt; HighNumberAlgorithm) -&gt; Text -&gt; ValueSplitter i
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205529"><span class="hs-identifier hs-var">suf1</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#_highWithSuffix"><span class="hs-identifier hs-type">_highWithSuffix</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-128"></span><span id="_highWithSuffix"><span class="annot"><span class="annottext">_highWithSuffix :: Text -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highWithSuffix"><span class="hs-identifier hs-var hs-var">_highWithSuffix</span></a></span></span><span> </span><span id="local-6989586621679205527"><span class="annot"><span class="annottext">suf :: Text
+</span><a href="#local-6989586621679205527"><span class="hs-identifier hs-var">suf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; Maybe Text -&gt; Maybe Text
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205527"><span class="hs-identifier hs-var">suf</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe Text -&gt; Maybe Text)
+-&gt; (Int -&gt; Maybe Text) -&gt; Int -&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Vector Text
+</span><a href="Text.Numerals.Prefix.html#latinPrefixes"><span class="hs-identifier hs-var">latinPrefixes</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text -&gt; Int -&gt; Maybe Text
+forall a. Vector a -&gt; Int -&gt; Maybe a
+</span><span class="hs-operator hs-var">!?</span></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#_highToText"><span class="hs-identifier hs-type">_highToText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-131"></span><span id="_highToText"><span class="annot"><span class="annottext">_highToText :: HighNumberAlgorithm -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highToText"><span class="hs-identifier hs-var hs-var">_highToText</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#ShortScale"><span class="hs-identifier hs-type">ShortScale</span></a></span><span> </span><span id="local-6989586621679205525"><span class="annot"><span class="annottext">suf :: Text
+</span><a href="#local-6989586621679205525"><span class="hs-identifier hs-var">suf</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679205524"><span class="annot"><span class="annottext">j :: Int
+</span><a href="#local-6989586621679205524"><span class="hs-identifier hs-var">j</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highWithSuffix"><span class="hs-identifier hs-var">_highWithSuffix</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205525"><span class="hs-identifier hs-var">suf</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205524"><span class="hs-identifier hs-var">j</span></a></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#_highToText"><span class="hs-identifier hs-var">_highToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-type">LongScale</span></a></span><span> </span><span id="local-6989586621679205523"><span class="annot"><span class="annottext">suf1 :: Text
+</span><a href="#local-6989586621679205523"><span class="hs-identifier hs-var">suf1</span></a></span></span><span> </span><span id="local-6989586621679205522"><span class="annot"><span class="annottext">suf2 :: Text
+</span><a href="#local-6989586621679205522"><span class="hs-identifier hs-var">suf2</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679205521"><span class="annot"><span class="annottext">j :: Int
+</span><a href="#local-6989586621679205521"><span class="hs-identifier hs-var">j</span></a></span></span><span>
+</span><span id="line-133"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+forall a. Integral a =&gt; a -&gt; Bool
+</span><span class="hs-identifier hs-var">even</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205521"><span class="hs-identifier hs-var">j</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highWithSuffix"><span class="hs-identifier hs-var">_highWithSuffix</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205523"><span class="hs-identifier hs-var">suf1</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205519"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highWithSuffix"><span class="hs-identifier hs-var">_highWithSuffix</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205522"><span class="hs-identifier hs-var">suf2</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205519"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205519"><span class="annot"><span class="annottext">k :: Int
+</span><a href="#local-6989586621679205519"><span class="hs-identifier hs-var hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">div</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205521"><span class="hs-identifier hs-var">j</span></a></span><span> </span><span class="annot"><span class="hs-number">2</span></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="hs-comment">-- | Generate a /value splitter/ for a 'HighNumberAlgorithm' but where the result</span><span>
+</span><span id="line-138"></span><span class="hs-comment">-- is post-processed by a function.</span><span>
+</span><span id="line-139"></span><span class="annot"><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier hs-type">valueSplit'</span></a></span><span>
+</span><span id="line-140"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- ^ The post-processing function.</span><span>
+</span><span id="line-141"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span>  </span><span class="hs-comment">-- ^ The 'HighNumberAlgorithm' that is used.</span><span>
+</span><span id="line-142"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span>  </span><span class="hs-comment">-- ^ The 'FreeValueSplitter' result.</span><span>
+</span><span id="line-143"></span><span id="valueSplit%27"><span class="annot"><span class="annottext">valueSplit' :: (Text -&gt; Text)
+-&gt; HighNumberAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier hs-var hs-var">valueSplit'</span></a></span></span><span> </span><span id="local-6989586621679205517"><span class="annot"><span class="annottext">f :: Text -&gt; Text
+</span><a href="#local-6989586621679205517"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679205516"><span class="annot"><span class="annottext">vs :: HighNumberAlgorithm
+</span><a href="#local-6989586621679205516"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span id="local-6989586621679205515"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205515"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205514"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; (i, Text)) -&gt; (Text -&gt; Text) -&gt; Text -&gt; (i, Text)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="#local-6989586621679205517"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; (i, Text)) -&gt; Maybe Text -&gt; Maybe (i, Text)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">HighNumberAlgorithm -&gt; Int -&gt; Maybe Text
+</span><a href="Text.Numerals.Algorithm.html#_highToText"><span class="hs-identifier hs-var">_highToText</span></a></span><span> </span><span class="annot"><span class="annottext">HighNumberAlgorithm
+</span><a href="#local-6989586621679205516"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679205513"><span class="hs-identifier hs-var">j</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span id="local-6989586621679205513"><span class="annot"><span class="annottext">j :: Int
+</span><a href="#local-6989586621679205513"><span class="hs-identifier hs-var">j</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205514"><span class="annot"><span class="annottext">m :: i
+</span><a href="#local-6989586621679205514"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; (Int, i)
+forall i j. (Integral i, Integral j) =&gt; i -&gt; (j, i)
+</span><a href="Text.Numerals.Algorithm.html#_toNumberScale"><span class="hs-identifier hs-var">_toNumberScale</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205515"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ValueSplit"><span class="hs-identifier hs-type">ValueSplit</span></a></span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-147"></span><span>    </span><span id="local-6989586621679205510"><span class="annot"><span class="annottext">valueSplit :: HighNumberAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="#local-6989586621679205510"><span class="hs-identifier hs-var hs-var hs-var hs-var">valueSplit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text)
+-&gt; HighNumberAlgorithm -&gt; forall i. Integral i =&gt; ValueSplitter i
+</span><a href="Text.Numerals.Algorithm.html#valueSplit%27"><span class="hs-identifier hs-var">valueSplit'</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- | A /smart constructor/ for the 'NumeralsAlgorithm' type. This constructor</span><span>
+</span><span id="line-150"></span><span class="hs-comment">-- allows one to use an arbitrary 'Foldable' type for the low words and mid</span><span>
+</span><span id="line-151"></span><span class="hs-comment">-- words. It will also order the midwords accordingly.</span><span>
+</span><span id="line-152"></span><span id="local-6989586621679205507"><span id="local-6989586621679205508"><span class="annot"><a href="Text.Numerals.Algorithm.html#numeralsAlgorithm"><span class="hs-identifier hs-type">numeralsAlgorithm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Foldable</span></span><span> </span><span class="annot"><a href="#local-6989586621679205508"><span class="hs-identifier hs-type">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Foldable</span></span><span> </span><span class="annot"><a href="#local-6989586621679205507"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205508"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205507"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeValueSplitter"><span class="hs-identifier hs-type">FreeValueSplitter</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeMergerFunction"><span class="hs-identifier hs-type">FreeMergerFunction</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#FreeNumberToWords"><span class="hs-identifier hs-type">FreeNumberToWords</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ClockText"><span class="hs-identifier hs-type">ClockText</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-type">NumeralsAlgorithm</span></a></span></span></span><span>
+</span><span id="line-153"></span><span id="numeralsAlgorithm"><span class="annot"><span class="annottext">numeralsAlgorithm :: Text
+-&gt; Text
+-&gt; Text
+-&gt; f Text
+-&gt; g (Integer, Text)
+-&gt; (forall i. Integral i =&gt; ValueSplitter i)
+-&gt; (forall i. Integral i =&gt; MergerFunction i)
+-&gt; (Text -&gt; Text)
+-&gt; (forall i. Integral i =&gt; NumberToWords i)
+-&gt; ClockText
+-&gt; NumeralsAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#numeralsAlgorithm"><span class="hs-identifier hs-var hs-var">numeralsAlgorithm</span></a></span></span><span> </span><span id="local-6989586621679205506"><span class="annot"><span class="annottext">minus :: Text
+</span><a href="#local-6989586621679205506"><span class="hs-identifier hs-var">minus</span></a></span></span><span> </span><span id="local-6989586621679205505"><span class="annot"><span class="annottext">zero :: Text
+</span><a href="#local-6989586621679205505"><span class="hs-identifier hs-var">zero</span></a></span></span><span> </span><span id="local-6989586621679205504"><span class="annot"><span class="annottext">one :: Text
+</span><a href="#local-6989586621679205504"><span class="hs-identifier hs-var">one</span></a></span></span><span> </span><span id="local-6989586621679205503"><span class="annot"><span class="annottext">_lowWords :: f Text
+</span><a href="#local-6989586621679205503"><span class="hs-identifier hs-var">_lowWords</span></a></span></span><span> </span><span id="local-6989586621679205502"><span class="annot"><span class="annottext">_midWords :: g (Integer, Text)
+</span><a href="#local-6989586621679205502"><span class="hs-identifier hs-var">_midWords</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+-&gt; Text
+-&gt; Vector Text
+-&gt; [(Integer, Text)]
+-&gt; (forall i. Integral i =&gt; ValueSplitter i)
+-&gt; (forall i. Integral i =&gt; MergerFunction i)
+-&gt; (Text -&gt; Text)
+-&gt; (forall i. Integral i =&gt; NumberToWords i)
+-&gt; ClockText
+-&gt; NumeralsAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-var">NumeralsAlgorithm</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205506"><span class="hs-identifier hs-var">minus</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205504"><span class="hs-identifier hs-var">one</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Vector Text
+forall a. [a] -&gt; Vector a
+</span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205505"><span class="hs-identifier hs-var">zero</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205504"><span class="hs-identifier hs-var">one</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">f Text -&gt; [Text]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; [a]
+</span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="annot"><span class="annottext">f Text
+</span><a href="#local-6989586621679205503"><span class="hs-identifier hs-var">_lowWords</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Integer, Text) -&gt; Integer)
+-&gt; [(Integer, Text)] -&gt; [(Integer, Text)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sortOn</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; Integer
+forall a. Num a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">negate</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Integer)
+-&gt; ((Integer, Text) -&gt; Integer) -&gt; (Integer, Text) -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Integer, Text) -&gt; Integer
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">g (Integer, Text) -&gt; [(Integer, Text)]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; [a]
+</span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="annot"><span class="annottext">g (Integer, Text)
+</span><a href="#local-6989586621679205502"><span class="hs-identifier hs-var">_midWords</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span id="local-6989586621679205720"><span class="annot"><a href="Text.Numerals.Algorithm.html#_maybeSegment"><span class="hs-identifier hs-type">_maybeSegment</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205720"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679205720"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205720"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205720"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#MNumberSegment"><span class="hs-identifier hs-type">MNumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205720"><span class="hs-identifier hs-type">i</span></a></span></span><span>
+</span><span id="line-156"></span><span id="_maybeSegment"><span class="annot"><span class="annottext">_maybeSegment :: (i -&gt; NumberSegment i) -&gt; i -&gt; MNumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_maybeSegment"><span class="hs-identifier hs-var hs-var">_maybeSegment</span></a></span></span><span> </span><span id="local-6989586621679205500"><span class="annot"><span class="annottext">f :: i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205500"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; MNumberSegment i
+</span><a href="#local-6989586621679205499"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-157"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205499"><span class="annot"><span class="annottext">go :: i -&gt; MNumberSegment i
+</span><a href="#local-6989586621679205499"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-number">0</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-158"></span><span>          </span><span class="annot"><a href="#local-6989586621679205499"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679205498"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205498"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegment i -&gt; MNumberSegment i
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205500"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205498"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of</span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- low numbers. Mid words and large numbers are not taken into account. This</span><span>
+</span><span id="line-162"></span><span class="hs-comment">-- is often the next step after the 'toSegmentMid'.</span><span>
+</span><span id="line-163"></span><span id="local-6989586621679205715"><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentLow"><span class="hs-identifier hs-type">toSegmentLow</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205715"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Vector' of low words.</span><span>
+</span><span id="line-165"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegmenting"><span class="hs-identifier hs-type">NumberSegmenting</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205715"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The function that maps the number to the 'NumberSegment'.</span></span><span>
+</span><span id="line-166"></span><span id="toSegmentLow"><span class="annot"><span class="annottext">toSegmentLow :: Vector Text -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentLow"><span class="hs-identifier hs-var hs-var">toSegmentLow</span></a></span></span><span> </span><span id="local-6989586621679205497"><span class="annot"><span class="annottext">vs :: Vector Text
+</span><a href="#local-6989586621679205497"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205496"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-167"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205496"><span class="annot"><span class="annottext">go :: NumberSegmenting i
+</span><a href="#local-6989586621679205496"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679205495"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205495"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205495"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205494"><span class="hs-identifier hs-var">nvs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+forall i.
+MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-var">NumberSegment</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NumberSegment i -&gt; MNumberSegment i
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205496"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205493"><span class="hs-identifier hs-var">dv</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205494"><span class="hs-identifier hs-var">nvs</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205492"><span class="hs-identifier hs-var">lv</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; MNumberSegment i
+</span><a href="#local-6989586621679205491"><span class="hs-identifier hs-var">tl</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205490"><span class="hs-identifier hs-var">md</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-168"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+forall i.
+MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-var">NumberSegment</span></a></span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205495"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205497"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text -&gt; Int -&gt; Text
+forall a. Vector a -&gt; Int -&gt; a
+</span><span class="hs-glyph hs-var">!</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205495"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-169"></span><span>               </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679205493"><span class="annot"><span class="annottext">dv :: i
+</span><a href="#local-6989586621679205493"><span class="hs-identifier hs-var">dv</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205490"><span class="annot"><span class="annottext">md :: i
+</span><a href="#local-6989586621679205490"><span class="hs-identifier hs-var">md</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; (i, i)
+forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
+</span><span class="hs-identifier hs-var">divMod</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205495"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205494"><span class="hs-identifier hs-var">nvs</span></a></span><span>
+</span><span id="line-170"></span><span>          </span><span id="local-6989586621679205492"><span class="annot"><span class="annottext">lv :: Text
+</span><a href="#local-6989586621679205492"><span class="hs-identifier hs-var hs-var">lv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Text -&gt; Text
+forall a. Vector a -&gt; a
+</span><span class="hs-identifier hs-var">V.last</span></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205497"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-171"></span><span>          </span><span id="local-6989586621679205494"><span class="annot"><span class="annottext">nvs :: i
+</span><a href="#local-6989586621679205494"><span class="hs-identifier hs-var hs-var">nvs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; i
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Vector Text -&gt; Int
+forall a. Vector a -&gt; Int
+</span><span class="hs-identifier hs-var">V.length</span></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205497"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; i
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span>
+</span><span id="line-172"></span><span>          </span><span id="local-6989586621679205491"><span class="annot"><span class="annottext">tl :: i -&gt; MNumberSegment i
+</span><a href="#local-6989586621679205491"><span class="hs-identifier hs-var hs-var">tl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i -&gt; i -&gt; MNumberSegment i
+forall i.
+Integral i =&gt;
+(i -&gt; NumberSegment i) -&gt; i -&gt; MNumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_maybeSegment"><span class="hs-identifier hs-var">_maybeSegment</span></a></span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205496"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-173"></span><span>
+</span><span id="line-174"></span><span id="local-6989586621679205714"><span class="annot"><a href="Text.Numerals.Algorithm.html#_splitRecurse"><span class="hs-identifier hs-type">_splitRecurse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205714"><span class="hs-identifier hs-type">i</span></a></span></span><span>
+</span><span id="line-175"></span><span id="_splitRecurse"><span class="annot"><span class="annottext">_splitRecurse :: (i -&gt; NumberSegment i)
+-&gt; (i -&gt; NumberSegment i) -&gt; i -&gt; Text -&gt; i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_splitRecurse"><span class="hs-identifier hs-var hs-var">_splitRecurse</span></a></span></span><span> </span><span id="local-6989586621679205485"><span class="annot"><span class="annottext">f :: i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205485"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679205484"><span class="annot"><span class="annottext">g :: i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205484"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span id="local-6989586621679205483"><span class="annot"><span class="annottext">im :: i
+</span><a href="#local-6989586621679205483"><span class="hs-identifier hs-var">im</span></a></span></span><span> </span><span id="local-6989586621679205482"><span class="annot"><span class="annottext">v :: Text
+</span><a href="#local-6989586621679205482"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span id="local-6989586621679205481"><span class="annot"><span class="annottext">j :: i
+</span><a href="#local-6989586621679205481"><span class="hs-identifier hs-var">j</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+forall i.
+MNumberSegment i
+-&gt; i -&gt; Text -&gt; MNumberSegment i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-var">NumberSegment</span></a></span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+</span><a href="#local-6989586621679205480"><span class="hs-identifier hs-var">hd</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205483"><span class="hs-identifier hs-var">im</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205482"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(i -&gt; NumberSegment i) -&gt; i -&gt; MNumberSegment i
+forall i.
+Integral i =&gt;
+(i -&gt; NumberSegment i) -&gt; i -&gt; MNumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_maybeSegment"><span class="hs-identifier hs-var">_maybeSegment</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205484"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205479"><span class="hs-identifier hs-var">md</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-176"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205480"><span class="annot"><span class="annottext">hd :: MNumberSegment i
+</span><a href="#local-6989586621679205480"><span class="hs-identifier hs-var hs-var">hd</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205478"><span class="hs-identifier hs-var">dv</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-177"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegment i -&gt; MNumberSegment i
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205485"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205478"><span class="hs-identifier hs-var">dv</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-178"></span><span>          </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span id="local-6989586621679205478"><span class="annot"><span class="annottext">dv :: i
+</span><a href="#local-6989586621679205478"><span class="hs-identifier hs-var">dv</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205479"><span class="annot"><span class="annottext">md :: i
+</span><a href="#local-6989586621679205479"><span class="hs-identifier hs-var">md</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; (i, i)
+forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
+</span><span class="hs-identifier hs-var">divMod</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205481"><span class="hs-identifier hs-var">j</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205483"><span class="hs-identifier hs-var">im</span></a></span><span>
+</span><span id="line-179"></span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of</span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- low numbers, and the /sorted/ list of mid numbers. Large numbers are not</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- taken into account. This is often the next step after the 'toSegmentHigh'.</span><span>
+</span><span id="line-183"></span><span id="local-6989586621679205712"><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentMid"><span class="hs-identifier hs-type">toSegmentMid</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205712"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-184"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Vector' of low words.</span><span>
+</span><span id="line-185"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ The list of name and the names of these numbers in /descending/ order for the mid words.</span><span>
+</span><span id="line-186"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegmenting"><span class="hs-identifier hs-type">NumberSegmenting</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205712"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The function that maps the number to the 'NumberSegment'.</span></span><span>
+</span><span id="line-187"></span><span id="toSegmentMid"><span class="annot"><span class="annottext">toSegmentMid :: Vector Text -&gt; [(Integer, Text)] -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentMid"><span class="hs-identifier hs-var hs-var">toSegmentMid</span></a></span></span><span> </span><span id="local-6989586621679205477"><span class="annot"><span class="annottext">lows :: Vector Text
+</span><a href="#local-6989586621679205477"><span class="hs-identifier hs-var">lows</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Integer, Text)] -&gt; NumberSegmenting i
+forall i a.
+(Integral i, Integral a) =&gt;
+[(a, Text)] -&gt; i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205476"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-188"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205476"><span class="annot"><span class="annottext">go :: [(a, Text)] -&gt; i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205476"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span id="local-6989586621679205475"><span class="annot"><span class="annottext">n :: i
+</span><a href="#local-6989586621679205475"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Text -&gt; i -&gt; NumberSegment i
+forall i. Integral i =&gt; Vector Text -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentLow"><span class="hs-identifier hs-var">toSegmentLow</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205477"><span class="hs-identifier hs-var">lows</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205475"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-189"></span><span>          </span><span class="annot"><a href="#local-6989586621679205476"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679205474"><span class="annot"><span class="annottext">ma :: [(a, Text)]
+</span><a href="#local-6989586621679205474"><span class="hs-identifier hs-var">ma</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679205473"><span class="annot"><span class="annottext">m :: a
+</span><a href="#local-6989586621679205473"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205472"><span class="annot"><span class="annottext">v :: Text
+</span><a href="#local-6989586621679205472"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679205471"><span class="annot"><span class="annottext">ms :: [(a, Text)]
+</span><a href="#local-6989586621679205471"><span class="hs-identifier hs-var">ms</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679205470"><span class="annot"><span class="annottext">n :: i
+</span><a href="#local-6989586621679205470"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-190"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205469"><span class="hs-identifier hs-var">im</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205470"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205467"><span class="hs-identifier hs-var">goms</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205470"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-191"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i -&gt; NumberSegment i)
+-&gt; (i -&gt; NumberSegment i) -&gt; i -&gt; Text -&gt; i -&gt; NumberSegment i
+forall i.
+Integral i =&gt;
+(i -&gt; NumberSegment i)
+-&gt; (i -&gt; NumberSegment i) -&gt; i -&gt; Text -&gt; i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_splitRecurse"><span class="hs-identifier hs-var">_splitRecurse</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(a, Text)] -&gt; i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205476"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[(a, Text)]
+</span><a href="#local-6989586621679205474"><span class="hs-identifier hs-var">ma</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205467"><span class="hs-identifier hs-var">goms</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205469"><span class="hs-identifier hs-var">im</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205472"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205470"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-192"></span><span>              </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205469"><span class="annot"><span class="annottext">im :: i
+</span><a href="#local-6989586621679205469"><span class="hs-identifier hs-var hs-var">im</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; i
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679205473"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-193"></span><span>                    </span><span id="local-6989586621679205467"><span class="annot"><span class="annottext">goms :: i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205467"><span class="hs-identifier hs-var hs-var">goms</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(a, Text)] -&gt; i -&gt; NumberSegment i
+</span><a href="#local-6989586621679205476"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[(a, Text)]
+</span><a href="#local-6989586621679205471"><span class="hs-identifier hs-var">ms</span></a></span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of</span><span>
+</span><span id="line-196"></span><span class="hs-comment">-- low numbers, the /sorted/ list of mid numbers, and a 'FreeValueSplitter' for</span><span>
+</span><span id="line-197"></span><span class="hs-comment">-- large numbers.</span><span>
+</span><span id="line-198"></span><span id="local-6989586621679205466"><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegmentHigh"><span class="hs-identifier hs-type">toSegmentHigh</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205466"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-199"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Vector' of low words.</span><span>
+</span><span id="line-200"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ The list of name and the names of these numbers in /descending/ order for the mid words.</span><span>
+</span><span id="line-201"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ValueSplitter"><span class="hs-identifier hs-type">ValueSplitter</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205466"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The 'ValueSplitter' used for large numbers, likely a splitter from a /short scale/ or /long scale/.</span><span>
+</span><span id="line-202"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegmenting"><span class="hs-identifier hs-type">NumberSegmenting</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205466"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The function that maps the number to the 'NumberSegment'.</span></span><span>
+</span><span id="line-203"></span><span id="toSegmentHigh"><span class="annot"><span class="annottext">toSegmentHigh :: Vector Text
+-&gt; [(Integer, Text)] -&gt; ValueSplitter i -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentHigh"><span class="hs-identifier hs-var hs-var">toSegmentHigh</span></a></span></span><span> </span><span id="local-6989586621679205465"><span class="annot"><span class="annottext">lows :: Vector Text
+</span><a href="#local-6989586621679205465"><span class="hs-identifier hs-var">lows</span></a></span></span><span> </span><span id="local-6989586621679205464"><span class="annot"><span class="annottext">mids :: [(Integer, Text)]
+</span><a href="#local-6989586621679205464"><span class="hs-identifier hs-var">mids</span></a></span></span><span> </span><span id="local-6989586621679205463"><span class="annot"><span class="annottext">highs :: ValueSplitter i
+</span><a href="#local-6989586621679205463"><span class="hs-identifier hs-var">highs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205462"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-204"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205462"><span class="annot"><span class="annottext">go :: NumberSegmenting i
+</span><a href="#local-6989586621679205462"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679205461"><span class="annot"><span class="annottext">v :: i
+</span><a href="#local-6989586621679205461"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679205460"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205460"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205459"><span class="annot"><span class="annottext">t :: Text
+</span><a href="#local-6989586621679205459"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ValueSplitter i
+</span><a href="#local-6989586621679205463"><span class="hs-identifier hs-var">highs</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205461"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+-&gt; NumberSegmenting i -&gt; i -&gt; Text -&gt; NumberSegmenting i
+forall i.
+Integral i =&gt;
+(i -&gt; NumberSegment i)
+-&gt; (i -&gt; NumberSegment i) -&gt; i -&gt; Text -&gt; i -&gt; NumberSegment i
+</span><a href="Text.Numerals.Algorithm.html#_splitRecurse"><span class="hs-identifier hs-var">_splitRecurse</span></a></span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205462"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">NumberSegmenting i
+</span><a href="#local-6989586621679205462"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205460"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205459"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205461"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-205"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Text -&gt; [(Integer, Text)] -&gt; NumberSegmenting i
+forall i.
+Integral i =&gt;
+Vector Text -&gt; [(Integer, Text)] -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentMid"><span class="hs-identifier hs-var">toSegmentMid</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="#local-6989586621679205465"><span class="hs-identifier hs-var">lows</span></a></span><span> </span><span class="annot"><span class="annottext">[(Integer, Text)]
+</span><a href="#local-6989586621679205464"><span class="hs-identifier hs-var">mids</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205461"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-206"></span><span>
+</span><span id="line-207"></span><span class="hs-comment">-- | Convert the given number to a 'NumberSegment' with the given 'Vector' of</span><span>
+</span><span id="line-208"></span><span class="hs-comment">-- low numbers, the /sorted/ list of mid numbers, and a 'FreeValueSplitter' for</span><span>
+</span><span id="line-209"></span><span class="hs-comment">-- large numbers.</span><span>
+</span><span id="line-210"></span><span id="local-6989586621679205844"><span class="annot"><a href="Text.Numerals.Algorithm.html#toSegments"><span class="hs-identifier hs-type">toSegments</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205844"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-211"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Vector' of low words.</span><span>
+</span><span id="line-212"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ The list of name and the names of these numbers in /descending/ order for the mid words.</span><span>
+</span><span id="line-213"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ValueSplitter"><span class="hs-identifier hs-type">ValueSplitter</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205844"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The 'ValueSplitter' used for large numbers, likely a splitter from a /short scale/ or /long scale/.</span><span>
+</span><span id="line-214"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegmenting"><span class="hs-identifier hs-type">NumberSegmenting</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205844"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The function that maps the number to the 'NumberSegment'.</span></span><span>
+</span><span id="line-215"></span><span id="toSegments"><span class="annot"><span class="annottext">toSegments :: Vector Text
+-&gt; [(Integer, Text)] -&gt; ValueSplitter i -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegments"><span class="hs-identifier hs-var hs-var">toSegments</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Text
+-&gt; [(Integer, Text)] -&gt; ValueSplitter i -&gt; NumberSegmenting i
+forall i.
+Integral i =&gt;
+Vector Text
+-&gt; [(Integer, Text)] -&gt; ValueSplitter i -&gt; NumberSegmenting i
+</span><a href="Text.Numerals.Algorithm.html#toSegmentHigh"><span class="hs-identifier hs-var">toSegmentHigh</span></a></span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- | Use the given 'MergerFunction' to compress the 'NumberSegment' to a single</span><span>
+</span><span id="line-218"></span><span class="hs-comment">-- 'Text' object that represents the given number.</span><span>
+</span><span id="line-219"></span><span id="local-6989586621679205848"><span class="annot"><a href="Text.Numerals.Algorithm.html#compressSegments"><span class="hs-identifier hs-type">compressSegments</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679205848"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-220"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ The value used for /one/ in the specific language.</span><span>
+</span><span id="line-221"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#MergerFunction"><span class="hs-identifier hs-type">MergerFunction</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205848"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The 'MergerFunction' for the specific language that implements the grammar rules how to merge values.</span><span>
+</span><span id="line-222"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679205848"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'NumberSegment' value to turn into a 'Text' object.</span><span>
+</span><span id="line-223"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ The 'Text' object that contains the name of the number stored in the 'NumberSegment'.</span></span><span>
+</span><span id="line-224"></span><span id="compressSegments"><span class="annot"><span class="annottext">compressSegments :: Text -&gt; MergerFunction i -&gt; NumberSegment i -&gt; Text
+</span><a href="Text.Numerals.Algorithm.html#compressSegments"><span class="hs-identifier hs-var hs-var">compressSegments</span></a></span></span><span> </span><span id="local-6989586621679205458"><span class="annot"><span class="annottext">one' :: Text
+</span><a href="#local-6989586621679205458"><span class="hs-identifier hs-var">one'</span></a></span></span><span> </span><span id="local-6989586621679205457"><span class="annot"><span class="annottext">merger :: MergerFunction i
+</span><a href="#local-6989586621679205457"><span class="hs-identifier hs-var">merger</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, Text) -&gt; Text
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">((i, Text) -&gt; Text)
+-&gt; (NumberSegment i -&gt; (i, Text)) -&gt; NumberSegment i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205456"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-225"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679205456"><span class="annot"><span class="annottext">go :: NumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205456"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#NumberSegment"><span class="hs-identifier hs-type">NumberSegment</span></a></span><span> </span><span id="local-6989586621679205455"><span class="annot"><span class="annottext">dv' :: MNumberSegment i
+</span><a href="#local-6989586621679205455"><span class="hs-identifier hs-var">dv'</span></a></span></span><span> </span><span id="local-6989586621679205454"><span class="annot"><span class="annottext">i :: i
+</span><a href="#local-6989586621679205454"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679205453"><span class="annot"><span class="annottext">t :: Text
+</span><a href="#local-6989586621679205453"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679205452"><span class="annot"><span class="annottext">md' :: MNumberSegment i
+</span><a href="#local-6989586621679205452"><span class="hs-identifier hs-var">md'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i -&gt; (i, Text) -&gt; (i, Text)
+</span><a href="#local-6989586621679205451"><span class="hs-identifier hs-var">_mergeTail</span></a></span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+</span><a href="#local-6989586621679205452"><span class="hs-identifier hs-var">md'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205450"><span class="hs-identifier hs-var">dvi</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; i
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205454"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MergerFunction i
+</span><a href="#local-6989586621679205457"><span class="hs-identifier hs-var">merger</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205450"><span class="hs-identifier hs-var">dvi</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205454"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205448"><span class="hs-identifier hs-var">dv</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205453"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-226"></span><span>              </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679205450"><span class="annot"><span class="annottext">dvi :: i
+</span><a href="#local-6989586621679205450"><span class="hs-identifier hs-var">dvi</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205448"><span class="annot"><span class="annottext">dv :: Text
+</span><a href="#local-6989586621679205448"><span class="hs-identifier hs-var">dv</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MNumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205447"><span class="hs-identifier hs-var">_unwrap</span></a></span><span> </span><span class="annot"><span class="annottext">MNumberSegment i
+</span><a href="#local-6989586621679205455"><span class="hs-identifier hs-var">dv'</span></a></span><span>
+</span><span id="line-227"></span><span>          </span><span id="local-6989586621679205447"><span class="annot"><span class="annottext">_unwrap :: MNumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205447"><span class="hs-identifier hs-var hs-var">_unwrap</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, Text)
+-&gt; (NumberSegment i -&gt; (i, Text)) -&gt; MNumberSegment i -&gt; (i, Text)
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205458"><span class="hs-identifier hs-var">one'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">NumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205456"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-228"></span><span>          </span><span id="local-6989586621679205451"><span class="annot"><span class="annottext">_mergeTail :: MNumberSegment i -&gt; (i, Text) -&gt; (i, Text)
+</span><a href="#local-6989586621679205451"><span class="hs-identifier hs-var hs-var">_mergeTail</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span id="local-6989586621679205445"><span class="annot"><span class="annottext">r :: (i, Text)
+</span><a href="#local-6989586621679205445"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, Text)
+</span><a href="#local-6989586621679205445"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-229"></span><span>          </span><span class="annot"><a href="#local-6989586621679205451"><span class="hs-identifier hs-var">_mergeTail</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679205444"><span class="annot"><span class="annottext">md' :: NumberSegment i
+</span><a href="#local-6989586621679205444"><span class="hs-identifier hs-var">md'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679205443"><span class="annot"><span class="annottext">vi :: i
+</span><a href="#local-6989586621679205443"><span class="hs-identifier hs-var">vi</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205442"><span class="annot"><span class="annottext">v :: Text
+</span><a href="#local-6989586621679205442"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205443"><span class="hs-identifier hs-var">vi</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; i
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205440"><span class="hs-identifier hs-var">mdi</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MergerFunction i
+</span><a href="#local-6989586621679205457"><span class="hs-identifier hs-var">merger</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205443"><span class="hs-identifier hs-var">vi</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679205440"><span class="hs-identifier hs-var">mdi</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205442"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679205439"><span class="hs-identifier hs-var">md</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-230"></span><span>              </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679205440"><span class="annot"><span class="annottext">mdi :: i
+</span><a href="#local-6989586621679205440"><span class="hs-identifier hs-var">mdi</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679205439"><span class="annot"><span class="annottext">md :: Text
+</span><a href="#local-6989586621679205439"><span class="hs-identifier hs-var">md</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumberSegment i -&gt; (i, Text)
+</span><a href="#local-6989586621679205456"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">NumberSegment i
+</span><a href="#local-6989586621679205444"><span class="hs-identifier hs-var">md'</span></a></span><span>
+</span><span id="line-231"></span></pre></body></html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_JufmDYMQg2UKr2xNZfMwB7"><span id="%24maxtag_JufmDYMQg2UKr2xNZfMwB7"><span id="%24tag2con_JufmDYMQg2UKr2xNZfMwB7"></span></span></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings                  #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.TestBench.Parsers</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-6"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Test Bench</span></span><span>
+</span><span id="line-7"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#MacroEnv"><span class="hs-identifier">MacroEnv</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#MacroDescriptor"><span class="hs-identifier">MacroDescriptor</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#RegexSource"><span class="hs-identifier">RegexSource</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#WithCaptures"><span class="hs-identifier">WithCaptures</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#RegexType"><span class="hs-identifier">RegexType</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#isTDFA"><span class="hs-identifier">isTDFA</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#isPCRE"><span class="hs-identifier">isPCRE</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#presentRegexType"><span class="hs-identifier">presentRegexType</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Constructing a MacrosEnv</span></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#mkMacros"><span class="hs-identifier">mkMacros</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Formatting Macros</span></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroTable"><span class="hs-identifier">formatMacroTable</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSummary"><span class="hs-identifier">formatMacroSummary</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSources"><span class="hs-identifier">formatMacroSources</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSource"><span class="hs-identifier">formatMacroSource</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Formatting Macros</span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#testMacroEnv"><span class="hs-identifier">testMacroEnv</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#runTests"><span class="hs-identifier">runTests</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#runTests%27"><span class="hs-identifier">runTests'</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Parsing</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseInteger"><span class="hs-identifier">parseInteger</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseHex"><span class="hs-identifier">parseHex</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDouble"><span class="hs-identifier">parseDouble</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseString"><span class="hs-identifier">parseString</span></a></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSimpleString"><span class="hs-identifier">parseSimpleString</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDate"><span class="hs-identifier">parseDate</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSlashesDate"><span class="hs-identifier">parseSlashesDate</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeOfDay"><span class="hs-identifier">parseTimeOfDay</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeZone"><span class="hs-identifier">parseTimeZone</span></a></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime"><span class="hs-identifier">parseDateTime</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime8601"><span class="hs-identifier">parseDateTime8601</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTimeCLF"><span class="hs-identifier">parseDateTimeCLF</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseShortMonth"><span class="hs-identifier">parseShortMonth</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#shortMonthArray"><span class="hs-identifier">shortMonthArray</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#IPV4Address"><span class="hs-identifier">IPV4Address</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseIPv4Address"><span class="hs-identifier">parseIPv4Address</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Severity"><span class="hs-identifier">Severity</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSeverity"><span class="hs-identifier">parseSeverity</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severityKeywords"><span class="hs-identifier">severityKeywords</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Array</span></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.HashMap.Strict</span></span><span>        </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">HM</span></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>                  </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Time</span></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Time.Locale.Compat</span></span><span>    </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LC</span></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Printf</span></span><span>
+</span><span id="line-56"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html"><span class="hs-identifier">Text.RE.ZeInternals.TestBench</span></a></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Read</span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span id="local-6989586621679164679"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseInteger"><span class="hs-identifier hs-type">parseInteger</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164679"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164679"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span></span><span>
+</span><span id="line-62"></span><span id="parseInteger"><span class="annot"><span class="annottext">parseInteger :: a -&gt; Maybe Int
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseInteger"><span class="hs-identifier hs-var hs-var">parseInteger</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe Int) -&gt; (a -&gt; String) -&gt; a -&gt; Maybe Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span id="local-6989586621679164675"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseHex"><span class="hs-identifier hs-type">parseHex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164675"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164675"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span></span><span>
+</span><span id="line-65"></span><span id="parseHex"><span class="annot"><span class="annottext">parseHex :: a -&gt; Maybe Int
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseHex"><span class="hs-identifier hs-var hs-var">parseHex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe Int) -&gt; (a -&gt; String) -&gt; a -&gt; Maybe Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;0x&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (a -&gt; String) -&gt; a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span id="local-6989586621679164674"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDouble"><span class="hs-identifier hs-type">parseDouble</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164674"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164674"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span></span><span>
+</span><span id="line-68"></span><span id="parseDouble"><span class="annot"><span class="annottext">parseDouble :: a -&gt; Maybe Double
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDouble"><span class="hs-identifier hs-var hs-var">parseDouble</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Double
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe Double) -&gt; (a -&gt; String) -&gt; a -&gt; Maybe Double
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span id="local-6989586621679164673"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseString"><span class="hs-identifier hs-type">parseString</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164673"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164673"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span></span><span>
+</span><span id="line-71"></span><span id="parseString"><span class="annot"><span class="annottext">parseString :: a -&gt; Maybe Text
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseString"><span class="hs-identifier hs-var hs-var">parseString</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Text
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe Text) -&gt; (a -&gt; String) -&gt; a -&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span id="local-6989586621679164672"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSimpleString"><span class="hs-identifier hs-type">parseSimpleString</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164672"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164672"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span></span><span>
+</span><span id="line-74"></span><span id="parseSimpleString"><span class="annot"><span class="annottext">parseSimpleString :: a -&gt; Maybe Text
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSimpleString"><span class="hs-identifier hs-var hs-var">parseSimpleString</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Text) -&gt; (a -&gt; Text) -&gt; a -&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">T.dropEnd</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (a -&gt; Text) -&gt; a -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">T.drop</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (a -&gt; Text) -&gt; a -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Text
+forall a. Replace a =&gt; a -&gt; Text
+</span><a href="Text.RE.ZeInternals.Replace.html#textifyR"><span class="hs-identifier hs-var">textifyR</span></a></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_templates"><span class="hs-identifier hs-type">date_templates</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#time_templates"><span class="hs-identifier hs-type">time_templates</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#timezone_templates"><span class="hs-identifier hs-type">timezone_templates</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_8601_templates"><span class="hs-identifier hs-type">date_time_8601_templates</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_templates"><span class="hs-identifier hs-type">date_time_templates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
+</span><span id="line-78"></span><span id="date_templates"><span class="annot"><span class="annottext">date_templates :: [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_templates"><span class="hs-identifier hs-var hs-var">date_templates</span></a></span></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;%F&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-79"></span><span id="time_templates"><span class="annot"><span class="annottext">time_templates :: [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#time_templates"><span class="hs-identifier hs-var hs-var">time_templates</span></a></span></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;%H:%M:%S&quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-string">&quot;%H:%M:%S%Q&quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-string">&quot;%H:%M&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span id="timezone_templates"><span class="annot"><span class="annottext">timezone_templates :: [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#timezone_templates"><span class="hs-identifier hs-var hs-var">timezone_templates</span></a></span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;Z&quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-string">&quot;%z&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-81"></span><span id="date_time_8601_templates"><span class="annot"><span class="annottext">date_time_8601_templates :: [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_8601_templates"><span class="hs-identifier hs-var hs-var">date_time_8601_templates</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String -&gt; String -&gt; String
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="hs-string">&quot;%sT%s%s&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164662"><span class="hs-identifier hs-var">dt</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164661"><span class="hs-identifier hs-var">tm</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164660"><span class="hs-identifier hs-var">tz</span></a></span><span>
+</span><span id="line-83"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679164662"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164662"><span class="hs-identifier hs-var">dt</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_templates"><span class="hs-identifier hs-var">date_templates</span></a></span><span>
+</span><span id="line-84"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164661"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164661"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#time_templates"><span class="hs-identifier hs-var">time_templates</span></a></span><span>
+</span><span id="line-85"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164660"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164660"><span class="hs-identifier hs-var">tz</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#timezone_templates"><span class="hs-identifier hs-var">timezone_templates</span></a></span><span>
+</span><span id="line-86"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-87"></span><span id="date_time_templates"><span class="annot"><span class="annottext">date_time_templates :: [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_templates"><span class="hs-identifier hs-var hs-var">date_time_templates</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Char -&gt; String -&gt; String -&gt; String
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="hs-string">&quot;%s%c%s%s&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164659"><span class="hs-identifier hs-var">dt</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679164658"><span class="hs-identifier hs-var">sc</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164657"><span class="hs-identifier hs-var">tm</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164656"><span class="hs-identifier hs-var">tz</span></a></span><span>
+</span><span id="line-89"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679164659"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164659"><span class="hs-identifier hs-var">dt</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_templates"><span class="hs-identifier hs-var">date_templates</span></a></span><span>
+</span><span id="line-90"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164658"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679164658"><span class="hs-identifier hs-var">sc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-char">'T'</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-char">' '</span></span><span class="hs-special">]</span><span>
+</span><span id="line-91"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164657"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164657"><span class="hs-identifier hs-var">tm</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#time_templates"><span class="hs-identifier hs-var">time_templates</span></a></span><span>
+</span><span id="line-92"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164656"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164656"><span class="hs-identifier hs-var">tz</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#timezone_templates"><span class="hs-identifier hs-var">timezone_templates</span></a></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot; UTC&quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-93"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span id="local-6989586621679164655"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDate"><span class="hs-identifier hs-type">parseDate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164655"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164655"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Day</span></span></span><span>
+</span><span id="line-96"></span><span id="parseDate"><span class="annot"><span class="annottext">parseDate :: a -&gt; Maybe Day
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDate"><span class="hs-identifier hs-var hs-var">parseDate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe Day
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_templates"><span class="hs-identifier hs-var">date_templates</span></a></span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span id="local-6989586621679164653"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSlashesDate"><span class="hs-identifier hs-type">parseSlashesDate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164653"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164653"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Day</span></span></span><span>
+</span><span id="line-99"></span><span id="parseSlashesDate"><span class="annot"><span class="annottext">parseSlashesDate :: a -&gt; Maybe Day
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSlashesDate"><span class="hs-identifier hs-var hs-var">parseSlashesDate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe Day
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;%Y/%m/%d&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span id="local-6989586621679164652"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeOfDay"><span class="hs-identifier hs-type">parseTimeOfDay</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164652"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164652"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TimeOfDay</span></span></span><span>
+</span><span id="line-102"></span><span id="parseTimeOfDay"><span class="annot"><span class="annottext">parseTimeOfDay :: a -&gt; Maybe TimeOfDay
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeOfDay"><span class="hs-identifier hs-var hs-var">parseTimeOfDay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe TimeOfDay
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#time_templates"><span class="hs-identifier hs-var">time_templates</span></a></span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span id="local-6989586621679164651"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeZone"><span class="hs-identifier hs-type">parseTimeZone</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164651"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164651"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TimeZone</span></span></span><span>
+</span><span id="line-105"></span><span id="parseTimeZone"><span class="annot"><span class="annottext">parseTimeZone :: a -&gt; Maybe TimeZone
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseTimeZone"><span class="hs-identifier hs-var hs-var">parseTimeZone</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe TimeZone
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#timezone_templates"><span class="hs-identifier hs-var">timezone_templates</span></a></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span id="local-6989586621679164650"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime"><span class="hs-identifier hs-type">parseDateTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164650"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164650"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTCTime</span></span></span><span>
+</span><span id="line-108"></span><span id="parseDateTime"><span class="annot"><span class="annottext">parseDateTime :: a -&gt; Maybe UTCTime
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime"><span class="hs-identifier hs-var hs-var">parseDateTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe UTCTime
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_templates"><span class="hs-identifier hs-var">date_time_templates</span></a></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span id="local-6989586621679164649"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime8601"><span class="hs-identifier hs-type">parseDateTime8601</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164649"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164649"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTCTime</span></span></span><span>
+</span><span id="line-111"></span><span id="parseDateTime8601"><span class="annot"><span class="annottext">parseDateTime8601 :: a -&gt; Maybe UTCTime
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTime8601"><span class="hs-identifier hs-var hs-var">parseDateTime8601</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe UTCTime
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#date_time_8601_templates"><span class="hs-identifier hs-var">date_time_8601_templates</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span id="local-6989586621679164648"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTimeCLF"><span class="hs-identifier hs-type">parseDateTimeCLF</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164648"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164648"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTCTime</span></span></span><span>
+</span><span id="line-114"></span><span id="parseDateTimeCLF"><span class="annot"><span class="annottext">parseDateTimeCLF :: a -&gt; Maybe UTCTime
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseDateTimeCLF"><span class="hs-identifier hs-var hs-var">parseDateTimeCLF</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; a -&gt; Maybe UTCTime
+forall t s. (ParseTime t, Replace s) =&gt; [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var">parse_time</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;%d/%b/%Y:%H:%M:%S %z&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span id="local-6989586621679164647"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseShortMonth"><span class="hs-identifier hs-type">parseShortMonth</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164647"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164647"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span></span><span>
+</span><span id="line-117"></span><span id="parseShortMonth"><span class="annot"><span class="annottext">parseShortMonth :: a -&gt; Maybe Int
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseShortMonth"><span class="hs-identifier hs-var hs-var">parseShortMonth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; HashMap String Int -&gt; Maybe Int)
+-&gt; HashMap String Int -&gt; String -&gt; Maybe Int
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; HashMap String Int -&gt; Maybe Int
+forall k v. (Eq k, Hashable k) =&gt; k -&gt; HashMap k v -&gt; Maybe v
+</span><span class="hs-identifier hs-var">HM.lookup</span></span><span> </span><span class="annot"><span class="annottext">HashMap String Int
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#short_month_hm"><span class="hs-identifier hs-var">short_month_hm</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe Int) -&gt; (a -&gt; String) -&gt; a -&gt; Maybe Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span id="local-6989586621679164768"><span id="local-6989586621679164770"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-type">parse_time</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ParseTime</span></span><span> </span><span class="annot"><a href="#local-6989586621679164770"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">,</span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164768"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164768"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679164770"><span class="hs-identifier hs-type">t</span></a></span></span></span><span>
+</span><span id="line-120"></span><span id="parse_time"><span class="annot"><span class="annottext">parse_time :: [String] -&gt; s -&gt; Maybe t
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parse_time"><span class="hs-identifier hs-var hs-var">parse_time</span></a></span></span><span> </span><span id="local-6989586621679164643"><span class="annot"><span class="annottext">tpls :: [String]
+</span><a href="#local-6989586621679164643"><span class="hs-identifier hs-var">tpls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe t
+forall a. ParseTime a =&gt; String -&gt; Maybe a
+</span><a href="#local-6989586621679164642"><span class="hs-identifier hs-var">prs</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Maybe t) -&gt; (s -&gt; String) -&gt; s -&gt; Maybe t
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-122"></span><span>    </span><span id="local-6989586621679164642"><span class="annot"><span class="annottext">prs :: String -&gt; Maybe a
+</span><a href="#local-6989586621679164642"><span class="hs-identifier hs-var hs-var">prs</span></a></span></span><span> </span><span id="local-6989586621679164641"><span class="annot"><span class="annottext">s :: String
+</span><a href="#local-6989586621679164641"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Maybe a
+forall a. [a] -&gt; Maybe a
+</span><span class="hs-identifier hs-var">listToMaybe</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Maybe a) -&gt; [a] -&gt; Maybe a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Maybe a] -&gt; [a]
+forall a. [Maybe a] -&gt; [a]
+</span><span class="hs-identifier hs-var">catMaybes</span></span><span>
+</span><span id="line-123"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">TimeLocale -&gt; String -&gt; String -&gt; Maybe a
+forall t. ParseTime t =&gt; TimeLocale -&gt; String -&gt; String -&gt; Maybe t
+</span><span class="hs-identifier hs-var">parseTime</span></span><span> </span><span class="annot"><span class="annottext">TimeLocale
+</span><span class="hs-identifier hs-var">LC.defaultTimeLocale</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164636"><span class="hs-identifier hs-var">fmt</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164641"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-124"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679164636"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164636"><span class="hs-identifier hs-var">fmt</span></a></span></span><span class="hs-glyph">&lt;-</span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679164643"><span class="hs-identifier hs-var">tpls</span></a></span><span>
+</span><span id="line-125"></span><span>          </span><span class="hs-special">]</span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#short_month_hm"><span class="hs-identifier hs-type">short_month_hm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HM.HashMap</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-128"></span><span id="short_month_hm"><span class="annot"><span class="annottext">short_month_hm :: HashMap String Int
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#short_month_hm"><span class="hs-identifier hs-var hs-var">short_month_hm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(String, Int)] -&gt; HashMap String Int
+forall k v. (Eq k, Hashable k) =&gt; [(k, v)] -&gt; HashMap k v
+</span><span class="hs-identifier hs-var">HM.fromList</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">T.unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; String) -&gt; Text -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Array Int Text
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#shortMonthArray"><span class="hs-identifier hs-var">shortMonthArray</span></a></span><span class="annot"><span class="annottext">Array Int Text -&gt; Int -&gt; Text
+forall i e. Ix i =&gt; Array i e -&gt; i -&gt; e
+</span><span class="hs-glyph hs-var">!</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164632"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164632"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679164632"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164632"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-glyph">&lt;-</span><span class="hs-special">[</span><span class="annot"><span class="hs-number">1</span></span><span class="hs-glyph">..</span><span class="annot"><span class="hs-number">12</span></span><span class="hs-special">]</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#shortMonthArray"><span class="hs-identifier hs-type">shortMonthArray</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Array</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span>
+</span><span id="line-131"></span><span id="shortMonthArray"><span class="annot"><span class="annottext">shortMonthArray :: Array Int Text
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#shortMonthArray"><span class="hs-identifier hs-var hs-var">shortMonthArray</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; [Text] -&gt; Array Int Text
+forall i e. Ix i =&gt; (i, i) -&gt; [e] -&gt; Array i e
+</span><span class="hs-identifier hs-var">listArray</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">1</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-number">12</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Array Int Text) -&gt; [Text] -&gt; Array Int Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-132"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; [Text]
+</span><span class="hs-identifier hs-var">T.words</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec&quot;</span></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-keyword">type</span><span> </span><span id="IPV4Address"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#IPV4Address"><span class="hs-identifier hs-var">IPV4Address</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span id="local-6989586621679164629"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseIPv4Address"><span class="hs-identifier hs-type">parseIPv4Address</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164629"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164629"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#IPV4Address"><span class="hs-identifier hs-type">IPV4Address</span></a></span></span><span>
+</span><span id="line-137"></span><span id="parseIPv4Address"><span class="annot"><span class="annottext">parseIPv4Address :: a -&gt; Maybe IPV4Address
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseIPv4Address"><span class="hs-identifier hs-var hs-var">parseIPv4Address</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Maybe IPV4Address
+forall a b c d.
+(Enum a, Enum b, Enum c, Enum d) =&gt;
+[String] -&gt; Maybe (a, b, c, d)
+</span><a href="#local-6989586621679164628"><span class="hs-identifier hs-var">prs</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Maybe IPV4Address)
+-&gt; (a -&gt; [String]) -&gt; a -&gt; Maybe IPV4Address
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#words_by"><span class="hs-identifier hs-var">words_by</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="annot"><span class="hs-char">'.'</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; (a -&gt; String) -&gt; a -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-138"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-139"></span><span>    </span><span id="local-6989586621679164628"><span class="annot"><span class="annottext">prs :: [String] -&gt; Maybe (a, b, c, d)
+</span><a href="#local-6989586621679164628"><span class="hs-identifier hs-var hs-var">prs</span></a></span></span><span> </span><span class="hs-special">[</span><span id="local-6989586621679164626"><span class="annot"><span class="annottext">a_s :: String
+</span><a href="#local-6989586621679164626"><span class="hs-identifier hs-var">a_s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679164625"><span class="annot"><span class="annottext">b_s :: String
+</span><a href="#local-6989586621679164625"><span class="hs-identifier hs-var">b_s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679164624"><span class="annot"><span class="annottext">c_s :: String
+</span><a href="#local-6989586621679164624"><span class="hs-identifier hs-var">c_s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679164623"><span class="annot"><span class="annottext">d_s :: String
+</span><a href="#local-6989586621679164623"><span class="hs-identifier hs-var">d_s</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-140"></span><span>      </span><span id="local-6989586621679164622"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164622"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164626"><span class="hs-identifier hs-var">a_s</span></a></span><span>
+</span><span id="line-141"></span><span>      </span><span id="local-6989586621679164621"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164621"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164625"><span class="hs-identifier hs-var">b_s</span></a></span><span>
+</span><span id="line-142"></span><span>      </span><span id="local-6989586621679164620"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164620"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164624"><span class="hs-identifier hs-var">c_s</span></a></span><span>
+</span><span id="line-143"></span><span>      </span><span id="local-6989586621679164619"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164619"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe Int
+forall a. Read a =&gt; String -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164623"><span class="hs-identifier hs-var">d_s</span></a></span><span>
+</span><span id="line-144"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; [Int] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">all</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+forall a. (Ord a, Num a) =&gt; a -&gt; Bool
+</span><a href="#local-6989586621679164617"><span class="hs-identifier hs-var">is_o</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164622"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164621"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164620"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164619"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-145"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(a, b, c, d) -&gt; Maybe (a, b, c, d)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; a
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164622"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; b
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164621"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; c
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164620"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; d
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679164619"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-146"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe (a, b, c, d)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-147"></span><span>    </span><span class="annot"><a href="#local-6989586621679164628"><span class="hs-identifier hs-var">prs</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (a, b, c, d)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679164617"><span class="annot"><span class="annottext">is_o :: a -&gt; Bool
+</span><a href="#local-6989586621679164617"><span class="hs-identifier hs-var hs-var">is_o</span></a></span></span><span> </span><span id="local-6989586621679164615"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679164615"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679164615"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679164615"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="hs-number">255</span></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-keyword">data</span><span> </span><span id="Severity"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Severity"><span class="hs-identifier hs-var">Severity</span></a></span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Emerg"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Emerg"><span class="hs-identifier hs-var">Emerg</span></a></span></span><span>
+</span><span id="line-153"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Alert"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Alert"><span class="hs-identifier hs-var">Alert</span></a></span></span><span>
+</span><span id="line-154"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Crit"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Crit"><span class="hs-identifier hs-var">Crit</span></a></span></span><span>
+</span><span id="line-155"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Err"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Err"><span class="hs-identifier hs-var">Err</span></a></span></span><span>
+</span><span id="line-156"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Warning"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Warning"><span class="hs-identifier hs-var">Warning</span></a></span></span><span>
+</span><span id="line-157"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Notice"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Notice"><span class="hs-identifier hs-var">Notice</span></a></span></span><span>
+</span><span id="line-158"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Info"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Info"><span class="hs-identifier hs-var">Info</span></a></span></span><span>
+</span><span id="line-159"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Debug"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Debug"><span class="hs-identifier hs-var">Debug</span></a></span></span><span>
+</span><span id="line-160"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679164601"><span id="local-6989586621679164603"><span class="annot"><span class="annottext">Severity
+Severity -&gt; Severity -&gt; Bounded Severity
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: Severity
+$cmaxBound :: Severity
+minBound :: Severity
+$cminBound :: Severity
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679164584"><span id="local-6989586621679164586"><span id="local-6989586621679164588"><span id="local-6989586621679164590"><span id="local-6989586621679164592"><span id="local-6989586621679164594"><span id="local-6989586621679164596"><span id="local-6989586621679164598"><span class="annot"><span class="annottext">Int -&gt; Severity
+Severity -&gt; Int
+Severity -&gt; [Severity]
+Severity -&gt; Severity
+Severity -&gt; Severity -&gt; [Severity]
+Severity -&gt; Severity -&gt; Severity -&gt; [Severity]
+(Severity -&gt; Severity)
+-&gt; (Severity -&gt; Severity)
+-&gt; (Int -&gt; Severity)
+-&gt; (Severity -&gt; Int)
+-&gt; (Severity -&gt; [Severity])
+-&gt; (Severity -&gt; Severity -&gt; [Severity])
+-&gt; (Severity -&gt; Severity -&gt; [Severity])
+-&gt; (Severity -&gt; Severity -&gt; Severity -&gt; [Severity])
+-&gt; Enum Severity
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: Severity -&gt; Severity -&gt; Severity -&gt; [Severity]
+$cenumFromThenTo :: Severity -&gt; Severity -&gt; Severity -&gt; [Severity]
+enumFromTo :: Severity -&gt; Severity -&gt; [Severity]
+$cenumFromTo :: Severity -&gt; Severity -&gt; [Severity]
+enumFromThen :: Severity -&gt; Severity -&gt; [Severity]
+$cenumFromThen :: Severity -&gt; Severity -&gt; [Severity]
+enumFrom :: Severity -&gt; [Severity]
+$cenumFrom :: Severity -&gt; [Severity]
+fromEnum :: Severity -&gt; Int
+$cfromEnum :: Severity -&gt; Int
+toEnum :: Int -&gt; Severity
+$ctoEnum :: Int -&gt; Severity
+pred :: Severity -&gt; Severity
+$cpred :: Severity -&gt; Severity
+succ :: Severity -&gt; Severity
+$csucc :: Severity -&gt; Severity
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679164568"><span id="local-6989586621679164570"><span id="local-6989586621679164572"><span id="local-6989586621679164574"><span id="local-6989586621679164576"><span id="local-6989586621679164578"><span id="local-6989586621679164580"><span class="annot"><span class="annottext">Eq Severity
+Eq Severity =&gt;
+(Severity -&gt; Severity -&gt; Ordering)
+-&gt; (Severity -&gt; Severity -&gt; Bool)
+-&gt; (Severity -&gt; Severity -&gt; Bool)
+-&gt; (Severity -&gt; Severity -&gt; Bool)
+-&gt; (Severity -&gt; Severity -&gt; Bool)
+-&gt; (Severity -&gt; Severity -&gt; Severity)
+-&gt; (Severity -&gt; Severity -&gt; Severity)
+-&gt; Ord Severity
+Severity -&gt; Severity -&gt; Bool
+Severity -&gt; Severity -&gt; Ordering
+Severity -&gt; Severity -&gt; Severity
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Severity -&gt; Severity -&gt; Severity
+$cmin :: Severity -&gt; Severity -&gt; Severity
+max :: Severity -&gt; Severity -&gt; Severity
+$cmax :: Severity -&gt; Severity -&gt; Severity
+&gt;= :: Severity -&gt; Severity -&gt; Bool
+$c&gt;= :: Severity -&gt; Severity -&gt; Bool
+&gt; :: Severity -&gt; Severity -&gt; Bool
+$c&gt; :: Severity -&gt; Severity -&gt; Bool
+&lt;= :: Severity -&gt; Severity -&gt; Bool
+$c&lt;= :: Severity -&gt; Severity -&gt; Bool
+&lt; :: Severity -&gt; Severity -&gt; Bool
+$c&lt; :: Severity -&gt; Severity -&gt; Bool
+compare :: Severity -&gt; Severity -&gt; Ordering
+$ccompare :: Severity -&gt; Severity -&gt; Ordering
+$cp1Ord :: Eq Severity
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679164563"><span id="local-6989586621679164565"><span class="annot"><span class="annottext">Severity -&gt; Severity -&gt; Bool
+(Severity -&gt; Severity -&gt; Bool)
+-&gt; (Severity -&gt; Severity -&gt; Bool) -&gt; Eq Severity
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Severity -&gt; Severity -&gt; Bool
+$c/= :: Severity -&gt; Severity -&gt; Bool
+== :: Severity -&gt; Severity -&gt; Bool
+$c== :: Severity -&gt; Severity -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679164556"><span id="local-6989586621679164558"><span id="local-6989586621679164560"><span class="annot"><span class="annottext">Int -&gt; Severity -&gt; String -&gt; String
+[Severity] -&gt; String -&gt; String
+Severity -&gt; String
+(Int -&gt; Severity -&gt; String -&gt; String)
+-&gt; (Severity -&gt; String)
+-&gt; ([Severity] -&gt; String -&gt; String)
+-&gt; Show Severity
+forall a.
+(Int -&gt; a -&gt; String -&gt; String)
+-&gt; (a -&gt; String) -&gt; ([a] -&gt; String -&gt; String) -&gt; Show a
+showList :: [Severity] -&gt; String -&gt; String
+$cshowList :: [Severity] -&gt; String -&gt; String
+show :: Severity -&gt; String
+$cshow :: Severity -&gt; String
+showsPrec :: Int -&gt; Severity -&gt; String -&gt; String
+$cshowsPrec :: Int -&gt; Severity -&gt; String -&gt; String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span id="local-6989586621679164554"><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSeverity"><span class="hs-identifier hs-type">parseSeverity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#Replace"><span class="hs-identifier hs-type">Replace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679164554"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679164554"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Severity"><span class="hs-identifier hs-type">Severity</span></a></span></span><span>
+</span><span id="line-163"></span><span id="parseSeverity"><span class="annot"><span class="annottext">parseSeverity :: a -&gt; Maybe Severity
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#parseSeverity"><span class="hs-identifier hs-var hs-var">parseSeverity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; HashMap Text Severity -&gt; Maybe Severity)
+-&gt; HashMap Text Severity -&gt; Text -&gt; Maybe Severity
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; HashMap Text Severity -&gt; Maybe Severity
+forall k v. (Eq k, Hashable k) =&gt; k -&gt; HashMap k v -&gt; Maybe v
+</span><span class="hs-identifier hs-var">HM.lookup</span></span><span> </span><span class="annot"><span class="annottext">HashMap Text Severity
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severity_hm"><span class="hs-identifier hs-var">severity_hm</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Severity) -&gt; (a -&gt; Text) -&gt; a -&gt; Maybe Severity
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Text
+forall a. Replace a =&gt; a -&gt; Text
+</span><a href="Text.RE.ZeInternals.Replace.html#textifyR"><span class="hs-identifier hs-var">textifyR</span></a></span><span>
+</span><span id="line-164"></span><span>
+</span><span id="line-165"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severity_hm"><span class="hs-identifier hs-type">severity_hm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HM.HashMap</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Severity"><span class="hs-identifier hs-type">Severity</span></a></span><span>
+</span><span id="line-166"></span><span id="severity_hm"><span class="annot"><span class="annottext">severity_hm :: HashMap Text Severity
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severity_hm"><span class="hs-identifier hs-var hs-var">severity_hm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Text, Severity)] -&gt; HashMap Text Severity
+forall k v. (Eq k, Hashable k) =&gt; [(k, v)] -&gt; HashMap k v
+</span><span class="hs-identifier hs-var">HM.fromList</span></span><span>
+</span><span id="line-167"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679164552"><span class="hs-identifier hs-var">kw</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Severity
+</span><a href="#local-6989586621679164551"><span class="hs-identifier hs-var">pri</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-168"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679164551"><span class="annot"><span class="annottext">Severity
+</span><a href="#local-6989586621679164551"><span class="hs-identifier hs-var">pri</span></a></span></span><span class="hs-glyph">&lt;-</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Severity
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span class="hs-glyph">..</span><span class="annot"><span class="annottext">Severity
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span class="hs-special">]</span><span>
+</span><span id="line-169"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679164548"><span class="annot"><span class="annottext">kw0 :: Text
+</span><a href="#local-6989586621679164548"><span class="hs-identifier hs-var">kw0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679164547"><span class="annot"><span class="annottext">kws :: [Text]
+</span><a href="#local-6989586621679164547"><span class="hs-identifier hs-var">kws</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Severity -&gt; (Text, [Text])
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severityKeywords"><span class="hs-identifier hs-var">severityKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">Severity
+</span><a href="#local-6989586621679164551"><span class="hs-identifier hs-var">pri</span></a></span><span>
+</span><span id="line-170"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164552"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679164552"><span class="hs-identifier hs-var">kw</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679164548"><span class="hs-identifier hs-var">kw0</span></a></span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679164547"><span class="hs-identifier hs-var">kws</span></a></span><span>
+</span><span id="line-171"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severityKeywords"><span class="hs-identifier hs-type">severityKeywords</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Severity"><span class="hs-identifier hs-type">Severity</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span class="hs-special">,</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span id="severityKeywords"><span class="annot"><span class="annottext">severityKeywords :: Severity -&gt; (Text, [Text])
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#severityKeywords"><span class="hs-identifier hs-var hs-var">severityKeywords</span></a></span></span><span> </span><span id="local-6989586621679164546"><span class="annot"><span class="annottext">pri :: Severity
+</span><a href="#local-6989586621679164546"><span class="hs-identifier hs-var">pri</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Severity
+</span><a href="#local-6989586621679164546"><span class="hs-identifier hs-var">pri</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-175"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Emerg"><span class="hs-identifier hs-type">Emerg</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;emerg&quot;</span></span><span>    </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;panic&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-176"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Alert"><span class="hs-identifier hs-type">Alert</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;alert&quot;</span></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-177"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Crit"><span class="hs-identifier hs-type">Crit</span></a></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;crit&quot;</span></span><span>     </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-178"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Err"><span class="hs-identifier hs-type">Err</span></a></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;err&quot;</span></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;error&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-179"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Warning"><span class="hs-identifier hs-type">Warning</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;warning&quot;</span></span><span>  </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;warn&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-180"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Notice"><span class="hs-identifier hs-type">Notice</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;notice&quot;</span></span><span>   </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-181"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Info"><span class="hs-identifier hs-type">Info</span></a></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;info&quot;</span></span><span>     </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-182"></span><span>  </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#Debug"><span class="hs-identifier hs-type">Debug</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-string">&quot;debug&quot;</span></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-183"></span><span>
+</span><span id="line-184"></span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.Parsers.html#words_by"><span class="hs-identifier hs-type">words_by</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
+</span><span id="line-185"></span><span id="words_by"><span class="annot"><span class="annottext">words_by :: (Char -&gt; Bool) -&gt; String -&gt; [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#words_by"><span class="hs-identifier hs-var hs-var">words_by</span></a></span></span><span> </span><span id="local-6989586621679164545"><span class="annot"><span class="annottext">f :: Char -&gt; Bool
+</span><a href="#local-6989586621679164545"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679164544"><span class="annot"><span class="annottext">s :: String
+</span><a href="#local-6989586621679164544"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; String
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">dropWhile</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="#local-6989586621679164545"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164544"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-186"></span><span>  </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-187"></span><span>  </span><span id="local-6989586621679164542"><span class="annot"><span class="annottext">s' :: String
+</span><a href="#local-6989586621679164542"><span class="hs-identifier hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164541"><span class="hs-identifier hs-var">w</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; [String]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; [String]
+</span><a href="Text.RE.ZeInternals.TestBench.Parsers.html#words_by"><span class="hs-identifier hs-var">words_by</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="#local-6989586621679164545"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164540"><span class="hs-identifier hs-var">s''</span></a></span><span>
+</span><span id="line-188"></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-189"></span><span>          </span><span class="hs-special">(</span><span id="local-6989586621679164541"><span class="annot"><span class="annottext">w :: String
+</span><a href="#local-6989586621679164541"><span class="hs-identifier hs-var">w</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679164540"><span class="annot"><span class="annottext">s'' :: String
+</span><a href="#local-6989586621679164540"><span class="hs-identifier hs-var">s''</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; (String, String)
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; ([a], [a])
+</span><span class="hs-identifier hs-var">break</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="#local-6989586621679164545"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679164542"><span class="hs-identifier hs-var">s'</span></a></span><span>
+</span><span id="line-190"></span></pre></body></html>

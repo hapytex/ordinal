@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_8YwyzS3At8uCqtYW6jVMqj"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-unused-imports    #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.Types.Poss</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Fail</span></span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">data</span><span> </span><span id="Poss"><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-var">Poss</span></a></span></span><span> </span><span id="local-6989586621679165439"><span class="annot"><a href="#local-6989586621679165439"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Eek"><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Yup"><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-var">Yup</span></a></span></span><span> </span><span class="annot"><a href="#local-6989586621679165439"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165389"><span id="local-6989586621679165391"><span class="annot"><span class="annottext">Poss a -&gt; Poss a -&gt; Bool
+(Poss a -&gt; Poss a -&gt; Bool)
+-&gt; (Poss a -&gt; Poss a -&gt; Bool) -&gt; Eq (Poss a)
+forall a. Eq a =&gt; Poss a -&gt; Poss a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Poss a -&gt; Poss a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Poss a -&gt; Poss a -&gt; Bool
+== :: Poss a -&gt; Poss a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Poss a -&gt; Poss a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679165373"><span id="local-6989586621679165375"><span id="local-6989586621679165377"><span id="local-6989586621679165379"><span id="local-6989586621679165381"><span id="local-6989586621679165383"><span id="local-6989586621679165385"><span class="annot"><span class="annottext">Eq (Poss a)
+Eq (Poss a) =&gt;
+(Poss a -&gt; Poss a -&gt; Ordering)
+-&gt; (Poss a -&gt; Poss a -&gt; Bool)
+-&gt; (Poss a -&gt; Poss a -&gt; Bool)
+-&gt; (Poss a -&gt; Poss a -&gt; Bool)
+-&gt; (Poss a -&gt; Poss a -&gt; Bool)
+-&gt; (Poss a -&gt; Poss a -&gt; Poss a)
+-&gt; (Poss a -&gt; Poss a -&gt; Poss a)
+-&gt; Ord (Poss a)
+Poss a -&gt; Poss a -&gt; Bool
+Poss a -&gt; Poss a -&gt; Ordering
+Poss a -&gt; Poss a -&gt; Poss a
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall a. Ord a =&gt; Eq (Poss a)
+forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Bool
+forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Ordering
+forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Poss a
+min :: Poss a -&gt; Poss a -&gt; Poss a
+$cmin :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Poss a
+max :: Poss a -&gt; Poss a -&gt; Poss a
+$cmax :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Poss a
+&gt;= :: Poss a -&gt; Poss a -&gt; Bool
+$c&gt;= :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Bool
+&gt; :: Poss a -&gt; Poss a -&gt; Bool
+$c&gt; :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Bool
+&lt;= :: Poss a -&gt; Poss a -&gt; Bool
+$c&lt;= :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Bool
+&lt; :: Poss a -&gt; Poss a -&gt; Bool
+$c&lt; :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Bool
+compare :: Poss a -&gt; Poss a -&gt; Ordering
+$ccompare :: forall a. Ord a =&gt; Poss a -&gt; Poss a -&gt; Ordering
+$cp1Ord :: forall a. Ord a =&gt; Eq (Poss a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679165366"><span id="local-6989586621679165368"><span id="local-6989586621679165370"><span class="annot"><span class="annottext">Int -&gt; Poss a -&gt; ShowS
+[Poss a] -&gt; ShowS
+Poss a -&gt; String
+(Int -&gt; Poss a -&gt; ShowS)
+-&gt; (Poss a -&gt; String) -&gt; ([Poss a] -&gt; ShowS) -&gt; Show (Poss a)
+forall a. Show a =&gt; Int -&gt; Poss a -&gt; ShowS
+forall a. Show a =&gt; [Poss a] -&gt; ShowS
+forall a. Show a =&gt; Poss a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Poss a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Poss a] -&gt; ShowS
+show :: Poss a -&gt; String
+$cshow :: forall a. Show a =&gt; Poss a -&gt; String
+showsPrec :: Int -&gt; Poss a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Poss a -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679165362"><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>  </span><span id="local-6989586621679165360"><span class="annot"><span class="annottext">fmap :: (a -&gt; b) -&gt; Poss a -&gt; Poss b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">fmap</span></span></span><span> </span><span id="local-6989586621679165359"><span class="annot"><span class="annottext">f :: a -&gt; b
+</span><a href="#local-6989586621679165359"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679165358"><span class="annot"><span class="annottext">p :: Poss a
+</span><a href="#local-6989586621679165358"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Poss a
+</span><a href="#local-6989586621679165358"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165357"><span class="annot"><span class="annottext">m :: String
+</span><a href="#local-6989586621679165357"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Poss b
+forall a. String -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165357"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165356"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679165356"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">b -&gt; Poss b
+forall a. a -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-var">Yup</span></a></span><span> </span><span class="annot"><span class="annottext">(b -&gt; Poss b) -&gt; b -&gt; Poss b
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679165359"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679165356"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679165347"><span id="local-6989586621679165349"><span id="local-6989586621679165351"><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-19"></span><span>  </span><span id="local-6989586621679165345"><span class="annot"><span class="annottext">pure :: a -&gt; Poss a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pure</span></span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Poss a
+forall a. a -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-var">Yup</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span id="local-6989586621679165344"><span class="annot"><span class="annottext">&lt;*&gt; :: Poss (a -&gt; b) -&gt; Poss a -&gt; Poss b
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">(&lt;*&gt;)</span></span></span><span> </span><span id="local-6989586621679165343"><span class="annot"><span class="annottext">p1 :: Poss (a -&gt; b)
+</span><a href="#local-6989586621679165343"><span class="hs-identifier hs-var">p1</span></a></span></span><span> </span><span id="local-6989586621679165342"><span class="annot"><span class="annottext">p2 :: Poss a
+</span><a href="#local-6989586621679165342"><span class="hs-identifier hs-var">p2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Poss (a -&gt; b)
+</span><a href="#local-6989586621679165343"><span class="hs-identifier hs-var">p1</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165341"><span class="annot"><span class="annottext">m :: String
+</span><a href="#local-6989586621679165341"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Poss b
+forall a. String -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165341"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165340"><span class="annot"><span class="annottext">f :: a -&gt; b
+</span><a href="#local-6989586621679165340"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Poss a
+</span><a href="#local-6989586621679165342"><span class="hs-identifier hs-var">p2</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-23"></span><span>      </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165339"><span class="annot"><span class="annottext">n :: String
+</span><a href="#local-6989586621679165339"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Poss b
+forall a. String -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165339"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-24"></span><span>      </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165338"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679165338"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">b -&gt; Poss b
+forall a. a -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-var">Yup</span></a></span><span> </span><span class="annot"><span class="annottext">(b -&gt; Poss b) -&gt; b -&gt; Poss b
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679165340"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679165338"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679165334"><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-27"></span><span>  </span><span id="local-6989586621679165331"><span class="annot"><span class="annottext">return :: a -&gt; Poss a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">return</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Poss a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span>
+</span><span id="line-28"></span><span>  </span><span id="local-6989586621679165330"><span class="annot"><span class="annottext">&gt;&gt;= :: Poss a -&gt; (a -&gt; Poss b) -&gt; Poss b
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">(&gt;&gt;=)</span></span></span><span> </span><span id="local-6989586621679165329"><span class="annot"><span class="annottext">p :: Poss a
+</span><a href="#local-6989586621679165329"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679165328"><span class="annot"><span class="annottext">f :: a -&gt; Poss b
+</span><a href="#local-6989586621679165328"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Poss a
+</span><a href="#local-6989586621679165329"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165327"><span class="annot"><span class="annottext">m :: String
+</span><a href="#local-6989586621679165327"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Poss b
+forall a. String -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165327"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165326"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679165326"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Poss b
+</span><a href="#local-6989586621679165328"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679165326"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-33"></span><span>  </span><span id="local-6989586621679165322"><span class="annot"><span class="annottext">fail :: String -&gt; Poss a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">fail</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Poss a
+forall a. String -&gt; Poss a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-var">Eek</span></a></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span id="local-6989586621679165320"><span id="local-6989586621679165321"><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#poss"><span class="hs-identifier hs-type">poss</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679165321"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679165320"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679165321"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679165320"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679165321"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
+</span><span id="line-36"></span><span id="poss"><span class="annot"><span class="annottext">poss :: (String -&gt; b) -&gt; (a -&gt; b) -&gt; Poss a -&gt; b
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss"><span class="hs-identifier hs-var hs-var">poss</span></a></span></span><span> </span><span id="local-6989586621679165318"><span class="annot"><span class="annottext">f :: String -&gt; b
+</span><a href="#local-6989586621679165318"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165317"><span class="annot"><span class="annottext">s :: String
+</span><a href="#local-6989586621679165317"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; b
+</span><a href="#local-6989586621679165318"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165317"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#poss"><span class="hs-identifier hs-var">poss</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span id="local-6989586621679165316"><span class="annot"><span class="annottext">g :: a -&gt; b
+</span><a href="#local-6989586621679165316"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165315"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679165315"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679165316"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679165315"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span id="local-6989586621679165314"><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-type">poss2either</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Poss"><span class="hs-identifier hs-type">Poss</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679165314"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><a href="#local-6989586621679165314"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-40"></span><span id="poss2either"><span class="annot"><span class="annottext">poss2either :: Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var hs-var">poss2either</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Eek"><span class="hs-identifier hs-type">Eek</span></a></span><span> </span><span id="local-6989586621679165312"><span class="annot"><span class="annottext">m :: String
+</span><a href="#local-6989586621679165312"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String a
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span>  </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679165312"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html#Yup"><span class="hs-identifier hs-type">Yup</span></a></span><span> </span><span id="local-6989586621679165311"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679165311"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Either String a
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679165311"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-42"></span></pre></body></html>
