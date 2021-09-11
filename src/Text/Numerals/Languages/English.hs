@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP, OverloadedLists, OverloadedStrings, TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module      : Text.Numerals.Languages.English
@@ -25,7 +26,7 @@ module Text.Numerals.Languages.English (
   , merge'
   ) where
 
-import Data.Default(def)
+import Data.Default(Default(def))
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
@@ -63,6 +64,9 @@ $(pure (ordinizeFromDict "ordinize'" [
 -- | A 'NumeralsAlgorithm' to convert numbers to words in the /English/ language.
 english :: NumeralsAlgorithm  -- ^ A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.
 english = numeralsAlgorithm negativeWord' zeroWord' oneWord' lowWords' midWords' (valueSplit highWords') merge' ordinize' shortOrdinal' clockText'
+
+instance Default NumeralsAlgorithm where
+  def = english
 
 -- | Convert numers to their cardinal counterpart in /English/.
 toCardinal' :: Integral i
