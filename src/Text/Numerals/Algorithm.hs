@@ -30,7 +30,7 @@ module Text.Numerals.Algorithm (
 import Control.DeepSeq(NFData)
 
 import Data.Data(Data)
-import Data.Default(Default(def))
+import Data.Default.Class(Default(def))
 import Data.Foldable(toList)
 import Data.List(sortOn)
 #if __GLASGOW_HASKELL__ < 803

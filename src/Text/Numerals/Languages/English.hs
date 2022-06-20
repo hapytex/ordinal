@@ -26,7 +26,7 @@ module Text.Numerals.Languages.English (
   , merge'
   ) where
 
-import Data.Default(Default(def))
+import Data.Default.Class(Default(def))
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif

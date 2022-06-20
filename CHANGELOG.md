@@ -2,6 +2,10 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/ordinal).
 
+## Version 0.5.0.0
+
+Use `data-default-class` instead of `data-default` to reduce the number of dependencies.
+
 ## Version 0.4.0.0
 
 Converting the time of the day to words by using `toTimeText` and `toTimeText'`.
