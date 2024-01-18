@@ -2,6 +2,10 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/ordinal).
 
+## Version 0.7.0.0
+
+Added an executable to make conversions more convenient.
+
 ## Version 0.5.0.0
 
 Use `data-default-class` instead of `data-default` to reduce the number of dependencies.
