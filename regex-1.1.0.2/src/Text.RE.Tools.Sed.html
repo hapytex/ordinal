@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards            #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.Tools.Sed</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Sed</span></span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Text.RE.Tools.Sed.html#sed"><span class="hs-identifier">sed</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Sed.html#sed%27"><span class="hs-identifier">sed'</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Edit</span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier">Edits</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier">Edit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier">LineEdit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier">applyEdits</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier">applyEdit</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier">applyLineEdit</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsRegex</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier">IsRegex</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceAll"><span class="hs-identifier">searchReplaceAll</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceFirst"><span class="hs-identifier">searchReplaceFirst</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><span class="hs-comment">-- * LineNo</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier">LineNo</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier">firstLine</span></a></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#getLineNo"><span class="hs-identifier">getLineNo</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#lineNo"><span class="hs-identifier">lineNo</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Replace</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy.Char8</span></span><span>               </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LBS</span></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Edit.html"><span class="hs-identifier">Text.RE.Tools.Edit</span></a></span><span>
+</span><span id="line-41"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | read a file, apply an 'Edits' script to each line it and</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- write the file out again; &quot;-&quot; is used to indicate standard input</span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- standard output as appropriate</span><span>
+</span><span id="line-48"></span><span id="local-6989586621679140946"><span class="annot"><a href="Text.RE.Tools.Sed.html#sed"><span class="hs-identifier hs-type">sed</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140946"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier hs-type">Edits</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679140946"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-53"></span><span id="sed"><span class="annot"><span class="annottext">sed :: forall re.
+IsRegex re ByteString =&gt;
+Edits IO re ByteString -&gt; FilePath -&gt; FilePath -&gt; IO ()
+</span><a href="Text.RE.Tools.Sed.html#sed"><span class="hs-identifier hs-var hs-var">sed</span></a></span></span><span> </span><span id="local-6989586621679141005"><span class="annot"><span class="annottext">Edits IO re ByteString
+</span><a href="#local-6989586621679141005"><span class="hs-identifier hs-var">escr</span></a></span></span><span> </span><span id="local-6989586621679141006"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141006"><span class="hs-identifier hs-var">i_fp</span></a></span></span><span> </span><span id="local-6989586621679141007"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141007"><span class="hs-identifier hs-var">o_fp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679141008"><span class="annot"><span class="annottext">[ByteString]
+</span><a href="#local-6989586621679141008"><span class="hs-identifier hs-var">lns</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; [ByteString]
+</span><span class="hs-identifier hs-var">LBS.lines</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; [ByteString]) -&gt; IO ByteString -&gt; IO [ByteString]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO ByteString
+</span><a href="Text.RE.Tools.Sed.html#read_file"><span class="hs-identifier hs-var">read_file</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141006"><span class="hs-identifier hs-var">i_fp</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span id="local-6989586621679141012"><span class="annot"><span class="annottext">[ByteString]
+</span><a href="#local-6989586621679141012"><span class="hs-identifier hs-var">lns'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[IO ByteString] -&gt; IO [ByteString]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+forall (m :: * -&gt; *) a. Monad m =&gt; [m a] -&gt; m [a]
+</span><span class="hs-identifier hs-var">sequence</span></span><span>
+</span><span id="line-56"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; Edits IO re ByteString -&gt; ByteString -&gt; IO ByteString
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; Edits m re s -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier hs-var">applyEdits</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679141014"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">Edits IO re ByteString
+</span><a href="#local-6989586621679141005"><span class="hs-identifier hs-var">escr</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679141015"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-57"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679141014"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679141014"><span class="hs-identifier hs-var">lno</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679141015"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679141015"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span class="hs-glyph">&lt;-</span><span class="annot"><span class="annottext">[LineNo] -&gt; [ByteString] -&gt; [(LineNo, ByteString)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier hs-var">firstLine</span></a></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ByteString]
+</span><a href="#local-6989586621679141008"><span class="hs-identifier hs-var">lns</span></a></span><span>
+</span><span id="line-58"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString -&gt; IO ()
+</span><a href="Text.RE.Tools.Sed.html#write_file"><span class="hs-identifier hs-var">write_file</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141007"><span class="hs-identifier hs-var">o_fp</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; IO ()) -&gt; ByteString -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[ByteString] -&gt; ByteString
+</span><span class="hs-identifier hs-var">LBS.concat</span></span><span> </span><span class="annot"><span class="annottext">[ByteString]
+</span><a href="#local-6989586621679141012"><span class="hs-identifier hs-var">lns'</span></a></span><span>
+</span><span id="line-60"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-64"></span><span class="annot"><span class="hs-comment">-- | apply an 'Edits' script to each line of the argument text</span></span><span>
+</span><span id="line-65"></span><span id="local-6989586621679140967"><span id="local-6989586621679140968"><span id="local-6989586621679140969"><span class="annot"><a href="Text.RE.Tools.Sed.html#sed%27"><span class="hs-identifier hs-type">sed'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140967"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140968"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679140969"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679140969"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier hs-type">Edits</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140969"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140967"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140968"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-67"></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140968"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-68"></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140969"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140968"><span class="hs-identifier hs-type">a</span></a></span></span></span></span><span>
+</span><span id="line-69"></span><span id="sed%27"><span class="annot"><span class="annottext">sed' :: forall re a (m :: * -&gt; *).
+(IsRegex re a, Monad m, Functor m) =&gt;
+Edits m re a -&gt; a -&gt; m a
+</span><a href="Text.RE.Tools.Sed.html#sed%27"><span class="hs-identifier hs-var hs-var">sed'</span></a></span></span><span> </span><span id="local-6989586621679141034"><span class="annot"><span class="annottext">Edits m re a
+</span><a href="#local-6989586621679141034"><span class="hs-identifier hs-var">escr</span></a></span></span><span> </span><span id="local-6989586621679141035"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679141035"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="annottext">[a] -&gt; a
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; a) -&gt; m [a] -&gt; m a
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[m a] -&gt; m [a]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+forall (m :: * -&gt; *) a. Monad m =&gt; [m a] -&gt; m [a]
+</span><span class="hs-identifier hs-var">sequence</span></span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; Edits m re a -&gt; a -&gt; m a
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; Edits m re s -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier hs-var">applyEdits</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679141036"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">Edits m re a
+</span><a href="#local-6989586621679141034"><span class="hs-identifier hs-var">escr</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679141037"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-72"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679141036"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679141036"><span class="hs-identifier hs-var">lno</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679141037"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679141037"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span class="hs-glyph">&lt;-</span><span class="annot"><span class="annottext">[LineNo] -&gt; [a] -&gt; [(LineNo, a)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier hs-var">firstLine</span></a></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [(LineNo, a)]) -&gt; [a] -&gt; [(LineNo, a)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Replace a =&gt; a -&gt; [a]
+</span><a href="Text.RE.ZeInternals.Replace.html#linesR"><span class="hs-identifier hs-var">linesR</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679141035"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-73"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-74"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Text.RE.Tools.Sed.html#read_file"><span class="hs-identifier hs-type">read_file</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-79"></span><span id="read_file"><span class="annot"><span class="annottext">read_file :: FilePath -&gt; IO ByteString
+</span><a href="Text.RE.Tools.Sed.html#read_file"><span class="hs-identifier hs-var hs-var">read_file</span></a></span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;-&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO ByteString
+</span><span class="hs-identifier hs-var">LBS.getContents</span></span><span>
+</span><span id="line-80"></span><span class="annot"><a href="Text.RE.Tools.Sed.html#read_file"><span class="hs-identifier hs-var">read_file</span></a></span><span> </span><span id="local-6989586621679141040"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141040"><span class="hs-identifier hs-var">fp</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO ByteString
+</span><span class="hs-identifier hs-var">LBS.readFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141040"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="annot"><a href="Text.RE.Tools.Sed.html#write_file"><span class="hs-identifier hs-type">write_file</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span id="write_file"><span class="annot"><span class="annottext">write_file :: FilePath -&gt; ByteString -&gt; IO ()
+</span><a href="Text.RE.Tools.Sed.html#write_file"><span class="hs-identifier hs-var hs-var">write_file</span></a></span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;-&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; IO ()
+</span><span class="hs-identifier hs-var">LBS.putStr</span></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="Text.RE.Tools.Sed.html#write_file"><span class="hs-identifier hs-var">write_file</span></a></span><span> </span><span id="local-6989586621679141043"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141043"><span class="hs-identifier hs-var">fp</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString -&gt; IO ()
+</span><span class="hs-identifier hs-var">LBS.writeFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679141043"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><span id="line-85"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- The Sed toolkit applies @Edits@ scripts to each line</span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- of a text, running the actions and adjusting each line</span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- accordingly.</span><span>
+</span><span id="line-93"></span><span class="hs-comment">--</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- See the Regex Tools tutorial at http://re-tutorial-tools.regex.uk</span><span>
+</span><span id="line-95"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-96"></span></pre></body></html>

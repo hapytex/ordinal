@@ -1,0 +1,1130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards            #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeSynonymInstances       #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances          #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskellQuotes      #-}</span><span class="hs-cpp">
+#else
+</span><span class="hs-pragma">{-# LANGUAGE QuasiQuotes                #-}</span><span>
+</span><span id="line-13"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell            #-}</span><span class="hs-cpp">
+#endif
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-orphans               #-}</span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-unused-imports        #-}</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.TDFA</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * About</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><span class="hs-comment">-- $about</span></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * RE Type</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier">RE</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier">regexType</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reOptions"><span class="hs-identifier">reOptions</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier">reSource</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier">reCaptureNames</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier">reRegex</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsOptions Class and REOptions Type</span></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier">IsOption</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier">REOptions</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier">defaultREOptions</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#noPreludeREOptions"><span class="hs-identifier">noPreludeREOptions</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier">unpackSimpleREOptions</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Compiling Regular Expressions</span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegex"><span class="hs-identifier">compileRegex</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier">compileRegexWith</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier">compileRegexWithOptions</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptionsForQQ"><span class="hs-identifier">compileRegexWithOptionsForQQ</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Compiling Search-Replace Templates</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplace"><span class="hs-identifier">compileSearchReplace</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier">compileSearchReplaceWith</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWithOptions"><span class="hs-identifier">compileSearchReplaceWithOptions</span></a></span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Escaping String</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escape"><span class="hs-identifier">escape</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escapeWith"><span class="hs-identifier">escapeWith</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escapeWithOptions"><span class="hs-identifier">escapeWithOptions</span></a></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.EscapeREString.html#escapeREString"><span class="hs-identifier">escapeREString</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Macros Standard Environment</span></span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier">prelude</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeEnv"><span class="hs-identifier">preludeEnv</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeTestsFailing"><span class="hs-identifier">preludeTestsFailing</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeTable"><span class="hs-identifier">preludeTable</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSummary"><span class="hs-identifier">preludeSummary</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSources"><span class="hs-identifier">preludeSources</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSource"><span class="hs-identifier">preludeSource</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Quasi Quoters</span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re"><span class="hs-identifier">re</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMS"><span class="hs-identifier">reMS</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMI"><span class="hs-identifier">reMI</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBS"><span class="hs-identifier">reBS</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBI"><span class="hs-identifier">reBI</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineSensitive"><span class="hs-identifier">reMultilineSensitive</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineInsensitive"><span class="hs-identifier">reMultilineInsensitive</span></a></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockSensitive"><span class="hs-identifier">reBlockSensitive</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockInsensitive"><span class="hs-identifier">reBlockInsensitive</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re_"><span class="hs-identifier">re_</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.NamedCaptures.html#cp"><span class="hs-identifier">cp</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Fail</span></span><span>
+</span><span id="line-72"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Functor.Identity</span></span><span>
+</span><span id="line-73"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH</span></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH.Quote</span></span><span>
+</span><span id="line-75"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>                       </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fail</span></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.REOptions.html"><span class="hs-identifier">Text.RE.REOptions</span></a></span><span>
+</span><span id="line-77"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-78"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.TestBench.html"><span class="hs-identifier">Text.RE.TestBench</span></a></span><span>
+</span><span id="line-79"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.html"><span class="hs-identifier">Text.RE.Tools</span></a></span><span>
+</span><span id="line-80"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.html"><span class="hs-identifier">Text.RE.ZeInternals</span></a></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Poss</span></a></span><span>
+</span><span id="line-82"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Regex.TDFA</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | the RE type for this back end representing a well-formed, compiled</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- RE</span><span>
+</span><span id="line-87"></span><span class="hs-keyword">data</span><span> </span><span id="RE"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-var">RE</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-88"></span><span>  </span><span id="RE"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-var">RE</span></a></span></span><span>
+</span><span id="line-89"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="_re_options"><span class="annot"><span class="annottext">RE -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_options"><span class="hs-identifier hs-var hs-var">_re_options</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-90"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_re_source"><span class="annot"><span class="annottext">RE -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_source"><span class="hs-identifier hs-var hs-var">_re_source</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-91"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_re_cnames"><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_cnames"><span class="hs-identifier hs-var hs-var">_re_cnames</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_re_regex"><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_regex"><span class="hs-identifier hs-var hs-var">_re_regex</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Regex</span></span><span>
+</span><span id="line-93"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-comment">-- | some functions in the &quot;Text.RE.TestBench&quot; need the back end to</span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- be passed dynamically as a 'RegexType' parameters: use 'regexType'</span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- for this</span><span>
+</span><span id="line-98"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-type">regexType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#RegexType"><span class="hs-identifier hs-type">RegexType</span></a></span><span>
+</span><span id="line-99"></span><span id="regexType"><span class="annot"><span class="annottext">regexType :: RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var hs-var">regexType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><span class="annottext">TestBenchMatcher -&gt; RegexType
+</span><a href="Text.RE.ZeInternals.TestBench.html#mkTDFA"><span class="hs-identifier hs-var">mkTDFA</span></a></span><span> </span><span class="annot"><span class="annottext">(TestBenchMatcher -&gt; RegexType) -&gt; TestBenchMatcher -&gt; RegexType
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679141983"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679141983"><span class="hs-identifier hs-var">txt</span></a></span></span><span> </span><span id="local-6989586621679141984"><span class="annot"><span class="annottext">MacroEnv
+</span><a href="#local-6989586621679141984"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span id="local-6989586621679141985"><span class="annot"><span class="annottext">MacroDescriptor
+</span><a href="#local-6989586621679141985"><span class="hs-identifier hs-var">md</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679141983"><span class="hs-identifier hs-var">txt</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Matches String
+forall source source1 target.
+(RegexMaker Regex CompOption ExecOption source,
+ RegexContext Regex source1 target) =&gt;
+source1 -&gt; source -&gt; target
+</span><span class="hs-operator hs-var">=~</span></span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; WithCaptures -&gt; MacroEnv -&gt; MacroDescriptor -&gt; String
+</span><a href="Text.RE.ZeInternals.TestBench.html#mdRegexSource"><span class="hs-identifier hs-var">mdRegexSource</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span> </span><span class="annot"><span class="annottext">WithCaptures
+</span><a href="Text.RE.ZeInternals.TestBench.html#ExclCaptures"><span class="hs-identifier hs-var">ExclCaptures</span></a></span><span> </span><span class="annot"><span class="annottext">MacroEnv
+</span><a href="#local-6989586621679141984"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">MacroDescriptor
+</span><a href="#local-6989586621679141985"><span class="hs-identifier hs-var">md</span></a></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="annot"><span class="hs-comment">-- | extract the 'REOptions' from the @RE@</span></span><span>
+</span><span id="line-103"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reOptions"><span class="hs-identifier hs-type">reOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-104"></span><span id="reOptions"><span class="annot"><span class="annottext">reOptions :: RE -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#reOptions"><span class="hs-identifier hs-var hs-var">reOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RE -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_options"><span class="hs-identifier hs-var">_re_options</span></a></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="annot"><span class="hs-comment">-- | extract the RE source string from the @RE@</span></span><span>
+</span><span id="line-107"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier hs-type">reSource</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-108"></span><span id="reSource"><span class="annot"><span class="annottext">reSource :: RE -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier hs-var hs-var">reSource</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RE -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_source"><span class="hs-identifier hs-var">_re_source</span></a></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="annot"><span class="hs-comment">-- | extract the 'CaptureNames' from the @RE@</span></span><span>
+</span><span id="line-111"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-type">reCaptureNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span>
+</span><span id="line-112"></span><span id="reCaptureNames"><span class="annot"><span class="annottext">reCaptureNames :: RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-var hs-var">reCaptureNames</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_cnames"><span class="hs-identifier hs-var">_re_cnames</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="annot"><span class="hs-comment">-- | extract the back end compiled 'Regex' type from the @RE@</span></span><span>
+</span><span id="line-115"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-type">reRegex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Regex</span></span><span>
+</span><span id="line-116"></span><span id="reRegex"><span class="annot"><span class="annottext">reRegex :: RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-var hs-var">reRegex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_regex"><span class="hs-identifier hs-var">_re_regex</span></a></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-120"></span><span class="hs-comment">-- IsOption &amp; REOptions</span><span>
+</span><span id="line-121"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- | a number of types can be used to encode 'REOptions_', each of which</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- is made a member of this class</span><span>
+</span><span id="line-125"></span><span class="hs-keyword">class</span><span> </span><span id="IsOption"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-var">IsOption</span></a></span></span><span> </span><span id="local-6989586621679141786"><span class="annot"><a href="#local-6989586621679141786"><span class="hs-identifier hs-type">o</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-comment">-- | convert the @o@ type into an @REOptions@</span><span>
+</span><span id="line-127"></span><span>  </span><span id="makeREOptions"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-type">makeREOptions</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679141786"><span class="hs-identifier hs-type">o</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span class="hs-comment">-- | and the REOptions for this back end (see &quot;Text.RE.REOptions&quot;</span><span>
+</span><span id="line-130"></span><span class="hs-comment">-- for details)</span><span>
+</span><span id="line-131"></span><span class="hs-keyword">type</span><span> </span><span id="REOptions"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-var">REOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#REOptions_"><span class="hs-identifier hs-type">REOptions_</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CompOption</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExecOption</span></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-134"></span><span>  </span><span id="local-6989586621679141993"><span class="annot"><span class="annottext">makeREOptions :: SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var">unpackSimpleREOptions</span></a></span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier hs-type">Macros</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-137"></span><span>  </span><span id="local-6989586621679141996"><span class="annot"><span class="annottext">makeREOptions :: Macros RE -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span> </span><span id="local-6989586621679141997"><span class="annot"><span class="annottext">Macros RE
+</span><a href="#local-6989586621679141997"><span class="hs-identifier hs-var">ms</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Macros RE -&gt; CompOption -&gt; ExecOption -&gt; REOptions
+forall r c e. Macros r -&gt; c -&gt; e -&gt; REOptions_ r c e
+</span><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-var">REOptions</span></a></span><span> </span><span class="annot"><span class="annottext">Macros RE
+</span><a href="#local-6989586621679141997"><span class="hs-identifier hs-var">ms</span></a></span><span> </span><span class="annot"><span class="annottext">CompOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_comp_option"><span class="hs-identifier hs-var">def_comp_option</span></a></span><span> </span><span class="annot"><span class="annottext">ExecOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_exec_option"><span class="hs-identifier hs-var">def_exec_option</span></a></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CompOption</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-140"></span><span>  </span><span id="local-6989586621679142002"><span class="annot"><span class="annottext">makeREOptions :: CompOption -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span> </span><span id="local-6989586621679142003"><span class="annot"><span class="annottext">CompOption
+</span><a href="#local-6989586621679142003"><span class="hs-identifier hs-var">co</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Macros RE -&gt; CompOption -&gt; ExecOption -&gt; REOptions
+forall r c e. Macros r -&gt; c -&gt; e -&gt; REOptions_ r c e
+</span><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-var">REOptions</span></a></span><span> </span><span class="annot"><span class="annottext">Macros RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier hs-var">prelude</span></a></span><span> </span><span class="annot"><span class="annottext">CompOption
+</span><a href="#local-6989586621679142003"><span class="hs-identifier hs-var">co</span></a></span><span> </span><span class="annot"><span class="annottext">ExecOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_exec_option"><span class="hs-identifier hs-var">def_exec_option</span></a></span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExecOption</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-143"></span><span>  </span><span id="local-6989586621679142006"><span class="annot"><span class="annottext">makeREOptions :: ExecOption -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span> </span><span id="local-6989586621679142007"><span class="annot"><span class="annottext">ExecOption
+</span><a href="#local-6989586621679142007"><span class="hs-identifier hs-var">eo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Macros RE -&gt; CompOption -&gt; ExecOption -&gt; REOptions
+forall r c e. Macros r -&gt; c -&gt; e -&gt; REOptions_ r c e
+</span><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-var">REOptions</span></a></span><span> </span><span class="annot"><span class="annottext">Macros RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier hs-var">prelude</span></a></span><span> </span><span class="annot"><span class="annottext">CompOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_comp_option"><span class="hs-identifier hs-var">def_comp_option</span></a></span><span> </span><span class="annot"><span class="annottext">ExecOption
+</span><a href="#local-6989586621679142007"><span class="hs-identifier hs-var">eo</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-146"></span><span>  </span><span id="local-6989586621679142010"><span class="annot"><span class="annottext">makeREOptions :: REOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">REOptions -&gt; REOptions
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-149"></span><span>  </span><span id="local-6989586621679142015"><span class="annot"><span class="annottext">makeREOptions :: () -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeREOptions</span></a></span></span><span> </span><span class="annot"><span class="annottext">()
+</span><span class="hs-identifier">_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var">unpackSimpleREOptions</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="annot"><span class="hs-comment">-- | the default 'REOptions'</span></span><span>
+</span><span id="line-152"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier hs-type">defaultREOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-153"></span><span id="defaultREOptions"><span class="annot"><span class="annottext">defaultREOptions :: REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier hs-var hs-var">defaultREOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+forall o. IsOption o =&gt; o -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var">makeREOptions</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span class="hs-glyph">::</span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="annot"><span class="hs-comment">-- | the default 'REOptions' but with no RE macros defined</span></span><span>
+</span><span id="line-156"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#noPreludeREOptions"><span class="hs-identifier hs-type">noPreludeREOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-157"></span><span id="noPreludeREOptions"><span class="annot"><span class="annottext">noPreludeREOptions :: REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#noPreludeREOptions"><span class="hs-identifier hs-var hs-var">noPreludeREOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier hs-var">defaultREOptions</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">optionsMacs :: Macros RE
+</span><a href="Text.RE.REOptions.html#optionsMacs"><span class="hs-identifier hs-var">optionsMacs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Macros RE
+forall r. Macros r
+</span><a href="Text.RE.REOptions.html#emptyMacros"><span class="hs-identifier hs-var">emptyMacros</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- | convert a universal 'SimpleReOptions' into the 'REOptions' used</span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- by this back end</span><span>
+</span><span id="line-161"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-type">unpackSimpleREOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-162"></span><span id="unpackSimpleREOptions"><span class="annot"><span class="annottext">unpackSimpleREOptions :: SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var hs-var">unpackSimpleREOptions</span></a></span></span><span> </span><span id="local-6989586621679142019"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142019"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-163"></span><span>  </span><span class="annot"><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-164"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">optionsMacs :: Macros RE
+</span><a href="Text.RE.REOptions.html#optionsMacs"><span class="hs-identifier hs-var">optionsMacs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Macros RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier hs-var">prelude</span></a></span><span>
+</span><span id="line-165"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">optionsComp :: CompOption
+</span><a href="Text.RE.REOptions.html#optionsComp"><span class="hs-identifier hs-var">optionsComp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CompOption
+</span><a href="#local-6989586621679142021"><span class="hs-identifier hs-var">comp</span></a></span><span>
+</span><span id="line-166"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">optionsExec :: ExecOption
+</span><a href="Text.RE.REOptions.html#optionsExec"><span class="hs-identifier hs-var">optionsExec</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExecOption
+forall regex compOpt execOpt.
+RegexOptions regex compOpt execOpt =&gt;
+execOpt
+</span><span class="hs-identifier hs-var">defaultExecOpt</span></span><span>
+</span><span id="line-167"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-168"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-169"></span><span>    </span><span id="local-6989586621679142021"><span class="annot"><span class="annottext">comp :: CompOption
+</span><a href="#local-6989586621679142021"><span class="hs-identifier hs-var hs-var">comp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CompOption
+forall regex compOpt execOpt.
+RegexOptions regex compOpt execOpt =&gt;
+compOpt
+</span><span class="hs-identifier hs-var">defaultCompOpt</span></span><span>
+</span><span id="line-170"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">caseSensitive :: Bool
+</span><span class="hs-identifier hs-var">caseSensitive</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679142027"><span class="hs-identifier hs-var">cs</span></a></span><span>
+</span><span id="line-171"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">multiline :: Bool
+</span><span class="hs-identifier hs-var">multiline</span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679142029"><span class="hs-identifier hs-var">ml</span></a></span><span>
+</span><span id="line-172"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-173"></span><span>
+</span><span id="line-174"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679142029"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679142029"><span class="hs-identifier hs-var">ml</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679142027"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679142027"><span class="hs-identifier hs-var">cs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142019"><span class="hs-identifier hs-var">sro</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-175"></span><span>        </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineSensitive"><span class="hs-identifier hs-var">MultilineSensitive</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-176"></span><span>        </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineInsensitive"><span class="hs-identifier hs-var">MultilineInsensitive</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-177"></span><span>        </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockSensitive"><span class="hs-identifier hs-var">BlockSensitive</span></a></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-178"></span><span>        </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockInsensitive"><span class="hs-identifier hs-var">BlockInsensitive</span></a></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-179"></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- Compiling Regular Expressions</span><span>
+</span><span id="line-183"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="hs-comment">-- | compile a 'String' into a 'RE' with the default options,</span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- generating an error if the RE is not well formed</span><span>
+</span><span id="line-187"></span><span id="local-6989586621679141800"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegex"><span class="hs-identifier hs-type">compileRegex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141800"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141800"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141800"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141800"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-188"></span><span id="compileRegex"><span class="annot"><span class="annottext">compileRegex :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex"><span class="hs-identifier hs-var hs-var">compileRegex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; m RE
+forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-var">compileRegexWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="hs-comment">-- | compile a 'String' into a 'RE' using the given @SimpleREOptions@,</span><span>
+</span><span id="line-191"></span><span class="hs-comment">-- generating an error if the RE is not well formed</span><span>
+</span><span id="line-192"></span><span id="local-6989586621679141802"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-type">compileRegexWith</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141802"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141802"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141802"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141802"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-193"></span><span id="compileRegexWith"><span class="annot"><span class="annottext">compileRegexWith :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-var hs-var">compileRegexWith</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; m RE
+forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier hs-var">compileRegexWithOptions</span></a></span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- | compile a 'String' into a 'RE' using the given @SimpleREOptions@,</span><span>
+</span><span id="line-196"></span><span class="hs-comment">-- generating an error if the RE is not well formed</span><span>
+</span><span id="line-197"></span><span id="local-6989586621679141804"><span id="local-6989586621679141805"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier hs-type">compileRegexWithOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141804"><span class="hs-identifier hs-type">o</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141805"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span>   </span><span class="annot"><a href="#local-6989586621679141805"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141805"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-198"></span><span>                        </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141804"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-199"></span><span>                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-200"></span><span>                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141805"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span></span><span>
+</span><span id="line-201"></span><span id="compileRegexWithOptions"><span class="annot"><span class="annottext">compileRegexWithOptions :: forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier hs-var hs-var">compileRegexWithOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-var">compileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_raw"><span class="hs-identifier hs-var">RPM_raw</span></a></span><span> </span><span class="annot"><span class="annottext">(REOptions -&gt; String -&gt; m RE)
+-&gt; (o -&gt; REOptions) -&gt; o -&gt; String -&gt; m RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">o -&gt; REOptions
+forall o. IsOption o =&gt; o -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var">makeREOptions</span></a></span><span>
+</span><span id="line-202"></span><span>
+</span><span id="line-203"></span><span class="hs-comment">-- | compile a 'String' into a 'RE' for q quasi quoter, using the given</span><span>
+</span><span id="line-204"></span><span class="hs-comment">-- @SimpleREOptions@, generating an error if the RE is not well formed</span><span>
+</span><span id="line-205"></span><span id="local-6989586621679142059"><span id="local-6989586621679142060"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptionsForQQ"><span class="hs-identifier hs-type">compileRegexWithOptionsForQQ</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142059"><span class="hs-identifier hs-type">o</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679142060"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span>   </span><span class="annot"><a href="#local-6989586621679142060"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679142060"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-206"></span><span>                             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679142059"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-207"></span><span>                             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-208"></span><span>                             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679142060"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span></span><span>
+</span><span id="line-209"></span><span id="compileRegexWithOptionsForQQ"><span class="annot"><span class="annottext">compileRegexWithOptionsForQQ :: forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptionsForQQ"><span class="hs-identifier hs-var hs-var">compileRegexWithOptionsForQQ</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-var">compileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span><span> </span><span class="annot"><span class="annottext">(REOptions -&gt; String -&gt; m RE)
+-&gt; (o -&gt; REOptions) -&gt; o -&gt; String -&gt; m RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">o -&gt; REOptions
+forall o. IsOption o =&gt; o -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var">makeREOptions</span></a></span><span>
+</span><span id="line-210"></span><span>
+</span><span id="line-211"></span><span>
+</span><span id="line-212"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-213"></span><span class="hs-comment">-- Compiling Search Replace Templates</span><span>
+</span><span id="line-214"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-215"></span><span>
+</span><span id="line-216"></span><span class="hs-comment">-- | compile a SearchReplace template generating errors if the RE or</span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- the template are not well formed, all capture references being checked</span><span>
+</span><span id="line-218"></span><span id="local-6989586621679141815"><span id="local-6989586621679141816"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplace"><span class="hs-identifier hs-type">compileSearchReplace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141815"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141815"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141815"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141816"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-219"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-220"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-221"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141815"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141816"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-222"></span><span id="compileSearchReplace"><span class="annot"><span class="annottext">compileSearchReplace :: forall (m :: * -&gt; *) s.
+(Monad m, MonadFail m, Functor m, IsRegex RE s) =&gt;
+String -&gt; String -&gt; m (SearchReplace RE s)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplace"><span class="hs-identifier hs-var hs-var">compileSearchReplace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; String -&gt; m (SearchReplace RE s)
+forall (m :: * -&gt; *) s.
+(Monad m, MonadFail m, Functor m, IsRegex RE s) =&gt;
+SimpleREOptions -&gt; String -&gt; String -&gt; m (SearchReplace RE s)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier hs-var">compileSearchReplaceWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-223"></span><span>
+</span><span id="line-224"></span><span class="hs-comment">-- | compile a SearchReplace template, with simple options, generating</span><span>
+</span><span id="line-225"></span><span class="hs-comment">-- errors if the RE or the template are not well formed, all capture</span><span>
+</span><span id="line-226"></span><span class="hs-comment">-- references being checked</span><span>
+</span><span id="line-227"></span><span id="local-6989586621679141821"><span id="local-6989586621679141822"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier hs-type">compileSearchReplaceWith</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141821"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141821"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141821"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141822"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-228"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span>
+</span><span id="line-229"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-230"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-231"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141821"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141822"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-232"></span><span id="compileSearchReplaceWith"><span class="annot"><span class="annottext">compileSearchReplaceWith :: forall (m :: * -&gt; *) s.
+(Monad m, MonadFail m, Functor m, IsRegex RE s) =&gt;
+SimpleREOptions -&gt; String -&gt; String -&gt; m (SearchReplace RE s)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier hs-var hs-var">compileSearchReplaceWith</span></a></span></span><span> </span><span id="local-6989586621679142092"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142092"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; s)
+-&gt; (String -&gt; Either String RE)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace RE s)
+forall (m :: * -&gt; *) s re.
+(Monad m, MonadFail m, Functor m) =&gt;
+(String -&gt; s)
+-&gt; (String -&gt; Either String re)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace re s)
+</span><a href="Text.RE.ZeInternals.SearchReplace.html#compileSearchAndReplace_"><span class="hs-identifier hs-var">compileSearchAndReplace_</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; s
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">((String -&gt; Either String RE)
+ -&gt; String -&gt; String -&gt; m (SearchReplace RE s))
+-&gt; (String -&gt; Either String RE)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace RE s)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Poss RE -&gt; Either String RE
+forall a. Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; Either String RE)
+-&gt; (String -&gt; Poss RE) -&gt; String -&gt; Either String RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; Poss RE
+forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-var">compileRegexWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142092"><span class="hs-identifier hs-var">sro</span></a></span><span>
+</span><span id="line-233"></span><span>
+</span><span id="line-234"></span><span class="hs-comment">-- | compile a SearchReplace template, with general options, generating</span><span>
+</span><span id="line-235"></span><span class="hs-comment">-- errors if the RE or the template are not well formed, all capture</span><span>
+</span><span id="line-236"></span><span class="hs-comment">-- references being checked</span><span>
+</span><span id="line-237"></span><span id="local-6989586621679141833"><span id="local-6989586621679141834"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWithOptions"><span class="hs-identifier hs-type">compileSearchReplaceWithOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141833"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141833"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141833"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141834"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-238"></span><span>                                </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-239"></span><span>                                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-240"></span><span>                                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-241"></span><span>                                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141833"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141834"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-242"></span><span id="compileSearchReplaceWithOptions"><span class="annot"><span class="annottext">compileSearchReplaceWithOptions :: forall (m :: * -&gt; *) s.
+(Monad m, MonadFail m, Functor m, IsRegex RE s) =&gt;
+REOptions -&gt; String -&gt; String -&gt; m (SearchReplace RE s)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWithOptions"><span class="hs-identifier hs-var hs-var">compileSearchReplaceWithOptions</span></a></span></span><span> </span><span id="local-6989586621679142109"><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142109"><span class="hs-identifier hs-var">os</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; s)
+-&gt; (String -&gt; Either String RE)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace RE s)
+forall (m :: * -&gt; *) s re.
+(Monad m, MonadFail m, Functor m) =&gt;
+(String -&gt; s)
+-&gt; (String -&gt; Either String re)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace re s)
+</span><a href="Text.RE.ZeInternals.SearchReplace.html#compileSearchAndReplace_"><span class="hs-identifier hs-var">compileSearchAndReplace_</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; s
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">((String -&gt; Either String RE)
+ -&gt; String -&gt; String -&gt; m (SearchReplace RE s))
+-&gt; (String -&gt; Either String RE)
+-&gt; String
+-&gt; String
+-&gt; m (SearchReplace RE s)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Poss RE -&gt; Either String RE
+forall a. Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; Either String RE)
+-&gt; (String -&gt; Poss RE) -&gt; String -&gt; Either String RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">REOptions -&gt; String -&gt; Poss RE
+forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier hs-var">compileRegexWithOptions</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142109"><span class="hs-identifier hs-var">os</span></a></span><span>
+</span><span id="line-243"></span><span>
+</span><span id="line-244"></span><span>
+</span><span id="line-245"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-246"></span><span class="hs-comment">-- Escaping Strings</span><span>
+</span><span id="line-247"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-248"></span><span>
+</span><span id="line-249"></span><span class="hs-comment">-- | convert a string into a RE that matches that string, and apply it</span><span>
+</span><span id="line-250"></span><span class="hs-comment">-- to an argument continuation function to make up the RE string to be</span><span>
+</span><span id="line-251"></span><span class="hs-comment">-- compiled; e.g., to compile a RE that will only match the string:</span><span>
+</span><span id="line-252"></span><span class="hs-comment">--</span><span>
+</span><span id="line-253"></span><span class="hs-comment">--  @maybe undefined id . escape ((\&quot;^\&quot;++) . (++\&quot;$\&quot;))@</span><span>
+</span><span id="line-254"></span><span class="hs-comment">--</span><span>
+</span><span id="line-255"></span><span id="local-6989586621679141837"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escape"><span class="hs-identifier hs-type">escape</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141837"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141837"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141837"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-256"></span><span>       </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-257"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-258"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141837"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-259"></span><span id="escape"><span class="annot"><span class="annottext">escape :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+(String -&gt; String) -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#escape"><span class="hs-identifier hs-var hs-var">escape</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#escapeWith"><span class="hs-identifier hs-var">escapeWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-260"></span><span>
+</span><span id="line-261"></span><span class="annot"><span class="hs-comment">-- | a variant of 'escape' where the 'SimpleREOptions' are specified</span></span><span>
+</span><span id="line-262"></span><span id="local-6989586621679141839"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escapeWith"><span class="hs-identifier hs-type">escapeWith</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141839"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141839"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141839"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-263"></span><span>           </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span>
+</span><span id="line-264"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-265"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-266"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141839"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-267"></span><span id="escapeWith"><span class="annot"><span class="annottext">escapeWith :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#escapeWith"><span class="hs-identifier hs-var hs-var">escapeWith</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#escapeWithOptions"><span class="hs-identifier hs-var">escapeWithOptions</span></a></span><span>
+</span><span id="line-268"></span><span>
+</span><span id="line-269"></span><span class="hs-comment">-- | a variant of 'escapeWith' that allows an 'IsOption' RE option</span><span>
+</span><span id="line-270"></span><span class="hs-comment">-- to be specified</span><span>
+</span><span id="line-271"></span><span id="local-6989586621679141841"><span id="local-6989586621679141842"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escapeWithOptions"><span class="hs-identifier hs-type">escapeWithOptions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141841"><span class="hs-identifier hs-type">o</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141842"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141842"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141842"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-272"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141841"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-273"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-274"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-275"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141842"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span></span><span>
+</span><span id="line-276"></span><span id="escapeWithOptions"><span class="annot"><span class="annottext">escapeWithOptions :: forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#escapeWithOptions"><span class="hs-identifier hs-var hs-var">escapeWithOptions</span></a></span></span><span> </span><span id="local-6989586621679142132"><span class="annot"><span class="annottext">o
+</span><a href="#local-6989586621679142132"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span id="local-6989586621679142133"><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679142133"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">o -&gt; String -&gt; m RE
+forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptions"><span class="hs-identifier hs-var">compileRegexWithOptions</span></a></span><span> </span><span class="annot"><span class="annottext">o
+</span><a href="#local-6989586621679142132"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; m RE) -&gt; (String -&gt; String) -&gt; String -&gt; m RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679142133"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (String -&gt; String) -&gt; String -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.EscapeREString.html#escapeREString"><span class="hs-identifier hs-var">escapeREString</span></a></span><span>
+</span><span id="line-277"></span><span>
+</span><span id="line-278"></span><span>
+</span><span id="line-279"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-280"></span><span class="hs-comment">-- Macro Standard Environment</span><span>
+</span><span id="line-281"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-282"></span><span>
+</span><span id="line-283"></span><span class="hs-comment">-- | the standard table of 'Macros' used to compile REs (which can be</span><span>
+</span><span id="line-284"></span><span class="hs-comment">-- extended or replace: see &quot;Text.RE.TestBench&quot;)</span><span>
+</span><span id="line-285"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier hs-type">prelude</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier hs-type">Macros</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-286"></span><span id="prelude"><span class="annot"><span class="annottext">prelude :: Macros RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#prelude"><span class="hs-identifier hs-var hs-var">prelude</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identity (Macros RE) -&gt; Macros RE
+forall a. Identity a -&gt; a
+</span><span class="hs-identifier hs-var">runIdentity</span></span><span> </span><span class="annot"><span class="annottext">(Identity (Macros RE) -&gt; Macros RE)
+-&gt; Identity (Macros RE) -&gt; Macros RE
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Identity RE)
+-&gt; RegexType -&gt; WithCaptures -&gt; Identity (Macros RE)
+forall (m :: * -&gt; *) r.
+(Monad m, Functor m) =&gt;
+(String -&gt; m r) -&gt; RegexType -&gt; WithCaptures -&gt; m (Macros r)
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacros"><span class="hs-identifier hs-var">preludeMacros</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Identity RE
+</span><a href="#local-6989586621679142136"><span class="hs-identifier hs-var">mk</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span> </span><span class="annot"><span class="annottext">WithCaptures
+</span><a href="Text.RE.ZeInternals.TestBench.html#ExclCaptures"><span class="hs-identifier hs-var">ExclCaptures</span></a></span><span>
+</span><span id="line-287"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-288"></span><span>    </span><span id="local-6989586621679142136"><span class="annot"><span class="annottext">mk :: String -&gt; Identity RE
+</span><a href="#local-6989586621679142136"><span class="hs-identifier hs-var hs-var">mk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RE -&gt; Identity RE
+forall a. a -&gt; Identity a
+</span><span class="hs-identifier hs-var">Identity</span></span><span> </span><span class="annot"><span class="annottext">(RE -&gt; Identity RE) -&gt; (String -&gt; RE) -&gt; String -&gt; Identity RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex_"><span class="hs-identifier hs-var">unsafeCompileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_raw"><span class="hs-identifier hs-var">RPM_raw</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#noPreludeREOptions"><span class="hs-identifier hs-var">noPreludeREOptions</span></a></span><span>
+</span><span id="line-289"></span><span>
+</span><span id="line-290"></span><span class="annot"><span class="hs-comment">-- | the standard 'MacroEnv' for this back end (see &quot;Text.RE.TestBench&quot;)</span></span><span>
+</span><span id="line-291"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeEnv"><span class="hs-identifier hs-type">preludeEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#MacroEnv"><span class="hs-identifier hs-type">MacroEnv</span></a></span><span>
+</span><span id="line-292"></span><span id="preludeEnv"><span class="annot"><span class="annottext">preludeEnv :: MacroEnv
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeEnv"><span class="hs-identifier hs-var hs-var">preludeEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; MacroEnv
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroEnv"><span class="hs-identifier hs-var">preludeMacroEnv</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-293"></span><span>
+</span><span id="line-294"></span><span class="hs-comment">-- | the macros in the standard environment that are failing their tests</span><span>
+</span><span id="line-295"></span><span class="hs-comment">-- (checked by the test suite to be empty)</span><span>
+</span><span id="line-296"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeTestsFailing"><span class="hs-identifier hs-type">preludeTestsFailing</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier hs-type">MacroID</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-297"></span><span id="preludeTestsFailing"><span class="annot"><span class="annottext">preludeTestsFailing :: [MacroID]
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeTestsFailing"><span class="hs-identifier hs-var hs-var">preludeTestsFailing</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MacroEnv -&gt; [MacroID]
+</span><a href="Text.RE.ZeInternals.TestBench.html#badMacros"><span class="hs-identifier hs-var">badMacros</span></a></span><span> </span><span class="annot"><span class="annottext">(MacroEnv -&gt; [MacroID]) -&gt; MacroEnv -&gt; [MacroID]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; MacroEnv
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroEnv"><span class="hs-identifier hs-var">preludeMacroEnv</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-298"></span><span>
+</span><span id="line-299"></span><span class="annot"><span class="hs-comment">-- | a table the standard macros in markdown format</span></span><span>
+</span><span id="line-300"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeTable"><span class="hs-identifier hs-type">preludeTable</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-301"></span><span id="preludeTable"><span class="annot"><span class="annottext">preludeTable :: String
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeTable"><span class="hs-identifier hs-var hs-var">preludeTable</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; String
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroTable"><span class="hs-identifier hs-var">preludeMacroTable</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-302"></span><span>
+</span><span id="line-303"></span><span class="hs-comment">-- | a summary of the macros in the standard environment for this back</span><span>
+</span><span id="line-304"></span><span class="hs-comment">-- end in plain text</span><span>
+</span><span id="line-305"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSummary"><span class="hs-identifier hs-type">preludeSummary</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.PreludeMacros.html#PreludeMacro"><span class="hs-identifier hs-type">PreludeMacro</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-306"></span><span id="preludeSummary"><span class="annot"><span class="annottext">preludeSummary :: PreludeMacro -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeSummary"><span class="hs-identifier hs-var hs-var">preludeSummary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; PreludeMacro -&gt; String
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroSummary"><span class="hs-identifier hs-var">preludeMacroSummary</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-307"></span><span>
+</span><span id="line-308"></span><span class="hs-comment">-- | a listing of the RE text for each macro in the standard environment</span><span>
+</span><span id="line-309"></span><span class="hs-comment">-- with all macros expanded to normal form</span><span>
+</span><span id="line-310"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSources"><span class="hs-identifier hs-type">preludeSources</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-311"></span><span id="preludeSources"><span class="annot"><span class="annottext">preludeSources :: String
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeSources"><span class="hs-identifier hs-var hs-var">preludeSources</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; String
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroSources"><span class="hs-identifier hs-var">preludeMacroSources</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-312"></span><span>
+</span><span id="line-313"></span><span class="annot"><span class="hs-comment">-- | the prelude source of a given macro in the standard environment</span></span><span>
+</span><span id="line-314"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#preludeSource"><span class="hs-identifier hs-type">preludeSource</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.PreludeMacros.html#PreludeMacro"><span class="hs-identifier hs-type">PreludeMacro</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-315"></span><span id="preludeSource"><span class="annot"><span class="annottext">preludeSource :: PreludeMacro -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#preludeSource"><span class="hs-identifier hs-var hs-var">preludeSource</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexType -&gt; PreludeMacro -&gt; String
+</span><a href="Text.RE.ZeInternals.PreludeMacros.html#preludeMacroSource"><span class="hs-identifier hs-var">preludeMacroSource</span></a></span><span> </span><span class="annot"><span class="annottext">RegexType
+</span><a href="Text.RE.ZeInternals.TDFA.html#regexType"><span class="hs-identifier hs-var">regexType</span></a></span><span>
+</span><span id="line-316"></span><span>
+</span><span id="line-317"></span><span>
+</span><span id="line-318"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-319"></span><span class="hs-comment">-- Quasi Quoters</span><span>
+</span><span id="line-320"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-321"></span><span>
+</span><span id="line-322"></span><span class="hs-comment">-- | @[re| ... |]@, is equivalent to @[reMultilineSensitive| ... |]@,</span><span>
+</span><span id="line-323"></span><span class="hs-comment">-- compiling a case-sensitive, multi-line RE</span><span>
+</span><span id="line-324"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re"><span class="hs-identifier hs-type">re</span></a></span><span>                      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-325"></span><span id="re"><span class="annot"><span class="annottext">re :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re"><span class="hs-identifier hs-var hs-var">re</span></a></span></span><span>                       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-326"></span><span>
+</span><span id="line-327"></span><span class="annot"><span class="hs-comment">-- | @[reMultilineSensitive| ... |]@, compiles a case-sensitive, multi-line RE</span></span><span>
+</span><span id="line-328"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineSensitive"><span class="hs-identifier hs-type">reMultilineSensitive</span></a></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-329"></span><span id="reMultilineSensitive"><span class="annot"><span class="annottext">reMultilineSensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMultilineSensitive"><span class="hs-identifier hs-var hs-var">reMultilineSensitive</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineSensitive"><span class="hs-identifier hs-var">MultilineSensitive</span></a></span><span>
+</span><span id="line-330"></span><span>
+</span><span id="line-331"></span><span class="annot"><span class="hs-comment">-- | @[reMultilineInsensitive| ... |]@, compiles a case-insensitive, multi-line RE</span></span><span>
+</span><span id="line-332"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineInsensitive"><span class="hs-identifier hs-type">reMultilineInsensitive</span></a></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-333"></span><span id="reMultilineInsensitive"><span class="annot"><span class="annottext">reMultilineInsensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMultilineInsensitive"><span class="hs-identifier hs-var hs-var">reMultilineInsensitive</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineInsensitive"><span class="hs-identifier hs-var">MultilineInsensitive</span></a></span><span>
+</span><span id="line-334"></span><span>
+</span><span id="line-335"></span><span class="annot"><span class="hs-comment">-- | @[reMultilineInsensitive| ... |]@, compiles a case-sensitive, non-multi-line RE</span></span><span>
+</span><span id="line-336"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockSensitive"><span class="hs-identifier hs-type">reBlockSensitive</span></a></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-337"></span><span id="reBlockSensitive"><span class="annot"><span class="annottext">reBlockSensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBlockSensitive"><span class="hs-identifier hs-var hs-var">reBlockSensitive</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockSensitive"><span class="hs-identifier hs-var">BlockSensitive</span></a></span><span>
+</span><span id="line-338"></span><span>
+</span><span id="line-339"></span><span class="annot"><span class="hs-comment">-- | @[reMultilineInsensitive| ... |]@, compiles a case-insensitive, non-multi-line RE</span></span><span>
+</span><span id="line-340"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockInsensitive"><span class="hs-identifier hs-type">reBlockInsensitive</span></a></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-341"></span><span id="reBlockInsensitive"><span class="annot"><span class="annottext">reBlockInsensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBlockInsensitive"><span class="hs-identifier hs-var hs-var">reBlockInsensitive</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockInsensitive"><span class="hs-identifier hs-var">BlockInsensitive</span></a></span><span>
+</span><span id="line-342"></span><span>
+</span><span id="line-343"></span><span class="annot"><span class="hs-comment">-- | @[reMS| ... |]@ is a shorthand for @[reMultilineSensitive| ... |]@</span></span><span>
+</span><span id="line-344"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMS"><span class="hs-identifier hs-type">reMS</span></a></span><span>                     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-345"></span><span id="reMS"><span class="annot"><span class="annottext">reMS :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMS"><span class="hs-identifier hs-var hs-var">reMS</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMultilineSensitive"><span class="hs-identifier hs-var">reMultilineSensitive</span></a></span><span>
+</span><span id="line-346"></span><span>
+</span><span id="line-347"></span><span class="annot"><span class="hs-comment">-- | @[reMI| ... |]@ is a shorthand for @[reMultilineInsensitive| ... |]@</span></span><span>
+</span><span id="line-348"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMI"><span class="hs-identifier hs-type">reMI</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-349"></span><span id="reMI"><span class="annot"><span class="annottext">reMI :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMI"><span class="hs-identifier hs-var hs-var">reMI</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reMultilineInsensitive"><span class="hs-identifier hs-var">reMultilineInsensitive</span></a></span><span>
+</span><span id="line-350"></span><span>
+</span><span id="line-351"></span><span class="annot"><span class="hs-comment">-- | @[reBS| ... |]@ is a shorthand for @[reBlockSensitive| ... |]@</span></span><span>
+</span><span id="line-352"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBS"><span class="hs-identifier hs-type">reBS</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-353"></span><span id="reBS"><span class="annot"><span class="annottext">reBS :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBS"><span class="hs-identifier hs-var hs-var">reBS</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBlockSensitive"><span class="hs-identifier hs-var">reBlockSensitive</span></a></span><span>
+</span><span id="line-354"></span><span>
+</span><span id="line-355"></span><span class="annot"><span class="hs-comment">-- | @[reBI| ... |]@ is a shorthand for @[reBlockInsensitive| ... |]@</span></span><span>
+</span><span id="line-356"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBI"><span class="hs-identifier hs-type">reBI</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-357"></span><span id="reBI"><span class="annot"><span class="annottext">reBI :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBI"><span class="hs-identifier hs-var hs-var">reBI</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#reBlockInsensitive"><span class="hs-identifier hs-var">reBlockInsensitive</span></a></span><span>
+</span><span id="line-358"></span><span>
+</span><span id="line-359"></span><span class="hs-comment">-- | @[re_| ... |]@ compiles a RE to produce a function that takes</span><span>
+</span><span id="line-360"></span><span class="hs-comment">-- the RE options (e.g., a 'SimpleREOptions' value) and yields the</span><span>
+</span><span id="line-361"></span><span class="hs-comment">-- RE compiled with those options. For example,</span><span>
+</span><span id="line-362"></span><span class="hs-comment">--</span><span>
+</span><span id="line-363"></span><span class="hs-comment">--   @countMatches $ s *=~ [re_|[0-9a-f]+|] MultilineInsensitive@</span><span>
+</span><span id="line-364"></span><span class="hs-comment">--</span><span>
+</span><span id="line-365"></span><span class="hs-comment">-- counts the number of hexadecimal digit strings in 's', allowing</span><span>
+</span><span id="line-366"></span><span class="hs-comment">-- for upper- or lower-case hex digits (which is entirely equivalent</span><span>
+</span><span id="line-367"></span><span class="hs-comment">-- in this example to just using @[reMultilineInsensitive|[0-9a-f]+|]@).</span><span>
+</span><span id="line-368"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re_"><span class="hs-identifier hs-type">re_</span></a></span><span>                     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-369"></span><span id="re_"><span class="annot"><span class="annottext">re_ :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re_"><span class="hs-identifier hs-var hs-var">re_</span></a></span></span><span>                      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var">re'</span></a></span><span>   </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-370"></span><span>
+</span><span id="line-371"></span><span>
+</span><span id="line-372"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-373"></span><span class="hs-comment">-- re Helpers</span><span>
+</span><span id="line-374"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-375"></span><span>
+</span><span id="line-376"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-type">re'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-377"></span><span id="re%27"><span class="annot"><span class="annottext">re' :: Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.TDFA.html#re%27"><span class="hs-identifier hs-var hs-var">re'</span></a></span></span><span> </span><span id="local-6989586621679142146"><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><a href="#local-6989586621679142146"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><a href="#local-6989586621679142146"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-378"></span><span>  </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-379"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-var">qq0</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;re'&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-380"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">quoteExp :: String -&gt; Q Exp
+</span><span class="hs-identifier hs-var">quoteExp</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142148"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679142149"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142149"><span class="hs-identifier hs-var">rs</span></a></span></span><span class="hs-glyph">-&gt;</span><span class="hs-special">[|</span><span class="hs-identifier">flip</span><span> </span><span class="hs-identifier">unsafeCompileRegex</span><span> </span><span class="hs-identifier">rs</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-381"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-382"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679142150"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142150"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-383"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-var">qq0</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;re'&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-384"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">quoteExp :: String -&gt; Q Exp
+</span><span class="hs-identifier hs-var">quoteExp</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142148"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142150"><span class="hs-identifier hs-var">sro</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679142151"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142151"><span class="hs-identifier hs-var">rs</span></a></span></span><span class="hs-glyph">-&gt;</span><span class="hs-special">[|</span><span class="hs-identifier">unsafeCompileRegexSimple</span><span> </span><span class="hs-identifier">sro</span><span> </span><span class="hs-identifier">rs</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-385"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-386"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-387"></span><span>    </span><span class="annot"><a href="#local-6989586621679142148"><span class="hs-identifier hs-type">parse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span>
+</span><span id="line-388"></span><span>    </span><span id="local-6989586621679142148"><span class="annot"><span class="annottext">parse :: SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142148"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679142152"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142152"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span id="local-6989586621679142153"><span class="annot"><span class="annottext">String -&gt; Q Exp
+</span><a href="#local-6989586621679142153"><span class="hs-identifier hs-var">mk</span></a></span></span><span> </span><span id="local-6989586621679142154"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142154"><span class="hs-identifier hs-var">rs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Q Exp) -&gt; (RE -&gt; Q Exp) -&gt; Poss RE -&gt; Q Exp
+forall b a. (String -&gt; b) -&gt; (a -&gt; b) -&gt; Poss a -&gt; b
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss"><span class="hs-identifier hs-var">poss</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Q Exp
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">RE
+</span><span class="hs-identifier">_</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="annottext">String -&gt; Q Exp
+</span><a href="#local-6989586621679142153"><span class="hs-identifier hs-var">mk</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142154"><span class="hs-identifier hs-var">rs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; Q Exp) -&gt; Poss RE -&gt; Q Exp
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; Poss RE
+forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-var">compileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142157"><span class="hs-identifier hs-var">os</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142154"><span class="hs-identifier hs-var">rs</span></a></span><span>
+</span><span id="line-389"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-390"></span><span>        </span><span id="local-6989586621679142157"><span class="annot"><span class="annottext">os :: REOptions
+</span><a href="#local-6989586621679142157"><span class="hs-identifier hs-var hs-var">os</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var">unpackSimpleREOptions</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142152"><span class="hs-identifier hs-var">sro</span></a></span><span>
+</span><span id="line-391"></span><span>
+</span><span id="line-392"></span><span class="hs-keyword">data</span><span> </span><span id="RegexParseMode"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RegexParseMode"><span class="hs-identifier hs-var">RegexParseMode</span></a></span></span><span>
+</span><span id="line-393"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="RPM_qq"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span></span><span>
+</span><span id="line-394"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="RPM_raw"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RPM_raw"><span class="hs-identifier hs-var">RPM_raw</span></a></span></span><span>
+</span><span id="line-395"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679142159"><span id="local-6989586621679142161"><span class="annot"><span class="annottext">RegexParseMode -&gt; RegexParseMode -&gt; Bool
+(RegexParseMode -&gt; RegexParseMode -&gt; Bool)
+-&gt; (RegexParseMode -&gt; RegexParseMode -&gt; Bool) -&gt; Eq RegexParseMode
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: RegexParseMode -&gt; RegexParseMode -&gt; Bool
+== :: RegexParseMode -&gt; RegexParseMode -&gt; Bool
+$c/= :: RegexParseMode -&gt; RegexParseMode -&gt; Bool
+/= :: RegexParseMode -&gt; RegexParseMode -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679142166"><span id="local-6989586621679142168"><span id="local-6989586621679142172"><span class="annot"><span class="annottext">Int -&gt; RegexParseMode -&gt; String -&gt; String
+[RegexParseMode] -&gt; String -&gt; String
+RegexParseMode -&gt; String
+(Int -&gt; RegexParseMode -&gt; String -&gt; String)
+-&gt; (RegexParseMode -&gt; String)
+-&gt; ([RegexParseMode] -&gt; String -&gt; String)
+-&gt; Show RegexParseMode
+forall a.
+(Int -&gt; a -&gt; String -&gt; String)
+-&gt; (a -&gt; String) -&gt; ([a] -&gt; String -&gt; String) -&gt; Show a
+$cshowsPrec :: Int -&gt; RegexParseMode -&gt; String -&gt; String
+showsPrec :: Int -&gt; RegexParseMode -&gt; String -&gt; String
+$cshow :: RegexParseMode -&gt; String
+show :: RegexParseMode -&gt; String
+$cshowList :: [RegexParseMode] -&gt; String -&gt; String
+showList :: [RegexParseMode] -&gt; String -&gt; String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-396"></span><span>
+</span><span id="line-397"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegexSimple"><span class="hs-identifier hs-type">unsafeCompileRegexSimple</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-398"></span><span id="unsafeCompileRegexSimple"><span class="annot"><span class="annottext">unsafeCompileRegexSimple :: SimpleREOptions -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegexSimple"><span class="hs-identifier hs-var hs-var">unsafeCompileRegexSimple</span></a></span></span><span> </span><span id="local-6989586621679142176"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142176"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span id="local-6989586621679142177"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142177"><span class="hs-identifier hs-var">re_s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex_"><span class="hs-identifier hs-var">unsafeCompileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142178"><span class="hs-identifier hs-var">os</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142177"><span class="hs-identifier hs-var">re_s</span></a></span><span>
+</span><span id="line-399"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-400"></span><span>    </span><span id="local-6989586621679142178"><span class="annot"><span class="annottext">os :: REOptions
+</span><a href="#local-6989586621679142178"><span class="hs-identifier hs-var hs-var">os</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var">unpackSimpleREOptions</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142176"><span class="hs-identifier hs-var">sro</span></a></span><span>
+</span><span id="line-401"></span><span>
+</span><span id="line-402"></span><span id="local-6989586621679141858"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex"><span class="hs-identifier hs-type">unsafeCompileRegex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679141858"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-403"></span><span>                   </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141858"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-404"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-405"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-406"></span><span id="unsafeCompileRegex"><span class="annot"><span class="annottext">unsafeCompileRegex :: forall o. IsOption o =&gt; o -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex"><span class="hs-identifier hs-var hs-var">unsafeCompileRegex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex_"><span class="hs-identifier hs-var">unsafeCompileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span><span> </span><span class="annot"><span class="annottext">(REOptions -&gt; String -&gt; RE)
+-&gt; (o -&gt; REOptions) -&gt; o -&gt; String -&gt; RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">o -&gt; REOptions
+forall o. IsOption o =&gt; o -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#makeREOptions"><span class="hs-identifier hs-var">makeREOptions</span></a></span><span>
+</span><span id="line-407"></span><span>
+</span><span id="line-408"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex_"><span class="hs-identifier hs-type">unsafeCompileRegex_</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RegexParseMode"><span class="hs-identifier hs-type">RegexParseMode</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-409"></span><span id="unsafeCompileRegex_"><span class="annot"><span class="annottext">unsafeCompileRegex_ :: RegexParseMode -&gt; REOptions -&gt; String -&gt; RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#unsafeCompileRegex_"><span class="hs-identifier hs-var hs-var">unsafeCompileRegex_</span></a></span></span><span> </span><span id="local-6989586621679142182"><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142182"><span class="hs-identifier hs-var">rpm</span></a></span></span><span> </span><span id="local-6989586621679142183"><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142183"><span class="hs-identifier hs-var">os</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; RE) -&gt; (RE -&gt; RE) -&gt; Poss RE -&gt; RE
+forall b a. (String -&gt; b) -&gt; (a -&gt; b) -&gt; Poss a -&gt; b
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss"><span class="hs-identifier hs-var">poss</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; RE
+forall {c}. String -&gt; c
+</span><a href="#local-6989586621679142184"><span class="hs-identifier hs-var">oops</span></a></span><span> </span><span class="annot"><span class="annottext">RE -&gt; RE
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; RE) -&gt; (String -&gt; Poss RE) -&gt; String -&gt; RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; Poss RE
+forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-var">compileRegex_</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142182"><span class="hs-identifier hs-var">rpm</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142183"><span class="hs-identifier hs-var">os</span></a></span><span>
+</span><span id="line-410"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-411"></span><span>    </span><span id="local-6989586621679142184"><span class="annot"><span class="annottext">oops :: String -&gt; c
+</span><a href="#local-6989586621679142184"><span class="hs-identifier hs-var hs-var">oops</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; c
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; c) -&gt; (String -&gt; String) -&gt; String -&gt; c
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;unsafeCompileRegex: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span>
+</span><span id="line-412"></span><span>
+</span><span id="line-413"></span><span id="local-6989586621679141809"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-type">compileRegex_</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141809"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141809"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141809"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-414"></span><span>              </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RegexParseMode"><span class="hs-identifier hs-type">RegexParseMode</span></a></span><span>
+</span><span id="line-415"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-416"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-417"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141809"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span></span><span>
+</span><span id="line-418"></span><span id="compileRegex_"><span class="annot"><span class="annottext">compileRegex_ :: forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex_"><span class="hs-identifier hs-var hs-var">compileRegex_</span></a></span></span><span> </span><span id="local-6989586621679142194"><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142194"><span class="hs-identifier hs-var">rpm</span></a></span></span><span> </span><span id="local-6989586621679142195"><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142195"><span class="hs-identifier hs-var">os</span></a></span></span><span> </span><span id="local-6989586621679142196"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142196"><span class="hs-identifier hs-var">re_s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureNames -&gt; Regex -&gt; RE) -&gt; (CaptureNames, Regex) -&gt; RE
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; Regex -&gt; RE
+</span><a href="#local-6989586621679142198"><span class="hs-identifier hs-var">mk</span></a></span><span> </span><span class="annot"><span class="annottext">((CaptureNames, Regex) -&gt; RE) -&gt; m (CaptureNames, Regex) -&gt; m RE
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">RegexParseMode -&gt; REOptions -&gt; String -&gt; m (CaptureNames, Regex)
+forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m (CaptureNames, Regex)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex%27"><span class="hs-identifier hs-var">compileRegex'</span></a></span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142194"><span class="hs-identifier hs-var">rpm</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142195"><span class="hs-identifier hs-var">os</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142196"><span class="hs-identifier hs-var">re_s</span></a></span><span>
+</span><span id="line-419"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-420"></span><span>    </span><span id="local-6989586621679142198"><span class="annot"><span class="annottext">mk :: CaptureNames -&gt; Regex -&gt; RE
+</span><a href="#local-6989586621679142198"><span class="hs-identifier hs-var hs-var">mk</span></a></span></span><span> </span><span id="local-6989586621679142201"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679142201"><span class="hs-identifier hs-var">cnms</span></a></span></span><span> </span><span id="local-6989586621679142202"><span class="annot"><span class="annottext">Regex
+</span><a href="#local-6989586621679142202"><span class="hs-identifier hs-var">rx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-421"></span><span>      </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-422"></span><span>        </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">_re_options :: REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_options"><span class="hs-identifier hs-var">_re_options</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="#local-6989586621679142195"><span class="hs-identifier hs-var">os</span></a></span><span>
+</span><span id="line-423"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_re_source :: String
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_source"><span class="hs-identifier hs-var">_re_source</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142196"><span class="hs-identifier hs-var">re_s</span></a></span><span>
+</span><span id="line-424"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_re_cnames :: CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_cnames"><span class="hs-identifier hs-var">_re_cnames</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679142201"><span class="hs-identifier hs-var">cnms</span></a></span><span>
+</span><span id="line-425"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_re_regex :: Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#_re_regex"><span class="hs-identifier hs-var">_re_regex</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Regex
+</span><a href="#local-6989586621679142202"><span class="hs-identifier hs-var">rx</span></a></span><span>
+</span><span id="line-426"></span><span>        </span><span class="hs-special">}</span><span>
+</span><span id="line-427"></span><span>
+</span><span id="line-428"></span><span id="local-6989586621679141869"><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegex%27"><span class="hs-identifier hs-type">compileRegex'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679141869"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679141869"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679141869"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-429"></span><span>              </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RegexParseMode"><span class="hs-identifier hs-type">RegexParseMode</span></a></span><span>
+</span><span id="line-430"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span>
+</span><span id="line-431"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-432"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679141869"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Regex</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-433"></span><span id="compileRegex%27"><span class="annot"><span class="annottext">compileRegex' :: forall (m :: * -&gt; *).
+(Functor m, MonadFail m, Monad m) =&gt;
+RegexParseMode -&gt; REOptions -&gt; String -&gt; m (CaptureNames, Regex)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegex%27"><span class="hs-identifier hs-var hs-var">compileRegex'</span></a></span></span><span> </span><span id="local-6989586621679142212"><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142212"><span class="hs-identifier hs-var">rpm</span></a></span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-type">REOptions</span></a></span><span class="hs-special">{</span><span id="local-6989586621679142213"><span id="local-6989586621679142214"><span id="local-6989586621679142215"><span class="annot"><span class="annottext">ExecOption
+CompOption
+Macros RE
+optionsMacs :: forall r c e. REOptions_ r c e -&gt; Macros r
+optionsComp :: forall r c e. REOptions_ r c e -&gt; c
+optionsExec :: forall r c e. REOptions_ r c e -&gt; e
+optionsMacs :: Macros RE
+optionsComp :: CompOption
+optionsExec :: ExecOption
+</span><a href="Text.RE.REOptions.html#optionsMacs"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679142216"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142216"><span class="hs-identifier hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-434"></span><span>    </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679142217"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679142217"><span class="hs-identifier hs-var">cnms</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span id="local-6989586621679142218"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142218"><span class="hs-identifier hs-var">s2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; m ((Int, CaptureNames), String))
+-&gt; (((Int, CaptureNames), String)
+    -&gt; m ((Int, CaptureNames), String))
+-&gt; Either String ((Int, CaptureNames), String)
+-&gt; m ((Int, CaptureNames), String)
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; m ((Int, CaptureNames), String)
+forall a. String -&gt; m a
+forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
+</span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="annot"><span class="annottext">((Int, CaptureNames), String) -&gt; m ((Int, CaptureNames), String)
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Either String ((Int, CaptureNames), String)
+ -&gt; m ((Int, CaptureNames), String))
+-&gt; Either String ((Int, CaptureNames), String)
+-&gt; m ((Int, CaptureNames), String)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String ((Int, CaptureNames), String)
+</span><a href="Text.RE.ZeInternals.NamedCaptures.html#extractNamedCaptures"><span class="hs-identifier hs-var">extractNamedCaptures</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142221"><span class="hs-identifier hs-var">s1</span></a></span><span>
+</span><span id="line-435"></span><span>    </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679142217"><span class="hs-identifier hs-var">cnms</span></a></span><span> </span><span class="annot"><span class="annottext">(Regex -&gt; (CaptureNames, Regex))
+-&gt; m Regex -&gt; m (CaptureNames, Regex)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">CompOption -&gt; ExecOption -&gt; String -&gt; m Regex
+forall regex compOpt execOpt source (m :: * -&gt; *).
+(RegexMaker regex compOpt execOpt source, MonadFail m) =&gt;
+compOpt -&gt; execOpt -&gt; source -&gt; m regex
+forall (m :: * -&gt; *).
+MonadFail m =&gt;
+CompOption -&gt; ExecOption -&gt; String -&gt; m Regex
+</span><span class="hs-identifier hs-var">makeRegexOptsM</span></span><span> </span><span class="annot"><span class="annottext">CompOption
+</span><a href="#local-6989586621679142214"><span class="hs-identifier hs-var">optionsComp</span></a></span><span> </span><span class="annot"><span class="annottext">ExecOption
+</span><a href="#local-6989586621679142215"><span class="hs-identifier hs-var">optionsExec</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142218"><span class="hs-identifier hs-var">s2</span></a></span><span>
+</span><span id="line-436"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-437"></span><span>    </span><span id="local-6989586621679142221"><span class="annot"><span class="annottext">s1 :: String
+</span><a href="#local-6989586621679142221"><span class="hs-identifier hs-var hs-var">s1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(RE -&gt; String) -&gt; Macros RE -&gt; String -&gt; String
+forall r. (r -&gt; String) -&gt; Macros r -&gt; String -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#expandMacros"><span class="hs-identifier hs-var">expandMacros</span></a></span><span> </span><span class="annot"><span class="annottext">RE -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier hs-var">reSource</span></a></span><span> </span><span class="annot"><span class="annottext">Macros RE
+</span><a href="#local-6989586621679142213"><span class="hs-identifier hs-var">optionsMacs</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; String -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679142224"><span class="hs-identifier hs-var">pp</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142216"><span class="hs-identifier hs-var">s0</span></a></span><span>
+</span><span id="line-438"></span><span>
+</span><span id="line-439"></span><span>    </span><span id="local-6989586621679142224"><span class="annot"><span class="annottext">pp :: String -&gt; String
+</span><a href="#local-6989586621679142224"><span class="hs-identifier hs-var hs-var">pp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="#local-6989586621679142212"><span class="hs-identifier hs-var">rpm</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-440"></span><span>      </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_qq"><span class="hs-identifier hs-var">RPM_qq</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span>
+</span><span id="line-441"></span><span>      </span><span class="annot"><span class="annottext">RegexParseMode
+</span><a href="Text.RE.ZeInternals.TDFA.html#RPM_raw"><span class="hs-identifier hs-var">RPM_raw</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-442"></span><span>
+</span><span id="line-443"></span><span>
+</span><span id="line-444"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-445"></span><span class="hs-comment">-- Preprocessing Literal REs</span><span>
+</span><span id="line-446"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-447"></span><span>
+</span><span id="line-448"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-type">qq_prep</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-449"></span><span id="qq_prep"><span class="annot"><span class="annottext">qq_prep :: String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var hs-var">qq_prep</span></a></span></span><span> </span><span id="local-6989586621679142226"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142226"><span class="hs-identifier hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142226"><span class="hs-identifier hs-var">s0</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-450"></span><span>    </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-451"></span><span>    </span><span id="local-6989586621679142227"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142227"><span class="hs-identifier hs-var">c</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679142228"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142228"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142227"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-452"></span><span>      </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\\'</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679142229"><span class="hs-identifier hs-var">backslash</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142228"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-453"></span><span>      </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142227"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142228"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-454"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-455"></span><span>    </span><span id="local-6989586621679142229"><span class="annot"><span class="annottext">backslash :: String -&gt; String
+</span><a href="#local-6989586621679142229"><span class="hs-identifier hs-var hs-var">backslash</span></a></span></span><span> </span><span id="local-6989586621679142230"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142230"><span class="hs-identifier hs-var">s1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142230"><span class="hs-identifier hs-var">s1</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-456"></span><span>      </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\\&quot;</span></span><span>
+</span><span id="line-457"></span><span>      </span><span id="local-6989586621679142231"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142231"><span class="hs-identifier hs-var">c</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679142232"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142231"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-458"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'a'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\a'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-459"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'b'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\b'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-460"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'f'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\f'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-461"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'n'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\n'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-462"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'r'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\r'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-463"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'t'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\t'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-464"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'v'</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\v'</span></span><span>    </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-465"></span><span>        </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\\'</span></span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679142231"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#qq_prep"><span class="hs-identifier hs-var">qq_prep</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142232"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-466"></span><span>
+</span><span id="line-467"></span><span>
+</span><span id="line-468"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-469"></span><span class="hs-comment">-- Options Helpers</span><span>
+</span><span id="line-470"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-471"></span><span>
+</span><span id="line-472"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#def_comp_option"><span class="hs-identifier hs-type">def_comp_option</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CompOption</span></span><span>
+</span><span id="line-473"></span><span id="def_comp_option"><span class="annot"><span class="annottext">def_comp_option :: CompOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_comp_option"><span class="hs-identifier hs-var hs-var">def_comp_option</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">REOptions -&gt; CompOption
+forall r c e. REOptions_ r c e -&gt; c
+</span><a href="Text.RE.REOptions.html#optionsComp"><span class="hs-identifier hs-var">optionsComp</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier hs-var">defaultREOptions</span></a></span><span>
+</span><span id="line-474"></span><span>
+</span><span id="line-475"></span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#def_exec_option"><span class="hs-identifier hs-type">def_exec_option</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExecOption</span></span><span>
+</span><span id="line-476"></span><span id="def_exec_option"><span class="annot"><span class="annottext">def_exec_option :: ExecOption
+</span><a href="Text.RE.ZeInternals.TDFA.html#def_exec_option"><span class="hs-identifier hs-var hs-var">def_exec_option</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">REOptions -&gt; ExecOption
+forall r c e. REOptions_ r c e -&gt; e
+</span><a href="Text.RE.REOptions.html#optionsExec"><span class="hs-identifier hs-var">optionsExec</span></a></span><span> </span><span class="annot"><span class="annottext">REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#defaultREOptions"><span class="hs-identifier hs-var">defaultREOptions</span></a></span><span>
+</span><span id="line-477"></span><span>
+</span><span id="line-478"></span><span>
+</span><span id="line-479"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-480"></span><span class="hs-comment">-- Haddock Sections</span><span>
+</span><span id="line-481"></span><span class="hs-comment">------------------------------------------------------------------------</span><span>
+</span><span id="line-482"></span><span>
+</span><span id="line-483"></span><span class="hs-comment">-- $about</span><span>
+</span><span id="line-484"></span><span class="hs-comment">--</span><span>
+</span><span id="line-485"></span><span class="hs-comment">-- This module provides the regex PCRE back end. Most of the functions that</span><span>
+</span><span id="line-486"></span><span class="hs-comment">-- you will need for day to day use are provided by the primary API modules</span><span>
+</span><span id="line-487"></span><span class="hs-comment">-- (e.g., &quot;Text.RE.TDFA.Text&quot;).</span><span>
+</span><span id="line-488"></span></pre></body></html>

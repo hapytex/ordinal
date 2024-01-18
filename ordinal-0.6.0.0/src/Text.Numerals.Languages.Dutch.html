@@ -1,0 +1,605 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE OverloadedLists #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Text.Numerals.Languages.Dutch</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : A module to convert numbers to words in the /Dutch/ language.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- This module contains logic to convert numbers to words in the /Dutch/ language.</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.Numerals.Languages.Dutch</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Num to word algorithm</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#dutch"><span class="hs-identifier">dutch</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a cardinal number to text</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier">toCardinal'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert to ordinal</span></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#ordinize%27"><span class="hs-identifier">ordinize'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Constant words</span></span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#negativeWord%27"><span class="hs-identifier">negativeWord'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#zeroWord%27"><span class="hs-identifier">zeroWord'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#oneWord%27"><span class="hs-identifier">oneWord'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Names for numbers</span></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#lowWords%27"><span class="hs-identifier">lowWords'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#midWords%27"><span class="hs-identifier">midWords'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#highWords%27"><span class="hs-identifier">highWords'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Merge function</span></span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#merge%27"><span class="hs-identifier">merge'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">where</span><span class="hs-cpp">
+
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">snoc</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Vector</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Vector</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html"><span class="hs-identifier">Text.Numerals.Algorithm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier">HighNumberAlgorithm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier">LongScale</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier">NumeralsAlgorithm</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#numeralsAlgorithm"><span class="hs-identifier">numeralsAlgorithm</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.Template.html"><span class="hs-identifier">Text.Numerals.Algorithm.Template</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Algorithm.Template.html#ordinizeFromDict"><span class="hs-identifier">ordinizeFromDict</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html"><span class="hs-identifier">Text.Numerals.Class</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#ClockSegment"><span class="hs-identifier">ClockSegment</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#Half"><span class="hs-identifier">Half</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#OClock"><span class="hs-identifier">OClock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#Past"><span class="hs-identifier">Past</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#PastHalf"><span class="hs-identifier">PastHalf</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#QuarterPast"><span class="hs-identifier">QuarterPast</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#QuarterTo"><span class="hs-identifier">QuarterTo</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#To"><span class="hs-identifier">To</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ToHalf"><span class="hs-identifier">ToHalf</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ClockText"><span class="hs-identifier">ClockText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#DayPart"><span class="hs-identifier">DayPart</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#Afternoon"><span class="hs-identifier">Afternoon</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#Evening"><span class="hs-identifier">Evening</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#Morning"><span class="hs-identifier">Morning</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#Night"><span class="hs-identifier">Night</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#DaySegment"><span class="hs-identifier">DaySegment</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#dayHour"><span class="hs-identifier">dayHour</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#dayPart"><span class="hs-identifier">dayPart</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#hourCorrection"><span class="hs-identifier">hourCorrection</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#toCardinal"><span class="hs-identifier">toCardinal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#valueSplit"><span class="hs-identifier">valueSplit</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html"><span class="hs-identifier">Text.Numerals.Internal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Internal.html#_mergeWithSpace"><span class="hs-identifier">_mergeWithSpace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_million"><span class="hs-identifier">_million</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_pluralize%27"><span class="hs-identifier">_pluralize'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.Numerals.Internal.html#_showIntegral"><span class="hs-identifier">_showIntegral</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-special">$</span><span id="_ordinize%27"><span class="hs-special">(</span><span> </span><span class="hs-identifier">pure</span><span>
+</span><span id="line-50"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="hs-identifier">ordinizeFromDict</span><span>
+</span><span id="line-51"></span><span>         </span><span class="hs-string">&quot;_ordinize'&quot;</span><span>
+</span><span id="line-52"></span><span>         </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;nul&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;nuld&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-53"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;&#233;&#233;n&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;eerst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-54"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;twee&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;tweed&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;drie&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;derd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-56"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;vier&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;vierd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;vijf&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;vijfd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;zes&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;zesd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;zeven&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;zevend&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-60"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;acht&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;achtst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-61"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;negen&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;negend&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;tien&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;tiend&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-63"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;elf&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;elfd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-64"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;twaalf&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;twaalfd&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-65"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;ig&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;igst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-66"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;erd&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;erdst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-67"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;end&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;endst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;joen&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;joenst&quot;</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-69"></span><span>           </span><span class="hs-special">(</span><span class="hs-string">&quot;rd&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;rdst&quot;</span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>         </span><span class="hs-special">]</span><span>
+</span><span id="line-71"></span><span>         </span><span class="hs-special">'</span><span class="hs-identifier">id</span><span>
+</span><span id="line-72"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span> </span><span class="hs-special">)</span></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- | A function that converts a number in words in /cardinal/ form to /ordinal/</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- form according to the /Dutch/ language rules.</span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#ordinize%27"><span class="hs-identifier hs-type">ordinize'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-78"></span><span id="ordinize%27"><span class="annot"><span class="annottext">ordinize' :: Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#ordinize%27"><span class="hs-identifier hs-var hs-var">ordinize'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Char -&gt; Text
+</span><span class="hs-operator hs-var">`snoc`</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'e'</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (Text -&gt; Text) -&gt; Text -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_ordinize%27"><span class="hs-identifier hs-var">_ordinize'</span></a></span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span class="annot"><span class="hs-comment">-- | A 'NumeralsAlgorithm' to convert numbers to words in the /Dutch/ language.</span></span><span>
+</span><span id="line-81"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#dutch"><span class="hs-identifier hs-type">dutch</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-82"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'NumeralsAlgorithm' that can be used to convert numbers to different formats.</span></span><span>
+</span><span id="line-83"></span><span>  </span><span class="annot"><a href="Text.Numerals.Algorithm.html#NumeralsAlgorithm"><span class="hs-identifier hs-type">NumeralsAlgorithm</span></a></span><span>
+</span><span id="line-84"></span><span id="dutch"><span class="annot"><span class="annottext">dutch :: NumeralsAlgorithm
+</span><a href="Text.Numerals.Languages.Dutch.html#dutch"><span class="hs-identifier hs-var hs-var">dutch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+-&gt; Text
+-&gt; Text
+-&gt; Vector Text
+-&gt; [(Integer, Text)]
+-&gt; FreeValueSplitter
+-&gt; FreeMergerFunction
+-&gt; (Text -&gt; Text)
+-&gt; FreeNumberToWords
+-&gt; ClockText
+-&gt; NumeralsAlgorithm
+forall (f :: * -&gt; *) (g :: * -&gt; *).
+(Foldable f, Foldable g) =&gt;
+Text
+-&gt; Text
+-&gt; Text
+-&gt; f Text
+-&gt; g (Integer, Text)
+-&gt; FreeValueSplitter
+-&gt; FreeMergerFunction
+-&gt; (Text -&gt; Text)
+-&gt; FreeNumberToWords
+-&gt; ClockText
+-&gt; NumeralsAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#numeralsAlgorithm"><span class="hs-identifier hs-var">numeralsAlgorithm</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Text.Numerals.Languages.Dutch.html#negativeWord%27"><span class="hs-identifier hs-var">negativeWord'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Text.Numerals.Languages.Dutch.html#zeroWord%27"><span class="hs-identifier hs-var">zeroWord'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Text.Numerals.Languages.Dutch.html#oneWord%27"><span class="hs-identifier hs-var">oneWord'</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Text
+</span><a href="Text.Numerals.Languages.Dutch.html#lowWords%27"><span class="hs-identifier hs-var">lowWords'</span></a></span><span> </span><span class="annot"><span class="annottext">[(Integer, Text)]
+</span><a href="Text.Numerals.Languages.Dutch.html#midWords%27"><span class="hs-identifier hs-var">midWords'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">HighNumberAlgorithm -&gt; FreeValueSplitter
+forall a. ValueSplit a =&gt; a -&gt; FreeValueSplitter
+</span><a href="Text.Numerals.Class.html#valueSplit"><span class="hs-identifier hs-var">valueSplit</span></a></span><span> </span><span class="annot"><span class="annottext">HighNumberAlgorithm
+</span><a href="Text.Numerals.Languages.Dutch.html#highWords%27"><span class="hs-identifier hs-var">highWords'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Text -&gt; Text -&gt; Text
+FreeMergerFunction
+</span><a href="Text.Numerals.Languages.Dutch.html#merge%27"><span class="hs-identifier hs-var">merge'</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#ordinize%27"><span class="hs-identifier hs-var">ordinize'</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#shortOrdinal%27"><span class="hs-identifier hs-var">shortOrdinal'</span></a></span><span> </span><span class="annot"><span class="annottext">ClockText
+</span><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><span class="hs-comment">-- | Convert numers to their cardinal counterpart in /Dutch/.</span></span><span>
+</span><span id="line-87"></span><span id="local-6989586621679187209"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-type">toCardinal'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187209"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The number to convert to text.</span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><a href="#local-6989586621679187209"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The cardinal counterpart in /Dutch/.</span></span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-93"></span><span id="toCardinal%27"><span class="annot"><span class="annottext">toCardinal' :: FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var hs-var">toCardinal'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm -&gt; i -&gt; Text
+forall i. Integral i =&gt; NumeralsAlgorithm -&gt; i -&gt; Text
+forall a i. (NumToWord a, Integral i) =&gt; a -&gt; i -&gt; Text
+</span><a href="Text.Numerals.Class.html#toCardinal"><span class="hs-identifier hs-var">toCardinal</span></a></span><span> </span><span class="annot"><span class="annottext">NumeralsAlgorithm
+</span><a href="Text.Numerals.Languages.Dutch.html#dutch"><span class="hs-identifier hs-var">dutch</span></a></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="annot"><span class="hs-comment">-- | The words used to mark a negative number in the /Dutch/ language.</span></span><span>
+</span><span id="line-96"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#negativeWord%27"><span class="hs-identifier hs-type">negativeWord'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-97"></span><span id="negativeWord%27"><span class="annot"><span class="annottext">negativeWord' :: Text
+</span><a href="Text.Numerals.Languages.Dutch.html#negativeWord%27"><span class="hs-identifier hs-var hs-var">negativeWord'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;min&quot;</span></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="annot"><span class="hs-comment">-- | The word used for the number /zero/ in the /Dutch/ language.</span></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#zeroWord%27"><span class="hs-identifier hs-type">zeroWord'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-101"></span><span id="zeroWord%27"><span class="annot"><span class="annottext">zeroWord' :: Text
+</span><a href="Text.Numerals.Languages.Dutch.html#zeroWord%27"><span class="hs-identifier hs-var hs-var">zeroWord'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;nul&quot;</span></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="annot"><span class="hs-comment">-- | The word used for the number /one/ in the /Dutch/ language.</span></span><span>
+</span><span id="line-104"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#oneWord%27"><span class="hs-identifier hs-type">oneWord'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-105"></span><span id="oneWord%27"><span class="annot"><span class="annottext">oneWord' :: Text
+</span><a href="Text.Numerals.Languages.Dutch.html#oneWord%27"><span class="hs-identifier hs-var hs-var">oneWord'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&#233;&#233;n&quot;</span></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="annot"><span class="hs-comment">-- | A 'Vector' that contains the word used for the numbers /two/ to /twenty/ in the /Dutch/ language.</span></span><span>
+</span><span id="line-108"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#lowWords%27"><span class="hs-identifier hs-type">lowWords'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Vector</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-109"></span><span id="lowWords%27"><span class="annot"><span class="annottext">lowWords' :: Vector Text
+</span><a href="Text.Numerals.Languages.Dutch.html#lowWords%27"><span class="hs-identifier hs-var hs-var">lowWords'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;twee&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-111"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;drie&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-112"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;vier&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-113"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;vijf&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;zes&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-115"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;zeven&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-116"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;acht&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-117"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;negen&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-118"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;tien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-119"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;elf&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-120"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;twaalf&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-121"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;dertien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-122"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;veertien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-123"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;vijftien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-124"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;zestien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-125"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;zeventien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-126"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;achttien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-127"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;negentien&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><span class="annottext">Item (Vector Text)
+Text
+</span><span class="hs-string">&quot;twintig&quot;</span></span><span>
+</span><span id="line-129"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="hs-comment">-- | A list of 2-tuples that contains the names of values between /thirty/ and</span><span>
+</span><span id="line-132"></span><span class="hs-comment">-- /thousand/ in the /Dutch/ language.</span><span>
+</span><span id="line-133"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#midWords%27"><span class="hs-identifier hs-type">midWords'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-134"></span><span id="midWords%27"><span class="annot"><span class="annottext">midWords' :: [(Integer, Text)]
+</span><a href="Text.Numerals.Languages.Dutch.html#midWords%27"><span class="hs-identifier hs-var hs-var">midWords'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-135"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1000</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;duizend&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">100</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;honderd&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">90</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;negentig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-138"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">80</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;tachtig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-139"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">70</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;zeventig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-140"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">60</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;zestig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-141"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">50</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;vijftig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-142"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">40</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;veertig&quot;</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-143"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">30</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;dertig&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span id="local-6989586621679187043"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_rightAnd"><span class="hs-identifier hs-type">_rightAnd</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187043"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187043"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-147"></span><span id="_rightAnd"><span class="annot"><span class="annottext">_rightAnd :: forall i. Integral i =&gt; i -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_rightAnd"><span class="hs-identifier hs-var hs-var">_rightAnd</span></a></span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;een&quot;</span></span><span>
+</span><span id="line-148"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_rightAnd"><span class="hs-identifier hs-var">_rightAnd</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span id="local-6989586621679187228"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_leftAnd"><span class="hs-identifier hs-type">_leftAnd</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187228"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187228"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-151"></span><span id="_leftAnd"><span class="annot"><span class="annottext">_leftAnd :: forall i. Integral i =&gt; i -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_leftAnd"><span class="hs-identifier hs-var hs-var">_leftAnd</span></a></span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;eenen&quot;</span></span><span>
+</span><span id="line-152"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_leftAnd"><span class="hs-identifier hs-var">_leftAnd</span></a></span><span> </span><span id="local-6989586621679187244"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187244"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-153"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">2</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187244"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="#local-6989586621679187245"><span class="hs-identifier hs-var">addE</span></a></span><span>
+</span><span id="line-154"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187244"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><a href="#local-6989586621679187245"><span class="hs-identifier hs-var">addE</span></a></span><span>
+</span><span id="line-155"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;en&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-156"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-157"></span><span>    </span><span id="local-6989586621679187245"><span class="annot"><span class="annottext">addE :: Text -&gt; Text
+</span><a href="#local-6989586621679187245"><span class="hs-identifier hs-var hs-var">addE</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&#235;n&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- | A merge function that is used to combine the names of words together to</span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- larger words, according to the /Dutch/ grammar rules.</span><span>
+</span><span id="line-161"></span><span id="local-6989586621679187248"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#merge%27"><span class="hs-identifier hs-type">merge'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187248"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187248"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187248"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-162"></span><span id="merge%27"><span class="annot"><span class="annottext">merge' :: FreeMergerFunction
+</span><a href="Text.Numerals.Languages.Dutch.html#merge%27"><span class="hs-identifier hs-var hs-var">merge'</span></a></span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span id="local-6989586621679187262"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187262"><span class="hs-identifier hs-var">r</span></a></span></span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187262"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+forall i. Integral i =&gt; i
+</span><a href="Text.Numerals.Internal.html#_million"><span class="hs-identifier hs-var">_million</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; Text -&gt; Text -&gt; Text
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; Text -&gt; Text -&gt; Text
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; i -&gt; Text -&gt; Text -&gt; Text
+FreeMergerFunction
+</span><a href="Text.Numerals.Languages.Dutch.html#_merge%27"><span class="hs-identifier hs-var">_merge'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187262"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;een&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-165"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#merge%27"><span class="hs-identifier hs-var">merge'</span></a></span><span> </span><span id="local-6989586621679187265"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187265"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679187266"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187266"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Text -&gt; Text -&gt; Text
+FreeMergerFunction
+</span><a href="Text.Numerals.Languages.Dutch.html#_merge%27"><span class="hs-identifier hs-var">_merge'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187265"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187266"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span id="local-6989586621679187267"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_merge%27"><span class="hs-identifier hs-type">_merge'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187267"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187267"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679187267"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-168"></span><span id="_merge%27"><span class="annot"><span class="annottext">_merge' :: FreeMergerFunction
+</span><a href="Text.Numerals.Languages.Dutch.html#_merge%27"><span class="hs-identifier hs-var hs-var">_merge'</span></a></span></span><span> </span><span id="local-6989586621679187289"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679187290"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span></span><span>
+</span><span id="line-169"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">i
+forall i. Integral i =&gt; i
+</span><a href="Text.Numerals.Internal.html#_million"><span class="hs-identifier hs-var">_million</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Internal.html#_mergeWithSpace"><span class="hs-identifier hs-var">_mergeWithSpace</span></a></span><span>
+</span><span id="line-170"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span>
+</span><span id="line-171"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">10</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">10</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">100</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+</span><a href="#local-6989586621679187293"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-172"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">i
+forall i. Integral i =&gt; i
+</span><a href="Text.Numerals.Internal.html#_million"><span class="hs-identifier hs-var">_million</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Internal.html#_mergeWithSpace"><span class="hs-identifier hs-var">_mergeWithSpace</span></a></span><span>
+</span><span id="line-173"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span>
+</span><span id="line-174"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-175"></span><span>    </span><span id="local-6989586621679187293"><span class="annot"><span class="annottext">go :: Text -&gt; Text -&gt; Text
+</span><a href="#local-6989586621679187293"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679187302"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187302"><span class="hs-identifier hs-var">tl</span></a></span></span><span> </span><span id="local-6989586621679187303"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187303"><span class="hs-identifier hs-var">tr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; Text -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_leftAnd"><span class="hs-identifier hs-var">_leftAnd</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187290"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187303"><span class="hs-identifier hs-var">tr</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; Text -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_rightAnd"><span class="hs-identifier hs-var">_rightAnd</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679187289"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187302"><span class="hs-identifier hs-var">tl</span></a></span><span>
+</span><span id="line-176"></span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- | An algorithm to obtain the names of /large/ numbers (one million or larger)</span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- in /Dutch/. Dutch uses a /long scale/ with the @iljoen@ and @iljard@</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- suffixes.</span><span>
+</span><span id="line-180"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#highWords%27"><span class="hs-identifier hs-type">highWords'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Algorithm.html#HighNumberAlgorithm"><span class="hs-identifier hs-type">HighNumberAlgorithm</span></a></span><span>
+</span><span id="line-181"></span><span id="highWords%27"><span class="annot"><span class="annottext">highWords' :: HighNumberAlgorithm
+</span><a href="Text.Numerals.Languages.Dutch.html#highWords%27"><span class="hs-identifier hs-var hs-var">highWords'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; HighNumberAlgorithm
+</span><a href="Text.Numerals.Algorithm.html#LongScale"><span class="hs-identifier hs-var">LongScale</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;iljoen&quot;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;iljard&quot;</span></span><span>
+</span><span id="line-182"></span><span>
+</span><span id="line-183"></span><span class="annot"><span class="hs-comment">-- | A function to convert a number to its /short ordinal/ form in /Dutch/.</span></span><span>
+</span><span id="line-184"></span><span id="local-6989586621679187304"><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#shortOrdinal%27"><span class="hs-identifier hs-type">shortOrdinal'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-185"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679187304"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-186"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The number to convert to /short ordinal/ form.</span></span><span>
+</span><span id="line-187"></span><span>  </span><span class="annot"><a href="#local-6989586621679187304"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-188"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent 'Text' specifying the number in /short ordinal/ form.</span></span><span>
+</span><span id="line-189"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-190"></span><span id="shortOrdinal%27"><span class="annot"><span class="annottext">shortOrdinal' :: FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#shortOrdinal%27"><span class="hs-identifier hs-var hs-var">shortOrdinal'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; (i -&gt; String) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; String -&gt; String
+forall i. Integral i =&gt; i -&gt; String -&gt; String
+</span><a href="Text.Numerals.Internal.html#_showIntegral"><span class="hs-operator hs-var">`_showIntegral`</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;e&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-191"></span><span>
+</span><span id="line-192"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-type">_dayPartText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#DayPart"><span class="hs-identifier hs-type">DayPart</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-193"></span><span id="_dayPartText"><span class="annot"><span class="annottext">_dayPartText :: DayPart -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-var hs-var">_dayPartText</span></a></span></span><span> </span><span class="annot"><span class="annottext">DayPart
+</span><a href="Text.Numerals.Class.html#Night"><span class="hs-identifier hs-var">Night</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;'s nachts&quot;</span></span><span>
+</span><span id="line-194"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-var">_dayPartText</span></a></span><span> </span><span class="annot"><span class="annottext">DayPart
+</span><a href="Text.Numerals.Class.html#Morning"><span class="hs-identifier hs-var">Morning</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;'s ochtends&quot;</span></span><span>
+</span><span id="line-195"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-var">_dayPartText</span></a></span><span> </span><span class="annot"><span class="annottext">DayPart
+</span><a href="Text.Numerals.Class.html#Afternoon"><span class="hs-identifier hs-var">Afternoon</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;'s middags&quot;</span></span><span>
+</span><span id="line-196"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-var">_dayPartText</span></a></span><span> </span><span class="annot"><span class="annottext">DayPart
+</span><a href="Text.Numerals.Class.html#Evening"><span class="hs-identifier hs-var">Evening</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;'s avonds&quot;</span></span><span>
+</span><span id="line-197"></span><span>
+</span><span id="line-198"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayComponent"><span class="hs-identifier hs-type">_dayComponent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#DaySegment"><span class="hs-identifier hs-type">DaySegment</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-199"></span><span id="_dayComponent"><span class="annot"><span class="annottext">_dayComponent :: Text -&gt; Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent"><span class="hs-identifier hs-var hs-var">_dayComponent</span></a></span></span><span> </span><span id="local-6989586621679187312"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187312"><span class="hs-identifier hs-var">sep</span></a></span></span><span> </span><span id="local-6989586621679187313"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187313"><span class="hs-identifier hs-var">dh</span></a></span></span><span> </span><span id="local-6989586621679187314"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187314"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var">toCardinal'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int
+</span><a href="Text.Numerals.Class.html#hourCorrection"><span class="hs-identifier hs-var">hourCorrection</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DaySegment -&gt; Int
+</span><a href="Text.Numerals.Class.html#dayHour"><span class="hs-identifier hs-var">dayHour</span></a></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187314"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187313"><span class="hs-identifier hs-var">dh</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679187312"><span class="hs-identifier hs-var">sep</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">DayPart -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayPartText"><span class="hs-identifier hs-var">_dayPartText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DaySegment -&gt; DayPart
+</span><a href="Text.Numerals.Class.html#dayPart"><span class="hs-identifier hs-var">dayPart</span></a></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187314"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-200"></span><span>
+</span><span id="line-201"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-type">_dayComponent'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#DaySegment"><span class="hs-identifier hs-type">DaySegment</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-202"></span><span id="_dayComponent%27"><span class="annot"><span class="annottext">_dayComponent' :: Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var hs-var">_dayComponent'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent"><span class="hs-identifier hs-var">_dayComponent</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot; &quot;</span></span><span>
+</span><span id="line-203"></span><span>
+</span><span id="line-204"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-type">_mins</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-205"></span><span id="_mins"><span class="annot"><span class="annottext">_mins :: Int -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-var hs-var">_mins</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Int -&gt; Text
+forall a. a -&gt; a -&gt; Int -&gt; a
+</span><a href="Text.Numerals.Internal.html#_pluralize%27"><span class="hs-identifier hs-var">_pluralize'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot; minuut &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot; minuten &quot;</span></span><span>
+</span><span id="line-206"></span><span>
+</span><span id="line-207"></span><span class="annot"><span class="hs-comment">-- | Converting the time to a text that describes that time in /Dutch/.</span></span><span>
+</span><span id="line-208"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-type">clockText'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.Numerals.Class.html#ClockText"><span class="hs-identifier hs-type">ClockText</span></a></span><span>
+</span><span id="line-209"></span><span id="clockText%27"><span class="annot"><span class="annottext">clockText' :: ClockText
+</span><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var hs-var">clockText'</span></a></span></span><span> </span><span class="annot"><span class="annottext">ClockSegment
+</span><a href="Text.Numerals.Class.html#OClock"><span class="hs-identifier hs-var">OClock</span></a></span><span> </span><span id="local-6989586621679187318"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187318"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent"><span class="hs-identifier hs-var">_dayComponent</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot; uur &quot;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187318"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-210"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span> </span><span id="local-6989586621679187319"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187319"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679187320"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187320"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var">toCardinal'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187319"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-var">_mins</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187319"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;na &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187320"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-211"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="annot"><span class="annottext">ClockSegment
+</span><a href="Text.Numerals.Class.html#QuarterPast"><span class="hs-identifier hs-var">QuarterPast</span></a></span><span> </span><span id="local-6989586621679187321"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187321"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kwart na &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187321"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-212"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#ToHalf"><span class="hs-identifier hs-type">ToHalf</span></a></span><span> </span><span id="local-6989586621679187322"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187322"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679187323"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187323"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var">toCardinal'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187322"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-var">_mins</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187322"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;voor half &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187323"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-213"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="annot"><span class="annottext">ClockSegment
+</span><a href="Text.Numerals.Class.html#Half"><span class="hs-identifier hs-var">Half</span></a></span><span> </span><span id="local-6989586621679187324"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187324"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;half &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187324"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-214"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#PastHalf"><span class="hs-identifier hs-type">PastHalf</span></a></span><span> </span><span id="local-6989586621679187325"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187325"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679187326"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187326"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var">toCardinal'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187325"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-var">_mins</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187325"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;na half &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187326"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-215"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="annot"><span class="annottext">ClockSegment
+</span><a href="Text.Numerals.Class.html#QuarterTo"><span class="hs-identifier hs-var">QuarterTo</span></a></span><span> </span><span id="local-6989586621679187327"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187327"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kwart voor &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187327"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-216"></span><span class="annot"><a href="Text.Numerals.Languages.Dutch.html#clockText%27"><span class="hs-identifier hs-var">clockText'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.Numerals.Class.html#To"><span class="hs-identifier hs-type">To</span></a></span><span> </span><span id="local-6989586621679187328"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187328"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679187329"><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187329"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+FreeNumberToWords
+</span><a href="Text.Numerals.Languages.Dutch.html#toCardinal%27"><span class="hs-identifier hs-var">toCardinal'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187328"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_mins"><span class="hs-identifier hs-var">_mins</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679187328"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;voor &quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; DaySegment -&gt; Text
+</span><a href="Text.Numerals.Languages.Dutch.html#_dayComponent%27"><span class="hs-identifier hs-var">_dayComponent'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">DaySegment
+</span><a href="#local-6989586621679187329"><span class="hs-identifier hs-var">ds</span></a></span><span>
+</span><span id="line-217"></span></pre></body></html>

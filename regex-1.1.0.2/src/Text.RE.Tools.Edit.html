@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards            #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DeriveFunctor              #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.Tools.Edit</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Editing</span></span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier">Edits</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier">Edit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier">LineEdit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier">applyEdits</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier">applyEdit</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier">applyLineEdit</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsRegex</span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier">IsRegex</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceAll"><span class="hs-identifier">searchReplaceAll</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceFirst"><span class="hs-identifier">searchReplaceFirst</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="annot"><span class="hs-comment">-- * LineNo</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier">LineNo</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier">firstLine</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#getLineNo"><span class="hs-identifier">getLineNo</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#lineNo"><span class="hs-identifier">lineNo</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Replace</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.LineNo</span></a></span><span>
+</span><span id="line-39"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- | an 'Edits' script will, for each line in the file, either perform</span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- the action selected by the first RE in the list, or perform all of the</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- actions on line, arranged as a pipeline</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">data</span><span> </span><span id="Edits"><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier hs-var">Edits</span></a></span></span><span> </span><span id="local-6989586621679140651"><span class="annot"><a href="#local-6989586621679140651"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679140652"><span class="annot"><a href="#local-6989586621679140652"><span class="hs-identifier hs-type">re</span></a></span></span><span> </span><span id="local-6989586621679140653"><span class="annot"><a href="#local-6989586621679140653"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Select"><span class="annot"><a href="Text.RE.Tools.Edit.html#Select"><span class="hs-identifier hs-var">Select</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140651"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140652"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140653"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span>   </span><span class="annot"><span class="hs-comment">-- ^ for each line select the first @Edit@ to match each line and edit the line with it</span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Pipe"><span class="annot"><a href="Text.RE.Tools.Edit.html#Pipe"><span class="hs-identifier hs-var">Pipe</span></a></span></span><span>   </span><span class="hs-glyph">!</span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140651"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140652"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140653"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span>   </span><span class="annot"><span class="hs-comment">-- ^ for each line apply every edit that matches in turn to the line</span></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="annot"><span class="hs-comment">-- | each Edit action specifies how the match should be processed</span></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">data</span><span> </span><span id="Edit"><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-var">Edit</span></a></span></span><span> </span><span id="local-6989586621679140656"><span class="annot"><a href="#local-6989586621679140656"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679140657"><span class="annot"><a href="#local-6989586621679140657"><span class="hs-identifier hs-type">re</span></a></span></span><span> </span><span id="local-6989586621679140658"><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Template"><span class="annot"><a href="Text.RE.Tools.Edit.html#Template"><span class="hs-identifier hs-var">Template</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140657"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>        </span><span class="annot"><span class="hs-comment">-- ^ replace the match with this template text, substituting ${capture} as appropriate</span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Function"><span class="annot"><a href="Text.RE.Tools.Edit.html#Function"><span class="hs-identifier hs-var">Function</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679140657"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#REContext"><span class="hs-identifier hs-type">REContext</span></a></span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Text.RE.ZeInternals.Replace.html#RELocation"><span class="hs-identifier hs-type">RELocation</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679140656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>        </span><span class="annot"><span class="hs-comment">-- ^ use this function to replace the 'REContext' specified captures in each line matched</span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LineEdit"><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-var">LineEdit</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679140657"><span class="hs-identifier hs-type">re</span></a></span><span>           </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier hs-type">Matches</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679140656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-type">LineEdit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140658"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>        </span><span class="annot"><span class="hs-comment">-- ^ use this function to edit each line matched</span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | a LineEdit is the most general action that can be performed on a line</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- and is the only means of deleting a line</span><span>
+</span><span id="line-61"></span><span class="hs-keyword">data</span><span> </span><span id="LineEdit"><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-var">LineEdit</span></a></span></span><span> </span><span id="local-6989586621679140662"><span class="annot"><a href="#local-6989586621679140662"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="NoEdit"><span class="annot"><a href="Text.RE.Tools.Edit.html#NoEdit"><span class="hs-identifier hs-var">NoEdit</span></a></span></span><span>                  </span><span class="annot"><span class="hs-comment">-- ^ do not edit this line but leave as is</span></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ReplaceWith"><span class="annot"><a href="Text.RE.Tools.Edit.html#ReplaceWith"><span class="hs-identifier hs-var">ReplaceWith</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679140662"><span class="hs-identifier hs-type">s</span></a></span><span>          </span><span class="annot"><span class="hs-comment">-- ^ replace the line with this text (terminating newline should not be included)</span></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Delete"><span class="annot"><a href="Text.RE.Tools.Edit.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span></span><span>                  </span><span class="annot"><span class="hs-comment">-- ^ delete the this line altogether</span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679140667"><span id="local-6989586621679140669"><span class="annot"><span class="annottext">(forall a b. (a -&gt; b) -&gt; LineEdit a -&gt; LineEdit b)
+-&gt; (forall a b. a -&gt; LineEdit b -&gt; LineEdit a) -&gt; Functor LineEdit
+forall a b. a -&gt; LineEdit b -&gt; LineEdit a
+forall a b. (a -&gt; b) -&gt; LineEdit a -&gt; LineEdit b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+$cfmap :: forall a b. (a -&gt; b) -&gt; LineEdit a -&gt; LineEdit b
+fmap :: forall a b. (a -&gt; b) -&gt; LineEdit a -&gt; LineEdit b
+$c&lt;$ :: forall a b. a -&gt; LineEdit b -&gt; LineEdit a
+&lt;$ :: forall a b. a -&gt; LineEdit b -&gt; LineEdit a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679140674"><span id="local-6989586621679140679"><span id="local-6989586621679140683"><span class="annot"><span class="annottext">Int -&gt; LineEdit s -&gt; ShowS
+[LineEdit s] -&gt; ShowS
+LineEdit s -&gt; String
+(Int -&gt; LineEdit s -&gt; ShowS)
+-&gt; (LineEdit s -&gt; String)
+-&gt; ([LineEdit s] -&gt; ShowS)
+-&gt; Show (LineEdit s)
+forall s. Show s =&gt; Int -&gt; LineEdit s -&gt; ShowS
+forall s. Show s =&gt; [LineEdit s] -&gt; ShowS
+forall s. Show s =&gt; LineEdit s -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: forall s. Show s =&gt; Int -&gt; LineEdit s -&gt; ShowS
+showsPrec :: Int -&gt; LineEdit s -&gt; ShowS
+$cshow :: forall s. Show s =&gt; LineEdit s -&gt; String
+show :: LineEdit s -&gt; String
+$cshowList :: forall s. Show s =&gt; [LineEdit s] -&gt; ShowS
+showList :: [LineEdit s] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-70"></span><span class="annot"><span class="hs-comment">-- | apply an 'Edit' script to a single line</span></span><span>
+</span><span id="line-71"></span><span id="local-6989586621679140567"><span id="local-6989586621679140568"><span id="local-6989586621679140570"><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier hs-type">applyEdits</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140567"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140568"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679140570"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679140570"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>           </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-73"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier hs-type">Edits</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140570"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140567"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140568"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-74"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140568"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-75"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140570"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140568"><span class="hs-identifier hs-type">s</span></a></span></span></span></span><span>
+</span><span id="line-76"></span><span id="applyEdits"><span class="annot"><span class="annottext">applyEdits :: forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; Edits m re s -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier hs-var hs-var">applyEdits</span></a></span></span><span> </span><span id="local-6989586621679140695"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140695"><span class="hs-identifier hs-var">lno</span></a></span></span><span> </span><span id="local-6989586621679140696"><span class="annot"><span class="annottext">Edits m re s
+</span><a href="#local-6989586621679140696"><span class="hs-identifier hs-var">ez0</span></a></span></span><span> </span><span id="local-6989586621679140697"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140697"><span class="hs-identifier hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Edits m re s
+</span><a href="#local-6989586621679140696"><span class="hs-identifier hs-var">ez0</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Select"><span class="hs-identifier hs-type">Select</span></a></span><span> </span><span id="local-6989586621679140698"><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140698"><span class="hs-identifier hs-var">ez</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#select_edit_scripts"><span class="hs-identifier hs-var">select_edit_scripts</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140695"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140698"><span class="hs-identifier hs-var">ez</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140697"><span class="hs-identifier hs-var">s0</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Pipe"><span class="hs-identifier hs-type">Pipe</span></a></span><span>   </span><span id="local-6989586621679140700"><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140700"><span class="hs-identifier hs-var">ez</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#pipe_edit_scripts"><span class="hs-identifier hs-var">pipe_edit_scripts</span></a></span><span>   </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140695"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140700"><span class="hs-identifier hs-var">ez</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140697"><span class="hs-identifier hs-var">s0</span></a></span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span class="hs-comment">-- | apply a single edit action to a line, the function in the first argument</span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- being used to add a new line onto the end of the line where appropriate;</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- the function returns @Nothing@ if no edit is to be performed on the line,</span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- @Just mempty@ to delete the line</span><span>
+</span><span id="line-84"></span><span id="local-6989586621679140580"><span id="local-6989586621679140581"><span id="local-6989586621679140582"><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier hs-type">applyEdit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140580"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679140582"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679140582"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>          </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-87"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140582"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140580"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-88"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-89"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140582"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679140581"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-90"></span><span id="applyEdit"><span class="annot"><span class="annottext">applyEdit :: forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+(s -&gt; s) -&gt; LineNo -&gt; Edit m re s -&gt; s -&gt; m (Maybe s)
+</span><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier hs-var hs-var">applyEdit</span></a></span></span><span> </span><span id="local-6989586621679140729"><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140729"><span class="hs-identifier hs-var">anl</span></a></span></span><span> </span><span id="local-6989586621679140730"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140730"><span class="hs-identifier hs-var">lno</span></a></span></span><span> </span><span id="local-6989586621679140731"><span class="annot"><span class="annottext">Edit m re s
+</span><a href="#local-6989586621679140731"><span class="hs-identifier hs-var">edit</span></a></span></span><span> </span><span id="local-6989586621679140732"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140732"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Matches s -&gt; [Match s]
+forall a. Matches a -&gt; [Match a]
+</span><a href="Text.RE.ZeInternals.Types.Matches.html#allMatches"><span class="hs-identifier hs-var">allMatches</span></a></span><span> </span><span class="annot"><span class="annottext">Matches s
+</span><a href="#local-6989586621679140734"><span class="hs-identifier hs-var">acs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe s -&gt; m (Maybe s)
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe s
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><span class="annottext">[Match s]
+</span><span class="hs-identifier">_</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(s -&gt; Maybe s) -&gt; m s -&gt; m (Maybe s)
+forall a b. (a -&gt; b) -&gt; m a -&gt; m b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; Maybe s
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(m s -&gt; m (Maybe s)) -&gt; m s -&gt; m (Maybe s)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Edit m re s
+</span><a href="#local-6989586621679140731"><span class="hs-identifier hs-var">edit</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-94"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Template"><span class="hs-identifier hs-type">Template</span></a></span><span> </span><span id="local-6989586621679140735"><span class="annot"><span class="annottext">SearchReplace re s
+</span><a href="#local-6989586621679140735"><span class="hs-identifier hs-var">srch_rpl</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">s -&gt; m s
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(s -&gt; m s) -&gt; s -&gt; m s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140729"><span class="hs-identifier hs-var">anl</span></a></span><span> </span><span class="annot"><span class="annottext">(s -&gt; s) -&gt; s -&gt; s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; Matches s -&gt; s
+forall a. Replace a =&gt; a -&gt; Matches a -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#replaceAll"><span class="hs-identifier hs-var">replaceAll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SearchReplace re s -&gt; s
+forall re s. SearchReplace re s -&gt; s
+</span><a href="Text.RE.ZeInternals.Types.SearchReplace.html#getTemplate"><span class="hs-identifier hs-var">getTemplate</span></a></span><span> </span><span class="annot"><span class="annottext">SearchReplace re s
+</span><a href="#local-6989586621679140735"><span class="hs-identifier hs-var">srch_rpl</span></a></span><span class="hs-special">)</span><span>       </span><span class="annot"><span class="annottext">Matches s
+</span><a href="#local-6989586621679140734"><span class="hs-identifier hs-var">acs</span></a></span><span>
+</span><span id="line-95"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Function"><span class="hs-identifier hs-type">Function</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140738"><span class="annot"><span class="annottext">REContext
+</span><a href="#local-6989586621679140738"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679140739"><span class="annot"><span class="annottext">LineNo -&gt; Match s -&gt; RELocation -&gt; Capture s -&gt; m (Maybe s)
+</span><a href="#local-6989586621679140739"><span class="hs-identifier hs-var">f</span></a></span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140729"><span class="hs-identifier hs-var">anl</span></a></span><span> </span><span class="annot"><span class="annottext">(s -&gt; s) -&gt; m s -&gt; m s
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ReplaceMethods s
+-&gt; REContext
+-&gt; (Match s -&gt; RELocation -&gt; Capture s -&gt; m (Maybe s))
+-&gt; Matches s
+-&gt; m s
+forall a (m :: * -&gt; *).
+(Extract a, Monad m) =&gt;
+ReplaceMethods a
+-&gt; REContext
+-&gt; (Match a -&gt; RELocation -&gt; Capture a -&gt; m (Maybe a))
+-&gt; Matches a
+-&gt; m a
+</span><a href="Text.RE.ZeInternals.Replace.html#replaceAllCapturesM"><span class="hs-identifier hs-var">replaceAllCapturesM</span></a></span><span> </span><span class="annot"><span class="annottext">ReplaceMethods s
+forall a. Replace a =&gt; ReplaceMethods a
+</span><a href="Text.RE.ZeInternals.Replace.html#replaceMethods"><span class="hs-identifier hs-var">replaceMethods</span></a></span><span> </span><span class="annot"><span class="annottext">REContext
+</span><a href="#local-6989586621679140738"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LineNo -&gt; Match s -&gt; RELocation -&gt; Capture s -&gt; m (Maybe s)
+</span><a href="#local-6989586621679140739"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140730"><span class="hs-identifier hs-var">lno</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Matches s
+</span><a href="#local-6989586621679140734"><span class="hs-identifier hs-var">acs</span></a></span><span>
+</span><span id="line-96"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-type">LineEdit</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><span class="hs-identifier">_</span></span><span>     </span><span id="local-6989586621679140743"><span class="annot"><span class="annottext">LineNo -&gt; Matches s -&gt; m (LineEdit s)
+</span><a href="#local-6989586621679140743"><span class="hs-identifier hs-var">g</span></a></span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">s -&gt; Maybe s -&gt; s
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140729"><span class="hs-identifier hs-var">anl</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140732"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe s -&gt; s) -&gt; (LineEdit s -&gt; Maybe s) -&gt; LineEdit s -&gt; s
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(s -&gt; s) -&gt; LineEdit s -&gt; Maybe s
+forall s. Monoid s =&gt; (s -&gt; s) -&gt; LineEdit s -&gt; Maybe s
+</span><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier hs-var">applyLineEdit</span></a></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140729"><span class="hs-identifier hs-var">anl</span></a></span><span> </span><span class="annot"><span class="annottext">(LineEdit s -&gt; s) -&gt; m (LineEdit s) -&gt; m s
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; Matches s -&gt; m (LineEdit s)
+</span><a href="#local-6989586621679140743"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140730"><span class="hs-identifier hs-var">lno</span></a></span><span>        </span><span class="annot"><span class="annottext">Matches s
+</span><a href="#local-6989586621679140734"><span class="hs-identifier hs-var">acs</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-98"></span><span>    </span><span id="local-6989586621679140734"><span class="annot"><span class="annottext">acs :: Matches s
+</span><a href="#local-6989586621679140734"><span class="hs-identifier hs-var hs-var">acs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">re -&gt; s -&gt; Matches s
+forall re s. IsRegex re s =&gt; re -&gt; s -&gt; Matches s
+</span><a href="Text.RE.ZeInternals.Types.IsRegex.html#matchMany"><span class="hs-identifier hs-var">matchMany</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140756"><span class="hs-identifier hs-var">rex</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140732"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span id="local-6989586621679140756"><span class="annot"><span class="annottext">rex :: re
+</span><a href="#local-6989586621679140756"><span class="hs-identifier hs-var hs-var">rex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Edit m re s
+</span><a href="#local-6989586621679140731"><span class="hs-identifier hs-var">edit</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Template"><span class="hs-identifier hs-type">Template</span></a></span><span> </span><span id="local-6989586621679140757"><span class="annot"><span class="annottext">SearchReplace re s
+</span><a href="#local-6989586621679140757"><span class="hs-identifier hs-var">srch_rpl</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SearchReplace re s -&gt; re
+forall re s. SearchReplace re s -&gt; re
+</span><a href="Text.RE.ZeInternals.Types.SearchReplace.html#getSearch"><span class="hs-identifier hs-var">getSearch</span></a></span><span> </span><span class="annot"><span class="annottext">SearchReplace re s
+</span><a href="#local-6989586621679140757"><span class="hs-identifier hs-var">srch_rpl</span></a></span><span>
+</span><span id="line-101"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Function"><span class="hs-identifier hs-type">Function</span></a></span><span> </span><span id="local-6989586621679140759"><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140759"><span class="hs-identifier hs-var">rex_</span></a></span></span><span> </span><span class="annot"><span class="annottext">REContext
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; Match s -&gt; RELocation -&gt; Capture s -&gt; m (Maybe s)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140759"><span class="hs-identifier hs-var">rex_</span></a></span><span>
+</span><span id="line-102"></span><span>      </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-type">LineEdit</span></a></span><span> </span><span id="local-6989586621679140760"><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140760"><span class="hs-identifier hs-var">rex_</span></a></span></span><span>   </span><span class="annot"><span class="annottext">LineNo -&gt; Matches s -&gt; m (LineEdit s)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140760"><span class="hs-identifier hs-var">rex_</span></a></span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- | apply a 'LineEdit' to a line, using the function in the first</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- argument to append a new line to the result; Nothing should be</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- returned if no edit is to be performed,  @Just mempty@ to</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- delete the line</span><span>
+</span><span id="line-109"></span><span id="local-6989586621679140619"><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier hs-type">applyLineEdit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monoid</span></span><span> </span><span class="annot"><a href="#local-6989586621679140619"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679140619"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="#local-6989586621679140619"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier hs-type">LineEdit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140619"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679140619"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-110"></span><span id="applyLineEdit"><span class="annot"><span class="annottext">applyLineEdit :: forall s. Monoid s =&gt; (s -&gt; s) -&gt; LineEdit s -&gt; Maybe s
+</span><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier hs-var hs-var">applyLineEdit</span></a></span></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><span class="hs-identifier">_</span></span><span>    </span><span class="annot"><span class="annottext">LineEdit s
+</span><a href="Text.RE.Tools.Edit.html#NoEdit"><span class="hs-identifier hs-var">NoEdit</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe s
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-111"></span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier hs-var">applyLineEdit</span></a></span><span> </span><span id="local-6989586621679140763"><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140763"><span class="hs-identifier hs-var">anl</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.Tools.Edit.html#ReplaceWith"><span class="hs-identifier hs-type">ReplaceWith</span></a></span><span> </span><span id="local-6989586621679140764"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140764"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">s -&gt; Maybe s
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(s -&gt; Maybe s) -&gt; s -&gt; Maybe s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140763"><span class="hs-identifier hs-var">anl</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140764"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-112"></span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier hs-var">applyLineEdit</span></a></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+</span><span class="hs-identifier">_</span></span><span>    </span><span class="annot"><span class="annottext">LineEdit s
+</span><a href="Text.RE.Tools.Edit.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">s -&gt; Maybe s
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>   </span><span class="annot"><span class="annottext">s
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span id="local-6989586621679140577"><span id="local-6989586621679140578"><span id="local-6989586621679140579"><span class="annot"><a href="Text.RE.Tools.Edit.html#select_edit_scripts"><span class="hs-identifier hs-type">select_edit_scripts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140577"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140578"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679140579"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679140579"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>                    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-116"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140579"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140577"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140578"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-117"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140578"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-118"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140579"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140578"><span class="hs-identifier hs-type">s</span></a></span></span></span></span><span>
+</span><span id="line-119"></span><span id="select_edit_scripts"><span class="annot"><span class="annottext">select_edit_scripts :: forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#select_edit_scripts"><span class="hs-identifier hs-var hs-var">select_edit_scripts</span></a></span></span><span> </span><span id="local-6989586621679140777"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140777"><span class="hs-identifier hs-var">lno</span></a></span></span><span> </span><span id="local-6989586621679140778"><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140778"><span class="hs-identifier hs-var">ps0</span></a></span></span><span> </span><span id="local-6989586621679140779"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140779"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Edit m re s] -&gt; m s
+forall {m :: * -&gt; *} {re}.
+(Monad m, IsRegex re s) =&gt;
+[Edit m re s] -&gt; m s
+</span><a href="#local-6989586621679140780"><span class="hs-identifier hs-var">select</span></a></span><span> </span><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140778"><span class="hs-identifier hs-var">ps0</span></a></span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-121"></span><span>    </span><span id="local-6989586621679140780"><span class="annot"><span class="annottext">select :: [Edit m re s] -&gt; m s
+</span><a href="#local-6989586621679140780"><span class="hs-identifier hs-var hs-var">select</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>           </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">s -&gt; m s
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(s -&gt; m s) -&gt; s -&gt; m s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+forall a. Replace a =&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#appendNewlineR"><span class="hs-identifier hs-var">appendNewlineR</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140779"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-122"></span><span>    </span><span class="annot"><a href="#local-6989586621679140780"><span class="hs-identifier hs-var">select</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679140813"><span class="annot"><span class="annottext">Edit m re s
+</span><a href="#local-6989586621679140813"><span class="hs-identifier hs-var">edit</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679140814"><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140814"><span class="hs-identifier hs-var">edits</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-123"></span><span>      </span><span class="annot"><span class="annottext">(s -&gt; s) -&gt; LineNo -&gt; Edit m re s -&gt; s -&gt; m (Maybe s)
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+(s -&gt; s) -&gt; LineNo -&gt; Edit m re s -&gt; s -&gt; m (Maybe s)
+</span><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier hs-var">applyEdit</span></a></span><span> </span><span class="annot"><span class="annottext">s -&gt; s
+forall a. Replace a =&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#appendNewlineR"><span class="hs-identifier hs-var">appendNewlineR</span></a></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140777"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">Edit m re s
+</span><a href="#local-6989586621679140813"><span class="hs-identifier hs-var">edit</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140779"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">m (Maybe s) -&gt; (Maybe s -&gt; m s) -&gt; m s
+forall a b. m a -&gt; (a -&gt; m b) -&gt; m b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">m s -&gt; (s -&gt; m s) -&gt; Maybe s -&gt; m s
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Edit m re s] -&gt; m s
+</span><a href="#local-6989586621679140780"><span class="hs-identifier hs-var">select</span></a></span><span> </span><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140814"><span class="hs-identifier hs-var">edits</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">s -&gt; m s
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span id="local-6989586621679140816"><span id="local-6989586621679140817"><span id="local-6989586621679140818"><span class="annot"><a href="Text.RE.Tools.Edit.html#pipe_edit_scripts"><span class="hs-identifier hs-type">pipe_edit_scripts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140816"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140817"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679140818"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679140818"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-127"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier hs-type">Edit</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140818"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140816"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140817"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-128"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140817"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-129"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140818"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140817"><span class="hs-identifier hs-type">s</span></a></span></span></span></span><span>
+</span><span id="line-130"></span><span id="pipe_edit_scripts"><span class="annot"><span class="annottext">pipe_edit_scripts :: forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+LineNo -&gt; [Edit m re s] -&gt; s -&gt; m s
+</span><a href="Text.RE.Tools.Edit.html#pipe_edit_scripts"><span class="hs-identifier hs-var hs-var">pipe_edit_scripts</span></a></span></span><span> </span><span id="local-6989586621679140830"><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140830"><span class="hs-identifier hs-var">lno</span></a></span></span><span> </span><span id="local-6989586621679140831"><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140831"><span class="hs-identifier hs-var">edits</span></a></span></span><span> </span><span id="local-6989586621679140832"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140832"><span class="hs-identifier hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-131"></span><span>    </span><span class="annot"><span class="annottext">s -&gt; s
+forall a. Replace a =&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#appendNewlineR"><span class="hs-identifier hs-var">appendNewlineR</span></a></span><span> </span><span class="annot"><span class="annottext">(s -&gt; s) -&gt; m s -&gt; m s
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">(Edit m re s -&gt; m s -&gt; m s) -&gt; m s -&gt; [Edit m re s] -&gt; m s
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">Edit m re s -&gt; m s -&gt; m s
+forall {m :: * -&gt; *} {re} {b}.
+(Monad m, IsRegex re b) =&gt;
+Edit m re b -&gt; m b -&gt; m b
+</span><a href="#local-6989586621679140834"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">s -&gt; m s
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140832"><span class="hs-identifier hs-var">s0</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Edit m re s]
+</span><a href="#local-6989586621679140831"><span class="hs-identifier hs-var">edits</span></a></span><span>
+</span><span id="line-132"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-133"></span><span>    </span><span id="local-6989586621679140834"><span class="annot"><span class="annottext">f :: Edit m re b -&gt; m b -&gt; m b
+</span><a href="#local-6989586621679140834"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679140861"><span class="annot"><span class="annottext">Edit m re b
+</span><a href="#local-6989586621679140861"><span class="hs-identifier hs-var">edit</span></a></span></span><span> </span><span id="local-6989586621679140862"><span class="annot"><span class="annottext">m b
+</span><a href="#local-6989586621679140862"><span class="hs-identifier hs-var">act</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-134"></span><span>      </span><span id="local-6989586621679140863"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679140863"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m b
+</span><a href="#local-6989586621679140862"><span class="hs-identifier hs-var">act</span></a></span><span>
+</span><span id="line-135"></span><span>      </span><span class="annot"><span class="annottext">b -&gt; Maybe b -&gt; b
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679140863"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe b -&gt; b) -&gt; m (Maybe b) -&gt; m b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">(b -&gt; b) -&gt; LineNo -&gt; Edit m re b -&gt; b -&gt; m (Maybe b)
+forall re s (m :: * -&gt; *).
+(IsRegex re s, Monad m, Functor m) =&gt;
+(s -&gt; s) -&gt; LineNo -&gt; Edit m re s -&gt; s -&gt; m (Maybe s)
+</span><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier hs-var">applyEdit</span></a></span><span> </span><span class="annot"><span class="annottext">b -&gt; b
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="annot"><span class="annottext">LineNo
+</span><a href="#local-6989586621679140830"><span class="hs-identifier hs-var">lno</span></a></span><span> </span><span class="annot"><span class="annottext">Edit m re b
+</span><a href="#local-6989586621679140861"><span class="hs-identifier hs-var">edit</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679140863"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-136"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-139"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- The Edit toolkit looks for REs that match a text and runs the</span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- associated actions.</span><span>
+</span><span id="line-142"></span><span class="hs-comment">--</span><span>
+</span><span id="line-143"></span><span class="hs-comment">-- See the Regex Tools tutorial at http://re-tutorial-tools.regex.uk</span><span>
+</span><span id="line-144"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-145"></span></pre></body></html>

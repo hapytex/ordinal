@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards            #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.Tools.Find</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Find</span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier">FindMethods</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_"><span class="hs-identifier">findMatches_</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_%27"><span class="hs-identifier">findMatches_'</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsRegex</span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier">IsRegex</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceAll"><span class="hs-identifier">searchReplaceAll</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceFirst"><span class="hs-identifier">searchReplaceFirst</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Replace</span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>                      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">L</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- | as we don't want the @directory@ and FilePath dependencies</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- we will abstract the three calls we need into this record type</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">data</span><span> </span><span id="FindMethods"><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-var">FindMethods</span></a></span></span><span> </span><span id="local-6989586621679140318"><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-36"></span><span>  </span><span id="FindMethods"><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-var">FindMethods</span></a></span></span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="doesDirectoryExistDM"><span class="annot"><span class="annottext">forall s. FindMethods s -&gt; s -&gt; IO Bool
+</span><a href="Text.RE.Tools.Find.html#doesDirectoryExistDM"><span class="hs-identifier hs-var hs-var">doesDirectoryExistDM</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>    </span><span class="hs-comment">-- ^ doesDirectoryExist from</span><span>
+</span><span id="line-38"></span><span>                                              </span><span class="hs-comment">-- System.Directory</span><span>
+</span><span id="line-39"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="listDirectoryDM"><span class="annot"><span class="annottext">forall s. FindMethods s -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#listDirectoryDM"><span class="hs-identifier hs-var hs-var">listDirectoryDM</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span>     </span><span class="hs-comment">-- ^ either getDirectoryContents</span><span>
+</span><span id="line-40"></span><span>                                              </span><span class="hs-comment">-- or listDirectory from</span><span>
+</span><span id="line-41"></span><span>                                              </span><span class="hs-comment">-- System.Directory</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="combineDM"><span class="annot"><span class="annottext">forall s. FindMethods s -&gt; s -&gt; s -&gt; s
+</span><a href="Text.RE.Tools.Find.html#combineDM"><span class="hs-identifier hs-var hs-var">combineDM</span></a></span></span><span>            </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140318"><span class="hs-identifier hs-type">s</span></a></span><span>     </span><span class="annot"><span class="hs-comment">-- ^ &lt;/&gt; from System.FilePath</span></span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-44"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | recursively list all files whose filename matches given RE,</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- sorting the list into ascending order; if the argument path has a</span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- trailing '/' then it will be removed</span><span>
+</span><span id="line-51"></span><span id="local-6989586621679140323"><span id="local-6989586621679140324"><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_"><span class="hs-identifier hs-type">findMatches_</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140323"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140324"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-type">FindMethods</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140324"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140323"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140324"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140324"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span></span></span><span>
+</span><span id="line-52"></span><span id="findMatches_"><span class="annot"><span class="annottext">findMatches_ :: forall re s. IsRegex re s =&gt; FindMethods s -&gt; re -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#findMatches_"><span class="hs-identifier hs-var hs-var">findMatches_</span></a></span></span><span> </span><span id="local-6989586621679140384"><span class="annot"><span class="annottext">FindMethods s
+</span><a href="#local-6989586621679140384"><span class="hs-identifier hs-var">fm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FindMethods s
+-&gt; ([s] -&gt; [s]) -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; IO [s]
+forall re s.
+IsRegex re s =&gt;
+FindMethods s
+-&gt; ([s] -&gt; [s]) -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#findMatches_%27"><span class="hs-identifier hs-var">findMatches_'</span></a></span><span> </span><span class="annot"><span class="annottext">FindMethods s
+</span><a href="#local-6989586621679140384"><span class="hs-identifier hs-var">fm</span></a></span><span> </span><span class="annot"><span class="annottext">[s] -&gt; [s]
+forall a. Ord a =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">L.sort</span></span><span> </span><span class="annot"><span class="annottext">Match s -&gt; Bool
+forall a. Match a -&gt; Bool
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matched"><span class="hs-identifier hs-var">matched</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- | recursively list all files whose filename matches given RE,</span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- using the given function to determine which matches to accept</span><span>
+</span><span id="line-56"></span><span id="local-6989586621679140333"><span id="local-6989586621679140334"><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_%27"><span class="hs-identifier hs-type">findMatches_'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140333"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-57"></span><span>              </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-type">FindMethods</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span>         </span><span class="annot"><span class="hs-comment">-- ^ the directory and filepath methods</span></span><span>
+</span><span id="line-58"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span class="hs-glyph">-&gt;</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>            </span><span class="annot"><span class="hs-comment">-- ^ result post-processing function</span></span><span>
+</span><span id="line-59"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>       </span><span class="annot"><span class="hs-comment">-- ^ filtering function</span></span><span>
+</span><span id="line-60"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140333"><span class="hs-identifier hs-type">re</span></a></span><span>                    </span><span class="annot"><span class="hs-comment">-- ^ re to be matched against the leaf filename</span></span><span>
+</span><span id="line-61"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span>                     </span><span class="annot"><span class="hs-comment">-- ^ root directory of the search</span></span><span>
+</span><span id="line-62"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140334"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span></span></span><span>
+</span><span id="line-63"></span><span id="findMatches_%27"><span class="annot"><span class="annottext">findMatches_' :: forall re s.
+IsRegex re s =&gt;
+FindMethods s
+-&gt; ([s] -&gt; [s]) -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#findMatches_%27"><span class="hs-identifier hs-var hs-var">findMatches_'</span></a></span></span><span> </span><span id="local-6989586621679140393"><span class="annot"><span class="annottext">FindMethods s
+</span><a href="#local-6989586621679140393"><span class="hs-identifier hs-var">fm</span></a></span></span><span> </span><span id="local-6989586621679140394"><span class="annot"><span class="annottext">[s] -&gt; [s]
+</span><a href="#local-6989586621679140394"><span class="hs-identifier hs-var">srt</span></a></span></span><span> </span><span id="local-6989586621679140395"><span class="annot"><span class="annottext">Match s -&gt; Bool
+</span><a href="#local-6989586621679140395"><span class="hs-identifier hs-var">tst</span></a></span></span><span> </span><span id="local-6989586621679140396"><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140396"><span class="hs-identifier hs-var">re</span></a></span></span><span> </span><span id="local-6989586621679140397"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140397"><span class="hs-identifier hs-var">fp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[s] -&gt; [s]
+</span><a href="#local-6989586621679140394"><span class="hs-identifier hs-var">srt</span></a></span><span> </span><span class="annot"><span class="annottext">([s] -&gt; [s]) -&gt; IO [s] -&gt; IO [s]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">FindMethods s -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; s -&gt; IO [s]
+forall re s.
+IsRegex re s =&gt;
+FindMethods s -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#find_"><span class="hs-identifier hs-var">find_</span></a></span><span> </span><span class="annot"><span class="annottext">FindMethods s
+</span><a href="#local-6989586621679140393"><span class="hs-identifier hs-var">fm</span></a></span><span> </span><span class="annot"><span class="annottext">Match s -&gt; Bool
+</span><a href="#local-6989586621679140395"><span class="hs-identifier hs-var">tst</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140396"><span class="hs-identifier hs-var">re</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; s
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140397"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span id="local-6989586621679140342"><span id="local-6989586621679140343"><span class="annot"><a href="Text.RE.Tools.Find.html#find_"><span class="hs-identifier hs-type">find_</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140342"><span class="hs-identifier hs-type">re</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-66"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-type">FindMethods</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140342"><span class="hs-identifier hs-type">re</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-70"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-71"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679140343"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">]</span></span></span><span>
+</span><span id="line-72"></span><span id="find_"><span class="annot"><span class="annottext">find_ :: forall re s.
+IsRegex re s =&gt;
+FindMethods s -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#find_"><span class="hs-identifier hs-var hs-var">find_</span></a></span></span><span> </span><span id="local-6989586621679140422"><span class="annot"><span class="annottext">fm :: FindMethods s
+</span><a href="#local-6989586621679140422"><span class="hs-identifier hs-var">fm</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier hs-type">FindMethods</span></a></span><span class="hs-special">{</span><span id="local-6989586621679140423"><span id="local-6989586621679140424"><span id="local-6989586621679140425"><span class="annot"><span class="annottext">s -&gt; IO Bool
+s -&gt; IO [s]
+s -&gt; s -&gt; s
+doesDirectoryExistDM :: forall s. FindMethods s -&gt; s -&gt; IO Bool
+listDirectoryDM :: forall s. FindMethods s -&gt; s -&gt; IO [s]
+combineDM :: forall s. FindMethods s -&gt; s -&gt; s -&gt; s
+doesDirectoryExistDM :: s -&gt; IO Bool
+listDirectoryDM :: s -&gt; IO [s]
+combineDM :: s -&gt; s -&gt; s
+</span><a href="Text.RE.Tools.Find.html#doesDirectoryExistDM"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679140426"><span class="annot"><span class="annottext">Match s -&gt; Bool
+</span><a href="#local-6989586621679140426"><span class="hs-identifier hs-var">tst</span></a></span></span><span> </span><span id="local-6989586621679140427"><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140427"><span class="hs-identifier hs-var">re</span></a></span></span><span> </span><span id="local-6989586621679140428"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140428"><span class="hs-identifier hs-var">fn</span></a></span></span><span> </span><span id="local-6989586621679140429"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-73"></span><span>  </span><span id="local-6989586621679140430"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140430"><span class="hs-identifier hs-var">is_dir</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">s -&gt; IO Bool
+</span><a href="#local-6989586621679140423"><span class="hs-identifier hs-var">doesDirectoryExistDM</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140430"><span class="hs-identifier hs-var">is_dir</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-76"></span><span>      </span><span id="local-6989586621679140431"><span class="annot"><span class="annottext">[s]
+</span><a href="#local-6989586621679140431"><span class="hs-identifier hs-var">fns</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(s -&gt; Bool) -&gt; [s] -&gt; [s]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; Bool
+forall {a}. Replace a =&gt; a -&gt; Bool
+</span><a href="#local-6989586621679140432"><span class="hs-identifier hs-var">ordinary</span></a></span><span> </span><span class="annot"><span class="annottext">([s] -&gt; [s]) -&gt; IO [s] -&gt; IO [s]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">s -&gt; IO [s]
+</span><a href="#local-6989586621679140424"><span class="hs-identifier hs-var">listDirectoryDM</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><span id="line-77"></span><span>      </span><span class="annot"><span class="annottext">[[s]] -&gt; [s]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span> </span><span class="annot"><span class="annottext">([[s]] -&gt; [s]) -&gt; IO [[s]] -&gt; IO [s]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span>
+</span><span id="line-78"></span><span>        </span><span class="annot"><span class="annottext">((s, s) -&gt; IO [s]) -&gt; [(s, s)] -&gt; IO [[s]]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(s -&gt; s -&gt; IO [s]) -&gt; (s, s) -&gt; IO [s]
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">((s -&gt; s -&gt; IO [s]) -&gt; (s, s) -&gt; IO [s])
+-&gt; (s -&gt; s -&gt; IO [s]) -&gt; (s, s) -&gt; IO [s]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FindMethods s -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; s -&gt; IO [s]
+forall re s.
+IsRegex re s =&gt;
+FindMethods s -&gt; (Match s -&gt; Bool) -&gt; re -&gt; s -&gt; s -&gt; IO [s]
+</span><a href="Text.RE.Tools.Find.html#find_"><span class="hs-identifier hs-var">find_</span></a></span><span> </span><span class="annot"><span class="annottext">FindMethods s
+</span><a href="#local-6989586621679140422"><span class="hs-identifier hs-var">fm</span></a></span><span> </span><span class="annot"><span class="annottext">Match s -&gt; Bool
+</span><a href="#local-6989586621679140426"><span class="hs-identifier hs-var">tst</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140427"><span class="hs-identifier hs-var">re</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140436"><span class="hs-identifier hs-var">fn_</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">s -&gt; s
+</span><a href="#local-6989586621679140437"><span class="hs-identifier hs-var">abs_path</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140436"><span class="hs-identifier hs-var">fn_</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679140436"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140436"><span class="hs-identifier hs-var">fn_</span></a></span></span><span class="hs-glyph">&lt;-</span><span class="annot"><span class="annottext">[s]
+</span><a href="#local-6989586621679140431"><span class="hs-identifier hs-var">fns</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[s] -&gt; IO [s]
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">s -&gt; Int
+forall a. Replace a =&gt; a -&gt; Int
+</span><a href="Text.RE.ZeInternals.Replace.html#lengthR"><span class="hs-identifier hs-var">lengthR</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Match s -&gt; Bool
+</span><a href="#local-6989586621679140426"><span class="hs-identifier hs-var">tst</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">re -&gt; s -&gt; Match s
+forall re s. IsRegex re s =&gt; re -&gt; s -&gt; Match s
+</span><a href="Text.RE.ZeInternals.Types.IsRegex.html#matchOnce"><span class="hs-identifier hs-var">matchOnce</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679140427"><span class="hs-identifier hs-var">re</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140428"><span class="hs-identifier hs-var">fn</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679140437"><span class="annot"><span class="annottext">abs_path :: s -&gt; s
+</span><a href="#local-6989586621679140437"><span class="hs-identifier hs-var hs-var">abs_path</span></a></span></span><span> </span><span id="local-6989586621679140442"><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140442"><span class="hs-identifier hs-var">fn_</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140429"><span class="hs-identifier hs-var">fp</span></a></span><span> </span><span class="annot"><span class="annottext">s -&gt; s -&gt; s
+</span><a href="#local-6989586621679140425"><span class="hs-operator hs-var">`combineDM`</span></a></span><span> </span><span class="annot"><span class="annottext">s
+</span><a href="#local-6989586621679140442"><span class="hs-identifier hs-var">fn_</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679140432"><span class="annot"><span class="annottext">ordinary :: a -&gt; Bool
+</span><a href="#local-6989586621679140432"><span class="hs-identifier hs-var hs-var">ordinary</span></a></span></span><span> </span><span id="local-6989586621679140466"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">fn_</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">fn_</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String -&gt; a
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.&quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">String -&gt; a
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;..&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-83"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- The Find toolkit traverses directory trees invoking actions for each</span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- file that matches a RE.</span><span>
+</span><span id="line-89"></span><span class="hs-comment">--</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- See the Regex Tools tutorial at http://re-tutorial-tools.regex.uk</span><span>
+</span><span id="line-91"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-92"></span></pre></body></html>

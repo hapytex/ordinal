@@ -1,0 +1,998 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards            #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances          #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances       #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses      #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable         #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE MonoLocalBinds             #-}</span><span>
+</span><span id="line-9"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.Types.Match</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier">Match</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#noMatch"><span class="hs-identifier">noMatch</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#emptyMatchArray"><span class="hs-identifier">emptyMatchArray</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matched"><span class="hs-identifier">matched</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchedText"><span class="hs-identifier">matchedText</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchCapture"><span class="hs-identifier">matchCapture</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchCaptures"><span class="hs-identifier">matchCaptures</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24"><span class="hs-operator">(!$$)</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureText"><span class="hs-identifier">captureText</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24%3F"><span class="hs-operator">(!$$?)</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureTextMaybe"><span class="hs-identifier">captureTextMaybe</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24"><span class="hs-operator">(!$)</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#capture"><span class="hs-identifier">capture</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%3F"><span class="hs-operator">(!$?)</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureMaybe"><span class="hs-identifier">captureMaybe</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier">RegexFix</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#convertMatchText"><span class="hs-identifier">convertMatchText</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Array</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString</span></span><span>                </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BW</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Char8</span></span><span>          </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">B</span></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy.Char8</span></span><span>     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LBS</span></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.UTF8</span></span><span>           </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">B</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Sequence</span></span><span>                  </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>                      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Encoding</span></span><span>             </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span>                 </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LT</span></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Typeable</span></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Capture</span></a></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.CaptureID</span></a></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Regex.Base</span></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Text.Regex.PCRE</span></span><span>                </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PCRE</span></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Text.Regex.TDFA</span></span><span>                </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TDFA</span></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">9</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24"><span class="hs-operator hs-type">!$</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24"><span class="hs-operator hs-type">!$$</span></a></span><span>
+</span><span id="line-54"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | the result of matching a RE to a text once (with @?=~@), retaining</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- the text that was matched against</span><span>
+</span><span id="line-59"></span><span class="hs-keyword">data</span><span> </span><span id="Match"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-var">Match</span></a></span></span><span> </span><span id="local-6989586621679134854"><span class="annot"><a href="#local-6989586621679134854"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-60"></span><span>  </span><span id="Match"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-var">Match</span></a></span></span><span>
+</span><span id="line-61"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="matchSource"><span class="annot"><span class="annottext">forall a. Match a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-identifier hs-var hs-var">matchSource</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679134854"><span class="hs-identifier hs-type">a</span></a></span><span>                </span><span class="annot"><span class="hs-comment">-- ^ the whole source text</span></span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="captureNames"><span class="annot"><span class="annottext">forall a. Match a -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureNames"><span class="hs-identifier hs-var hs-var">captureNames</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span>     </span><span class="annot"><span class="hs-comment">-- ^ the RE's capture names</span></span><span>
+</span><span id="line-63"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="matchArray"><span class="annot"><span class="annottext">forall a. Match a -&gt; Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchArray"><span class="hs-identifier hs-var hs-var">matchArray</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Array</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134854"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>                                        </span><span class="hs-comment">-- ^ 0..n-1 captures,</span><span>
+</span><span id="line-65"></span><span>                                        </span><span class="hs-comment">-- starting with the</span><span>
+</span><span id="line-66"></span><span>                                        </span><span class="hs-comment">-- text matched by the</span><span>
+</span><span id="line-67"></span><span>                                        </span><span class="hs-comment">-- whole RE</span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135099"><span id="local-6989586621679135111"><span id="local-6989586621679135115"><span class="annot"><span class="annottext">Int -&gt; Match a -&gt; ShowS
+[Match a] -&gt; ShowS
+Match a -&gt; String
+(Int -&gt; Match a -&gt; ShowS)
+-&gt; (Match a -&gt; String) -&gt; ([Match a] -&gt; ShowS) -&gt; Show (Match a)
+forall a. Show a =&gt; Int -&gt; Match a -&gt; ShowS
+forall a. Show a =&gt; [Match a] -&gt; ShowS
+forall a. Show a =&gt; Match a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Match a -&gt; ShowS
+showsPrec :: Int -&gt; Match a -&gt; ShowS
+$cshow :: forall a. Show a =&gt; Match a -&gt; String
+show :: Match a -&gt; String
+$cshowList :: forall a. Show a =&gt; [Match a] -&gt; ShowS
+showList :: [Match a] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679135124"><span id="local-6989586621679135135"><span class="annot"><span class="annottext">Match a -&gt; Match a -&gt; Bool
+(Match a -&gt; Match a -&gt; Bool)
+-&gt; (Match a -&gt; Match a -&gt; Bool) -&gt; Eq (Match a)
+forall a. Eq a =&gt; Match a -&gt; Match a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: forall a. Eq a =&gt; Match a -&gt; Match a -&gt; Bool
+== :: Match a -&gt; Match a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Match a -&gt; Match a -&gt; Bool
+/= :: Match a -&gt; Match a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-73"></span><span class="annot"><span class="hs-comment">-- | Construct a Match that does not match anything.</span></span><span>
+</span><span id="line-74"></span><span id="local-6989586621679134882"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#noMatch"><span class="hs-identifier hs-type">noMatch</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679134882"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134882"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-75"></span><span id="noMatch"><span class="annot"><span class="annottext">noMatch :: forall a. a -&gt; Match a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#noMatch"><span class="hs-identifier hs-var hs-var">noMatch</span></a></span></span><span> </span><span id="local-6989586621679135142"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679135142"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; CaptureNames -&gt; Array CaptureOrdinal (Capture a) -&gt; Match a
+forall a.
+a -&gt; CaptureNames -&gt; Array CaptureOrdinal (Capture a) -&gt; Match a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-var">Match</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679135142"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#noCaptureNames"><span class="hs-identifier hs-var">noCaptureNames</span></a></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+forall a. Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#emptyMatchArray"><span class="hs-identifier hs-var">emptyMatchArray</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="annot"><span class="hs-comment">-- | an empty array of Capture</span></span><span>
+</span><span id="line-78"></span><span id="local-6989586621679134884"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#emptyMatchArray"><span class="hs-identifier hs-type">emptyMatchArray</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Array</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134884"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-79"></span><span id="emptyMatchArray"><span class="annot"><span class="annottext">emptyMatchArray :: forall a. Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#emptyMatchArray"><span class="hs-identifier hs-var hs-var">emptyMatchArray</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureOrdinal, CaptureOrdinal)
+-&gt; [Capture a] -&gt; Array CaptureOrdinal (Capture a)
+forall i e. Ix i =&gt; (i, i) -&gt; [e] -&gt; Array i e
+</span><span class="hs-identifier hs-var">listArray</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CaptureOrdinal) -&gt; Int -&gt; CaptureOrdinal
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-83"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135151"><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-84"></span><span>  </span><span id="local-6989586621679135159"><span class="annot"><span class="annottext">fmap :: forall a b. (a -&gt; b) -&gt; Match a -&gt; Match b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">fmap</span></span></span><span> </span><span id="local-6989586621679135160"><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679135160"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span class="hs-special">{</span><span id="local-6989586621679135161"><span id="local-6989586621679135162"><span id="local-6989586621679135163"><span class="annot"><span class="annottext">a
+Array CaptureOrdinal (Capture a)
+CaptureNames
+matchSource :: forall a. Match a -&gt; a
+captureNames :: forall a. Match a -&gt; CaptureNames
+matchArray :: forall a. Match a -&gt; Array CaptureOrdinal (Capture a)
+matchSource :: a
+captureNames :: CaptureNames
+matchArray :: Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-85"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span>
+</span><span id="line-86"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">matchSource :: b
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-identifier hs-var">matchSource</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679135160"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679135161"><span class="hs-identifier hs-var">matchSource</span></a></span><span>
+</span><span id="line-87"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">captureNames :: CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureNames"><span class="hs-identifier hs-var">captureNames</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679135162"><span class="hs-identifier hs-var">captureNames</span></a></span><span>
+</span><span id="line-88"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">matchArray :: Array CaptureOrdinal (Capture b)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchArray"><span class="hs-identifier hs-var">matchArray</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Capture a -&gt; Capture b)
+-&gt; Array CaptureOrdinal (Capture a)
+-&gt; Array CaptureOrdinal (Capture b)
+forall a b.
+(a -&gt; b) -&gt; Array CaptureOrdinal a -&gt; Array CaptureOrdinal b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(a -&gt; b) -&gt; Capture a -&gt; Capture b
+forall a b. (a -&gt; b) -&gt; Capture a -&gt; Capture b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679135160"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135163"><span class="hs-identifier hs-var">matchArray</span></a></span><span>
+</span><span id="line-89"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-90"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-93"></span><span class="annot"><span class="hs-comment">-- | tests whether the RE matched the source text at all</span></span><span>
+</span><span id="line-94"></span><span id="local-6989586621679134900"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matched"><span class="hs-identifier hs-type">matched</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134900"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-95"></span><span id="matched"><span class="annot"><span class="annottext">matched :: forall a. Match a -&gt; Bool
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matched"><span class="hs-identifier hs-var hs-var">matched</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Capture a) -&gt; Bool
+forall a. Maybe a -&gt; Bool
+</span><span class="hs-identifier hs-var">isJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Capture a) -&gt; Bool)
+-&gt; (Match a -&gt; Maybe (Capture a)) -&gt; Match a -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Match a -&gt; Maybe (Capture a)
+forall a. Match a -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchCapture"><span class="hs-identifier hs-var">matchCapture</span></a></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="annot"><span class="hs-comment">-- | yields the text matched by the RE, Nothing if no match</span></span><span>
+</span><span id="line-98"></span><span id="local-6989586621679134907"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchedText"><span class="hs-identifier hs-type">matchedText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134907"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679134907"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-99"></span><span id="matchedText"><span class="annot"><span class="annottext">matchedText :: forall a. Match a -&gt; Maybe a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchedText"><span class="hs-identifier hs-var hs-var">matchedText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Capture a -&gt; a) -&gt; Maybe (Capture a) -&gt; Maybe a
+forall a b. (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; a
+forall a. Capture a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#capturedText"><span class="hs-identifier hs-var">capturedText</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe (Capture a) -&gt; Maybe a)
+-&gt; (Match a -&gt; Maybe (Capture a)) -&gt; Match a -&gt; Maybe a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Match a -&gt; Maybe (Capture a)
+forall a. Match a -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchCapture"><span class="hs-identifier hs-var">matchCapture</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- | the top-level capture if the source text matched the RE,</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- Nothing otherwise</span><span>
+</span><span id="line-103"></span><span id="local-6989586621679134906"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchCapture"><span class="hs-identifier hs-type">matchCapture</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134906"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134906"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-104"></span><span id="matchCapture"><span class="annot"><span class="annottext">matchCapture :: forall a. Match a -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchCapture"><span class="hs-identifier hs-var hs-var">matchCapture</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((Capture a, [Capture a]) -&gt; Capture a)
+-&gt; Maybe (Capture a, [Capture a]) -&gt; Maybe (Capture a)
+forall a b. (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">(Capture a, [Capture a]) -&gt; Capture a
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Capture a, [Capture a]) -&gt; Maybe (Capture a))
+-&gt; (Match a -&gt; Maybe (Capture a, [Capture a]))
+-&gt; Match a
+-&gt; Maybe (Capture a)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Match a -&gt; Maybe (Capture a, [Capture a])
+forall a. Match a -&gt; Maybe (Capture a, [Capture a])
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchCaptures"><span class="hs-identifier hs-var">matchCaptures</span></a></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- | the main top-level capture (capture \'0'') and the sub captures</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- if the text matched the RE, @Nothing@ otherwise</span><span>
+</span><span id="line-108"></span><span id="local-6989586621679134913"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchCaptures"><span class="hs-identifier hs-type">matchCaptures</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134913"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134913"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span class="hs-special">[</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134913"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
+</span><span id="line-109"></span><span id="matchCaptures"><span class="annot"><span class="annottext">matchCaptures :: forall a. Match a -&gt; Maybe (Capture a, [Capture a])
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchCaptures"><span class="hs-identifier hs-var hs-var">matchCaptures</span></a></span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span class="hs-special">{</span><span id="local-6989586621679135177"><span id="local-6989586621679135178"><span id="local-6989586621679135179"><span class="annot"><span class="annottext">a
+Array CaptureOrdinal (Capture a)
+CaptureNames
+matchSource :: forall a. Match a -&gt; a
+captureNames :: forall a. Match a -&gt; CaptureNames
+matchArray :: forall a. Match a -&gt; Array CaptureOrdinal (Capture a)
+matchSource :: a
+captureNames :: CaptureNames
+matchArray :: Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(CaptureOrdinal, CaptureOrdinal) -&gt; Int
+forall a. Ix a =&gt; (a, a) -&gt; Int
+</span><span class="hs-identifier hs-var">rangeSize</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+-&gt; (CaptureOrdinal, CaptureOrdinal)
+forall i e. Array i e -&gt; (i, i)
+</span><span class="hs-identifier hs-var">bounds</span></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135179"><span class="hs-identifier hs-var">matchArray</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe (Capture a, [Capture a])
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Capture a, [Capture a]) -&gt; Maybe (Capture a, [Capture a])
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135179"><span class="hs-identifier hs-var">matchArray</span></a></span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a) -&gt; CaptureOrdinal -&gt; Capture a
+forall i e. Ix i =&gt; Array i e -&gt; i -&gt; e
+</span><span class="hs-operator hs-var">!</span></span><span class="annot"><span class="annottext">CaptureOrdinal
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; [Capture a] -&gt; [Capture a]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">drop</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">([Capture a] -&gt; [Capture a]) -&gt; [Capture a] -&gt; [Capture a]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a) -&gt; [Capture a]
+forall i e. Array i e -&gt; [e]
+</span><span class="hs-identifier hs-var">elems</span></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135179"><span class="hs-identifier hs-var">matchArray</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="annot"><span class="hs-comment">-- | an alternative for captureText</span></span><span>
+</span><span id="line-114"></span><span id="local-6989586621679134923"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24"><span class="hs-operator hs-type">(!$$)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134923"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679134923"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-115"></span><span id="%21%24%24"><span class="annot"><span class="annottext">!$$ :: forall a. Match a -&gt; CaptureID -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24"><span class="hs-operator hs-var hs-var">(!$$)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureID -&gt; Match a -&gt; a) -&gt; Match a -&gt; CaptureID -&gt; a
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; a
+forall a. CaptureID -&gt; Match a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureText"><span class="hs-identifier hs-var">captureText</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- | look up the text of the nth capture, 0 being the match of the whole</span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- RE against the source text, 1, the first bracketed sub-expression to</span><span>
+</span><span id="line-119"></span><span class="hs-comment">-- be matched and so on</span><span>
+</span><span id="line-120"></span><span id="local-6989586621679134929"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureText"><span class="hs-identifier hs-type">captureText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134929"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679134929"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-121"></span><span id="captureText"><span class="annot"><span class="annottext">captureText :: forall a. CaptureID -&gt; Match a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureText"><span class="hs-identifier hs-var hs-var">captureText</span></a></span></span><span> </span><span id="local-6989586621679135186"><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135186"><span class="hs-identifier hs-var">cid</span></a></span></span><span> </span><span id="local-6989586621679135187"><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135187"><span class="hs-identifier hs-var">mtch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; a
+forall a. Capture a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#capturedText"><span class="hs-identifier hs-var">capturedText</span></a></span><span> </span><span class="annot"><span class="annottext">(Capture a -&gt; a) -&gt; Capture a -&gt; a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; Capture a
+forall a. CaptureID -&gt; Match a -&gt; Capture a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#capture"><span class="hs-identifier hs-var">capture</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135186"><span class="hs-identifier hs-var">cid</span></a></span><span> </span><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135187"><span class="hs-identifier hs-var">mtch</span></a></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="annot"><span class="hs-comment">-- | an alternative for captureTextMaybe</span></span><span>
+</span><span id="line-124"></span><span id="local-6989586621679134932"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24%3F"><span class="hs-operator hs-type">(!$$?)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134932"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679134932"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-125"></span><span id="%21%24%24%3F"><span class="annot"><span class="annottext">!$$? :: forall a. Match a -&gt; CaptureID -&gt; Maybe a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%24%3F"><span class="hs-operator hs-var hs-var">(!$$?)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureID -&gt; Match a -&gt; Maybe a)
+-&gt; Match a -&gt; CaptureID -&gt; Maybe a
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; Maybe a
+forall a. CaptureID -&gt; Match a -&gt; Maybe a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureTextMaybe"><span class="hs-identifier hs-var">captureTextMaybe</span></a></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- | look up the text of the nth capture (0 being the match of the</span><span>
+</span><span id="line-128"></span><span class="hs-comment">-- whole), returning Nothing if the Match doesn't contain the capture</span><span>
+</span><span id="line-129"></span><span id="local-6989586621679134934"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureTextMaybe"><span class="hs-identifier hs-type">captureTextMaybe</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134934"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679134934"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-130"></span><span id="captureTextMaybe"><span class="annot"><span class="annottext">captureTextMaybe :: forall a. CaptureID -&gt; Match a -&gt; Maybe a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureTextMaybe"><span class="hs-identifier hs-var hs-var">captureTextMaybe</span></a></span></span><span> </span><span id="local-6989586621679135190"><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135190"><span class="hs-identifier hs-var">cid</span></a></span></span><span> </span><span id="local-6989586621679135191"><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135191"><span class="hs-identifier hs-var">mtch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-131"></span><span>    </span><span id="local-6989586621679135192"><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135192"><span class="hs-identifier hs-var">cap</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135191"><span class="hs-identifier hs-var">mtch</span></a></span><span> </span><span class="annot"><span class="annottext">Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+forall a. Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%3F"><span class="hs-operator hs-var">!$?</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135190"><span class="hs-identifier hs-var">cid</span></a></span><span>
+</span><span id="line-132"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; Bool
+forall a. Capture a -&gt; Bool
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#hasCaptured"><span class="hs-identifier hs-var">hasCaptured</span></a></span><span> </span><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135192"><span class="hs-identifier hs-var">cap</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-133"></span><span>      </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Maybe a) -&gt; a -&gt; Maybe a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; a
+forall a. Capture a -&gt; a
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#capturedText"><span class="hs-identifier hs-var">capturedText</span></a></span><span> </span><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135192"><span class="hs-identifier hs-var">cap</span></a></span><span>
+</span><span id="line-134"></span><span>      </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe a
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span class="annot"><span class="hs-comment">-- | an alternative for capture</span></span><span>
+</span><span id="line-137"></span><span id="local-6989586621679134938"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24"><span class="hs-operator hs-type">(!$)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134938"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134938"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-138"></span><span id="%21%24"><span class="annot"><span class="annottext">!$ :: forall a. Match a -&gt; CaptureID -&gt; Capture a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24"><span class="hs-operator hs-var hs-var">(!$)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureID -&gt; Match a -&gt; Capture a)
+-&gt; Match a -&gt; CaptureID -&gt; Capture a
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; Capture a
+forall a. CaptureID -&gt; Match a -&gt; Capture a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#capture"><span class="hs-identifier hs-var">capture</span></a></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- | look up the nth capture, 0 being the match of the whole RE against</span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- the source text, 1, the first bracketed sub-expression to be matched</span><span>
+</span><span id="line-142"></span><span class="hs-comment">-- and so on</span><span>
+</span><span id="line-143"></span><span id="local-6989586621679134931"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#capture"><span class="hs-identifier hs-type">capture</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134931"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134931"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-144"></span><span id="capture"><span class="annot"><span class="annottext">capture :: forall a. CaptureID -&gt; Match a -&gt; Capture a
+</span><a href="Text.RE.ZeInternals.Types.Match.html#capture"><span class="hs-identifier hs-var hs-var">capture</span></a></span></span><span> </span><span id="local-6989586621679135198"><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135198"><span class="hs-identifier hs-var">cid</span></a></span></span><span> </span><span id="local-6989586621679135199"><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135199"><span class="hs-identifier hs-var">mtch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; Maybe (Capture a) -&gt; Capture a
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135201"><span class="hs-identifier hs-var">oops</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe (Capture a) -&gt; Capture a) -&gt; Maybe (Capture a) -&gt; Capture a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135199"><span class="hs-identifier hs-var">mtch</span></a></span><span> </span><span class="annot"><span class="annottext">Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+forall a. Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%3F"><span class="hs-operator hs-var">!$?</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135198"><span class="hs-identifier hs-var">cid</span></a></span><span>
+</span><span id="line-145"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-146"></span><span>    </span><span id="local-6989586621679135201"><span class="annot"><span class="annottext">oops :: Capture a
+</span><a href="#local-6989586621679135201"><span class="hs-identifier hs-var hs-var">oops</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Capture a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Capture a) -&gt; String -&gt; Capture a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;capture: out of bounds (&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135198"><span class="hs-identifier hs-var">cid</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span class="annot"><span class="hs-comment">-- | an alternative for capture captureMaybe</span></span><span>
+</span><span id="line-149"></span><span id="local-6989586621679134936"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%3F"><span class="hs-operator hs-type">(!$?)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134936"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134936"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-150"></span><span id="%21%24%3F"><span class="annot"><span class="annottext">!$? :: forall a. Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#%21%24%3F"><span class="hs-operator hs-var hs-var">(!$?)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CaptureID -&gt; Match a -&gt; Maybe (Capture a))
+-&gt; Match a -&gt; CaptureID -&gt; Maybe (Capture a)
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; Maybe (Capture a)
+forall a. CaptureID -&gt; Match a -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureMaybe"><span class="hs-identifier hs-var">captureMaybe</span></a></span><span>
+</span><span id="line-151"></span><span>
+</span><span id="line-152"></span><span class="hs-comment">-- | look up the nth capture, 0 being the match of the whole RE against</span><span>
+</span><span id="line-153"></span><span class="hs-comment">-- the source text, 1, the first bracketed sub-expression to be matched</span><span>
+</span><span id="line-154"></span><span class="hs-comment">-- and so on, returning Nothing if there is no such capture, or if the</span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- capture failed to capture anything (being in a failed alternate)</span><span>
+</span><span id="line-156"></span><span id="local-6989586621679134946"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#captureMaybe"><span class="hs-identifier hs-type">captureMaybe</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134946"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134946"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-157"></span><span id="captureMaybe"><span class="annot"><span class="annottext">captureMaybe :: forall a. CaptureID -&gt; Match a -&gt; Maybe (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureMaybe"><span class="hs-identifier hs-var hs-var">captureMaybe</span></a></span></span><span> </span><span id="local-6989586621679135208"><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135208"><span class="hs-identifier hs-var">cid</span></a></span></span><span> </span><span id="local-6989586621679135209"><span class="annot"><span class="annottext">mtch :: Match a
+</span><a href="#local-6989586621679135209"><span class="hs-identifier hs-var">mtch</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span class="hs-special">{</span><span id="local-6989586621679135210"><span id="local-6989586621679135211"><span id="local-6989586621679135212"><span class="annot"><span class="annottext">a
+Array CaptureOrdinal (Capture a)
+CaptureNames
+matchSource :: forall a. Match a -&gt; a
+captureNames :: forall a. Match a -&gt; CaptureNames
+matchArray :: forall a. Match a -&gt; Array CaptureOrdinal (Capture a)
+matchSource :: a
+captureNames :: CaptureNames
+matchArray :: Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-158"></span><span>  </span><span id="local-6989586621679135213"><span class="annot"><span class="annottext">CaptureOrdinal
+</span><a href="#local-6989586621679135213"><span class="hs-identifier hs-var">i</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; Match a -&gt; Maybe CaptureOrdinal
+forall a. CaptureID -&gt; Match a -&gt; Maybe CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.Match.html#lookupCaptureID"><span class="hs-identifier hs-var">lookupCaptureID</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135208"><span class="hs-identifier hs-var">cid</span></a></span><span> </span><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679135209"><span class="hs-identifier hs-var">mtch</span></a></span><span>
+</span><span id="line-159"></span><span>  </span><span id="local-6989586621679135215"><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135215"><span class="hs-identifier hs-var">cap</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+-&gt; (CaptureOrdinal, CaptureOrdinal)
+forall i e. Array i e -&gt; (i, i)
+</span><span class="hs-identifier hs-var">bounds</span></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135212"><span class="hs-identifier hs-var">matchArray</span></a></span><span> </span><span class="annot"><span class="annottext">(CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Bool
+forall a. Ix a =&gt; (a, a) -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">`inRange`</span></span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal
+</span><a href="#local-6989586621679135213"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-160"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; Maybe (Capture a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Capture a -&gt; Maybe (Capture a)) -&gt; Capture a -&gt; Maybe (Capture a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a)
+</span><a href="#local-6989586621679135212"><span class="hs-identifier hs-var">matchArray</span></a></span><span> </span><span class="annot"><span class="annottext">Array CaptureOrdinal (Capture a) -&gt; CaptureOrdinal -&gt; Capture a
+forall i e. Ix i =&gt; Array i e -&gt; i -&gt; e
+</span><span class="hs-operator hs-var">!</span></span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal
+</span><a href="#local-6989586621679135213"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-161"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe (Capture a)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-162"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; Bool
+forall a. Capture a -&gt; Bool
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#hasCaptured"><span class="hs-identifier hs-var">hasCaptured</span></a></span><span> </span><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135215"><span class="hs-identifier hs-var">cap</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-163"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Capture a -&gt; Maybe (Capture a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Capture a
+</span><a href="#local-6989586621679135215"><span class="hs-identifier hs-var">cap</span></a></span><span>
+</span><span id="line-164"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe (Capture a)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span id="local-6989586621679134948"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#lookupCaptureID"><span class="hs-identifier hs-type">lookupCaptureID</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134948"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span></span><span>
+</span><span id="line-167"></span><span id="lookupCaptureID"><span class="annot"><span class="annottext">lookupCaptureID :: forall a. CaptureID -&gt; Match a -&gt; Maybe CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.Match.html#lookupCaptureID"><span class="hs-identifier hs-var hs-var">lookupCaptureID</span></a></span></span><span> </span><span id="local-6989586621679135217"><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135217"><span class="hs-identifier hs-var">cid</span></a></span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span class="hs-special">{</span><span id="local-6989586621679135218"><span id="local-6989586621679135219"><span id="local-6989586621679135220"><span class="annot"><span class="annottext">a
+Array CaptureOrdinal (Capture a)
+CaptureNames
+matchSource :: forall a. Match a -&gt; a
+captureNames :: forall a. Match a -&gt; CaptureNames
+matchArray :: forall a. Match a -&gt; Array CaptureOrdinal (Capture a)
+matchSource :: a
+captureNames :: CaptureNames
+matchArray :: Array CaptureOrdinal (Capture a)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-168"></span><span>    </span><span class="annot"><span class="annottext">(String -&gt; Maybe CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; Maybe CaptureOrdinal)
+-&gt; Either String CaptureOrdinal
+-&gt; Maybe CaptureOrdinal
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe CaptureOrdinal -&gt; String -&gt; Maybe CaptureOrdinal
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Maybe CaptureOrdinal
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal -&gt; Maybe CaptureOrdinal
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Either String CaptureOrdinal -&gt; Maybe CaptureOrdinal)
+-&gt; Either String CaptureOrdinal -&gt; Maybe CaptureOrdinal
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CaptureID -&gt; CaptureNames -&gt; Either String CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#findCaptureID"><span class="hs-identifier hs-var">findCaptureID</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureID
+</span><a href="#local-6989586621679135217"><span class="hs-identifier hs-var">cid</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679135219"><span class="hs-identifier hs-var">captureNames</span></a></span><span>
+</span><span id="line-169"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span>
+</span><span id="line-172"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-173"></span><span class="hs-comment">-- | this instance hooks 'Match' into regex-base: regex consumers need</span><span>
+</span><span id="line-174"></span><span class="hs-comment">-- not worry about any of this</span><span>
+</span><span id="line-175"></span><span class="hs-keyword">instance</span><span>
+</span><span id="line-176"></span><span>    </span><span id="local-6989586621679134965"><span id="local-6989586621679134966"><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RegexContext</span></span><span> </span><span class="annot"><a href="#local-6989586621679134965"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllTextSubmatches</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Array</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span class="hs-special">,</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-177"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RegexLike</span></span><span>    </span><span class="annot"><a href="#local-6989586621679134965"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span>
+</span><span id="line-178"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679134965"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span>
+</span><span id="line-179"></span><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-180"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">RegexContext</span></span><span> </span><span class="annot"><a href="#local-6989586621679134965"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134966"><span class="hs-identifier hs-type">source</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-181"></span><span>    </span><span id="local-6989586621679135235"><span class="annot"><span class="annottext">match :: regex -&gt; source -&gt; Match source
+</span><a href="#local-6989586621679135235"><span class="hs-identifier hs-var hs-var hs-var hs-var">match</span></a></span></span><span>  </span><span id="local-6989586621679135237"><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135237"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679135238"><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135238"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">regex -&gt; source -&gt; MatchText source -&gt; Match source
+forall regex source.
+RegexFix regex source =&gt;
+regex -&gt; source -&gt; MatchText source -&gt; Match source
+</span><a href="Text.RE.ZeInternals.Types.Match.html#convertMatchText"><span class="hs-identifier hs-var">convertMatchText</span></a></span><span> </span><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135237"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135238"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(MatchText source -&gt; Match source)
+-&gt; MatchText source -&gt; Match source
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AllTextSubmatches (Array Int) (source, (Int, Int))
+-&gt; MatchText source
+forall (f :: * -&gt; *) b. AllTextSubmatches f b -&gt; f b
+</span><span class="hs-identifier hs-var">getAllTextSubmatches</span></span><span> </span><span class="annot"><span class="annottext">(AllTextSubmatches (Array Int) (source, (Int, Int))
+ -&gt; MatchText source)
+-&gt; AllTextSubmatches (Array Int) (source, (Int, Int))
+-&gt; MatchText source
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">regex
+-&gt; source -&gt; AllTextSubmatches (Array Int) (source, (Int, Int))
+forall regex source target.
+RegexContext regex source target =&gt;
+regex -&gt; source -&gt; target
+</span><span class="hs-identifier hs-var">match</span></span><span> </span><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135237"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135238"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-182"></span><span>    </span><span id="local-6989586621679135248"><span class="annot"><span class="annottext">matchM :: forall (m :: * -&gt; *).
+MonadFail m =&gt;
+regex -&gt; source -&gt; m (Match source)
+</span><a href="#local-6989586621679135248"><span class="hs-identifier hs-var hs-var hs-var hs-var">matchM</span></a></span></span><span> </span><span id="local-6989586621679135250"><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135250"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679135251"><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135251"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-183"></span><span>      </span><span id="local-6989586621679135252"><span class="annot"><span class="annottext">AllTextSubmatches (Array Int) (source, (Int, Int))
+</span><a href="#local-6989586621679135252"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">regex
+-&gt; source -&gt; m (AllTextSubmatches (Array Int) (source, (Int, Int)))
+forall regex source target (m :: * -&gt; *).
+(RegexContext regex source target, MonadFail m) =&gt;
+regex -&gt; source -&gt; m target
+forall (m :: * -&gt; *).
+MonadFail m =&gt;
+regex
+-&gt; source -&gt; m (AllTextSubmatches (Array Int) (source, (Int, Int)))
+</span><span class="hs-identifier hs-var">matchM</span></span><span> </span><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135250"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135251"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-184"></span><span>      </span><span class="annot"><span class="annottext">Match source -&gt; m (Match source)
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Match source -&gt; m (Match source))
+-&gt; Match source -&gt; m (Match source)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">regex -&gt; source -&gt; MatchText source -&gt; Match source
+forall regex source.
+RegexFix regex source =&gt;
+regex -&gt; source -&gt; MatchText source -&gt; Match source
+</span><a href="Text.RE.ZeInternals.Types.Match.html#convertMatchText"><span class="hs-identifier hs-var">convertMatchText</span></a></span><span> </span><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135250"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135251"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(MatchText source -&gt; Match source)
+-&gt; MatchText source -&gt; Match source
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AllTextSubmatches (Array Int) (source, (Int, Int))
+-&gt; MatchText source
+forall (f :: * -&gt; *) b. AllTextSubmatches f b -&gt; f b
+</span><span class="hs-identifier hs-var">getAllTextSubmatches</span></span><span> </span><span class="annot"><span class="annottext">AllTextSubmatches (Array Int) (source, (Int, Int))
+</span><a href="#local-6989586621679135252"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-185"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-186"></span><span>
+</span><span id="line-187"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-188"></span><span class="annot"><span class="hs-comment">-- | convert a regex-base native MatchText into a regex Match type</span></span><span>
+</span><span id="line-189"></span><span id="local-6989586621679134968"><span id="local-6989586621679134969"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#convertMatchText"><span class="hs-identifier hs-type">convertMatchText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134968"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134969"><span class="hs-identifier hs-type">source</span></a></span><span>
+</span><span id="line-190"></span><span>                 </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679134968"><span class="hs-identifier hs-type">regex</span></a></span><span>
+</span><span id="line-191"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679134969"><span class="hs-identifier hs-type">source</span></a></span><span>
+</span><span id="line-192"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MatchText</span></span><span> </span><span class="annot"><a href="#local-6989586621679134969"><span class="hs-identifier hs-type">source</span></a></span><span>
+</span><span id="line-193"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134969"><span class="hs-identifier hs-type">source</span></a></span></span></span><span>
+</span><span id="line-194"></span><span id="convertMatchText"><span class="annot"><span class="annottext">convertMatchText :: forall regex source.
+RegexFix regex source =&gt;
+regex -&gt; source -&gt; MatchText source -&gt; Match source
+</span><a href="Text.RE.ZeInternals.Types.Match.html#convertMatchText"><span class="hs-identifier hs-var hs-var">convertMatchText</span></a></span></span><span> </span><span id="local-6989586621679135259"><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135259"><span class="hs-identifier hs-var">re</span></a></span></span><span> </span><span id="local-6989586621679135260"><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135260"><span class="hs-identifier hs-var">hay</span></a></span></span><span> </span><span id="local-6989586621679135261"><span class="annot"><span class="annottext">MatchText source
+</span><a href="#local-6989586621679135261"><span class="hs-identifier hs-var">arr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-195"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span>
+</span><span id="line-196"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">matchSource :: source
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-identifier hs-var">matchSource</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135260"><span class="hs-identifier hs-var">hay</span></a></span><span>
+</span><span id="line-197"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">captureNames :: CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureNames"><span class="hs-identifier hs-var">captureNames</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#noCaptureNames"><span class="hs-identifier hs-var">noCaptureNames</span></a></span><span>
+</span><span id="line-198"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">matchArray :: Array CaptureOrdinal (Capture source)
+</span><a href="Text.RE.ZeInternals.Types.Match.html#matchArray"><span class="hs-identifier hs-var">matchArray</span></a></span><span>   </span><span class="hs-glyph">=</span><span>
+</span><span id="line-199"></span><span>          </span><span class="annot"><span class="annottext">(CaptureOrdinal, CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; Int)
+-&gt; Array Int (Capture source)
+-&gt; Array CaptureOrdinal (Capture source)
+forall i j e.
+(Ix i, Ix j) =&gt;
+(i, i) -&gt; (i -&gt; j) -&gt; Array j e -&gt; Array i e
+</span><span class="hs-identifier hs-var">ixmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135263"><span class="hs-identifier hs-var">lo</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135264"><span class="hs-identifier hs-var">hi</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal -&gt; Int
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureOrdinal"><span class="hs-identifier hs-var">getCaptureOrdinal</span></a></span><span> </span><span class="annot"><span class="annottext">(Array Int (Capture source)
+ -&gt; Array CaptureOrdinal (Capture source))
+-&gt; Array Int (Capture source)
+-&gt; Array CaptureOrdinal (Capture source)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-200"></span><span>            </span><span class="annot"><span class="annottext">((source, (Int, Int)) -&gt; Capture source)
+-&gt; MatchText source -&gt; Array Int (Capture source)
+forall a b. (a -&gt; b) -&gt; Array Int a -&gt; Array Int b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">(source, (Int, Int)) -&gt; Capture source
+</span><a href="#local-6989586621679135266"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">MatchText source
+</span><a href="#local-6989586621679135261"><span class="hs-identifier hs-var">arr</span></a></span><span>
+</span><span id="line-201"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-202"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-203"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679135263"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135263"><span class="hs-identifier hs-var">lo</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679135264"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135264"><span class="hs-identifier hs-var">hi</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MatchText source -&gt; (Int, Int)
+forall i e. Array i e -&gt; (i, i)
+</span><span class="hs-identifier hs-var">bounds</span></span><span> </span><span class="annot"><span class="annottext">MatchText source
+</span><a href="#local-6989586621679135261"><span class="hs-identifier hs-var">arr</span></a></span><span>
+</span><span id="line-204"></span><span>
+</span><span id="line-205"></span><span>    </span><span id="local-6989586621679135266"><span class="annot"><span class="annottext">f :: (source, (Int, Int)) -&gt; Capture source
+</span><a href="#local-6989586621679135266"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135267"><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135267"><span class="hs-identifier hs-var">ndl</span></a></span></span><span class="hs-special">,</span><span class="hs-special">(</span><span id="local-6989586621679135268"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135268"><span class="hs-identifier hs-var">off_</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679135269"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135269"><span class="hs-identifier hs-var">len_</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-206"></span><span>      </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Capture.html#Capture"><span class="hs-identifier hs-type">Capture</span></a></span><span>
+</span><span id="line-207"></span><span>        </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">captureSource :: source
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#captureSource"><span class="hs-identifier hs-var">captureSource</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135260"><span class="hs-identifier hs-var">hay</span></a></span><span>
+</span><span id="line-208"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">capturedText :: source
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#capturedText"><span class="hs-identifier hs-var">capturedText</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135267"><span class="hs-identifier hs-var">ndl</span></a></span><span>
+</span><span id="line-209"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">captureOffset :: Int
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#captureOffset"><span class="hs-identifier hs-var">captureOffset</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135273"><span class="hs-identifier hs-var">off</span></a></span><span>
+</span><span id="line-210"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">captureLength :: Int
+</span><a href="Text.RE.ZeInternals.Types.Capture.html#captureLength"><span class="hs-identifier hs-var">captureLength</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135275"><span class="hs-identifier hs-var">len</span></a></span><span>
+</span><span id="line-211"></span><span>        </span><span class="hs-special">}</span><span>
+</span><span id="line-212"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-213"></span><span>        </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-type">CharRange</span></a></span><span> </span><span id="local-6989586621679135273"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135273"><span class="hs-identifier hs-var">off</span></a></span></span><span> </span><span id="local-6989586621679135275"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135275"><span class="hs-identifier hs-var">len</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">regex -&gt; source -&gt; Int -&gt; Int -&gt; CharRange
+forall regex source.
+RegexFix regex source =&gt;
+regex -&gt; source -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-var">utf8_correct</span></a></span><span> </span><span class="annot"><span class="annottext">regex
+</span><a href="#local-6989586621679135259"><span class="hs-identifier hs-var">re</span></a></span><span> </span><span class="annot"><span class="annottext">source
+</span><a href="#local-6989586621679135260"><span class="hs-identifier hs-var">hay</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135268"><span class="hs-identifier hs-var">off_</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135269"><span class="hs-identifier hs-var">len_</span></a></span><span>
+</span><span id="line-214"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-215"></span><span>
+</span><span id="line-216"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-217"></span><span class="hs-keyword">data</span><span> </span><span id="CharRange"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-var">CharRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="CharRange"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-var">CharRange</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-218"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135279"><span id="local-6989586621679135285"><span id="local-6989586621679135289"><span class="annot"><span class="annottext">Int -&gt; CharRange -&gt; ShowS
+[CharRange] -&gt; ShowS
+CharRange -&gt; String
+(Int -&gt; CharRange -&gt; ShowS)
+-&gt; (CharRange -&gt; String)
+-&gt; ([CharRange] -&gt; ShowS)
+-&gt; Show CharRange
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; CharRange -&gt; ShowS
+showsPrec :: Int -&gt; CharRange -&gt; ShowS
+$cshow :: CharRange -&gt; String
+show :: CharRange -&gt; String
+$cshowList :: [CharRange] -&gt; ShowS
+showList :: [CharRange] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-219"></span><span>
+</span><span id="line-220"></span><span class="hs-keyword">class</span><span> </span><span id="RegexFix"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-var">RegexFix</span></a></span></span><span> </span><span id="local-6989586621679134982"><span class="annot"><a href="#local-6989586621679134982"><span class="hs-identifier hs-type">regex</span></a></span></span><span> </span><span id="local-6989586621679134983"><span class="annot"><a href="#local-6989586621679134983"><span class="hs-identifier hs-type">source</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-221"></span><span>  </span><span id="utf8_correct"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-type">utf8_correct</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679134982"><span class="hs-identifier hs-type">regex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679134983"><span class="hs-identifier hs-type">source</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-type">CharRange</span></a></span><span>
+</span><span id="line-222"></span><span>  </span><span id="local-6989586621679135292"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-var hs-var">utf8_correct</span></a></span><span> </span><span class="annot"><span class="annottext">regex
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">source
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-var">CharRange</span></a></span></span><span>
+</span><span id="line-223"></span><span>
+</span><span id="line-224"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135294"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">]</span></span><span>         </span><span class="hs-keyword">where</span><span>
+</span><span id="line-225"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135299"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">B.ByteString</span></span></span><span>   </span><span class="hs-keyword">where</span><span>
+</span><span id="line-226"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135303"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-227"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135307"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span></span><span>         </span><span class="hs-keyword">where</span><span>
+</span><span id="line-228"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135311"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LT.Text</span></span></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-229"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135315"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S.Seq</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span></span><span>   </span><span class="hs-keyword">where</span><span>
+</span><span id="line-230"></span><span>
+</span><span id="line-231"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">]</span><span>         </span><span class="hs-keyword">where</span><span>
+</span><span id="line-232"></span><span>  </span><span id="local-6989586621679135320"><span class="annot"><span class="annottext">utf8_correct :: Regex -&gt; String -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-var hs-var hs-var hs-var">utf8_correct</span></a></span></span><span> </span><span class="annot"><span class="annottext">Regex
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct_bs"><span class="hs-identifier hs-var">utf8_correct_bs</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Int -&gt; Int -&gt; CharRange)
+-&gt; (String -&gt; ByteString) -&gt; String -&gt; Int -&gt; Int -&gt; CharRange
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ByteString
+</span><span class="hs-identifier hs-var">B.fromString</span></span><span>
+</span><span id="line-233"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135324"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">B.ByteString</span></span></span><span>   </span><span class="hs-keyword">where</span><span>
+</span><span id="line-234"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135328"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-235"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span>         </span><span class="hs-keyword">where</span><span>
+</span><span id="line-236"></span><span>  </span><span id="local-6989586621679135333"><span class="annot"><span class="annottext">utf8_correct :: Regex -&gt; Text -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-var hs-var hs-var hs-var">utf8_correct</span></a></span></span><span> </span><span class="annot"><span class="annottext">Regex
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct_bs"><span class="hs-identifier hs-var">utf8_correct_bs</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Int -&gt; Int -&gt; CharRange)
+-&gt; (Text -&gt; ByteString) -&gt; Text -&gt; Int -&gt; Int -&gt; CharRange
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; ByteString
+</span><span class="hs-identifier hs-var">T.encodeUtf8</span></span><span>
+</span><span id="line-237"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LT.Text</span></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-238"></span><span>  </span><span id="local-6989586621679135337"><span class="annot"><span class="annottext">utf8_correct :: Regex -&gt; Text -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct"><span class="hs-identifier hs-var hs-var hs-var hs-var">utf8_correct</span></a></span></span><span> </span><span class="annot"><span class="annottext">Regex
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct_bs"><span class="hs-identifier hs-var">utf8_correct_bs</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Int -&gt; Int -&gt; CharRange)
+-&gt; (Text -&gt; ByteString) -&gt; Text -&gt; Int -&gt; Int -&gt; CharRange
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; ByteString
+</span><span class="hs-identifier hs-var">T.encodeUtf8</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; ByteString) -&gt; (Text -&gt; Text) -&gt; Text -&gt; ByteString
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">LT.toStrict</span></span><span>
+</span><span id="line-239"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679135340"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#RegexFix"><span class="hs-identifier hs-type">RegexFix</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PCRE.Regex</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S.Seq</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span></span><span>   </span><span class="hs-keyword">where</span><span>
+</span><span id="line-240"></span><span>
+</span><span id="line-241"></span><span class="hs-comment">-- convert a byte offset+length in a UTF-8-encoded ByteString</span><span>
+</span><span id="line-242"></span><span class="hs-comment">-- into a character offset+length</span><span>
+</span><span id="line-243"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct_bs"><span class="hs-identifier hs-type">utf8_correct_bs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">B.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-type">CharRange</span></a></span><span>
+</span><span id="line-244"></span><span id="utf8_correct_bs"><span class="annot"><span class="annottext">utf8_correct_bs :: ByteString -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#utf8_correct_bs"><span class="hs-identifier hs-var hs-var">utf8_correct_bs</span></a></span></span><span> </span><span id="local-6989586621679135343"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679135343"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span id="local-6989586621679135344"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span></span><span> </span><span id="local-6989586621679135345"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135345"><span class="hs-identifier hs-var">ln0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135345"><span class="hs-identifier hs-var">ln0</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int
+</span><span class="hs-identifier hs-var">BW.length</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679135343"><span class="hs-identifier hs-var">bs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-245"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; CharRange
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;utf8_correct_bs: index+length out of range&quot;</span></span><span>
+</span><span id="line-246"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>     </span><span class="hs-comment">-- BW.index calls below should not fail</span><span>
+</span><span id="line-247"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-248"></span><span>    </span><span id="local-6989586621679135349"><span class="annot"><span class="annottext">skip :: Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var hs-var">skip</span></a></span></span><span> </span><span id="local-6989586621679135350"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span></span><span> </span><span id="local-6989586621679135351"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-249"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">GT</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-250"></span><span>        </span><span class="hs-comment">-- -1 is used as a magic number to indicate failure to match</span><span>
+</span><span id="line-251"></span><span>        </span><span class="hs-glyph">-</span><span class="hs-number">1</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-var">CharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135345"><span class="hs-identifier hs-var">ln0</span></a></span><span>
+</span><span id="line-252"></span><span>        </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; CharRange
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;utf8_correct_bs: UTF-8 decoding error&quot;</span></span><span>
+</span><span id="line-253"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">EQ</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135345"><span class="hs-identifier hs-var">ln0</span></a></span><span>
+</span><span id="line-254"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">LT</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#u8_width"><span class="hs-identifier hs-var">u8_width</span></a></span><span> </span><span class="annot"><span class="annottext">(Word8 -&gt; UTF8Size) -&gt; Word8 -&gt; UTF8Size
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HasCallStack =&gt; ByteString -&gt; Int -&gt; Word8
+ByteString -&gt; Int -&gt; Word8
+</span><span class="hs-identifier hs-var">BW.index</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679135343"><span class="hs-identifier hs-var">bs</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-255"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Single"><span class="hs-identifier hs-var">Single</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>   </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span><span>
+</span><span id="line-256"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Double"><span class="hs-identifier hs-var">Double</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-257"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Triple"><span class="hs-identifier hs-var">Triple</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-258"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Quadruple"><span class="hs-identifier hs-var">Quadruple</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135349"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135350"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135351"><span class="hs-identifier hs-var">di</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-259"></span><span>
+</span><span id="line-260"></span><span>    </span><span id="local-6989586621679135353"><span class="annot"><span class="annottext">count :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var hs-var">count</span></a></span></span><span> </span><span id="local-6989586621679135360"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span></span><span> </span><span id="local-6989586621679135361"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span></span><span> </span><span id="local-6989586621679135362"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span></span><span> </span><span id="local-6989586621679135363"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-261"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">LT</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; CharRange
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;utf8_correct_bs: length ends inside character&quot;</span></span><span>
+</span><span id="line-262"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">EQ</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; CharRange
+</span><a href="Text.RE.ZeInternals.Types.Match.html#CharRange"><span class="hs-identifier hs-var">CharRange</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135344"><span class="hs-identifier hs-var">ix0</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135345"><span class="hs-identifier hs-var">ln0</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-263"></span><span>      </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">GT</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#u8_width"><span class="hs-identifier hs-var">u8_width</span></a></span><span> </span><span class="annot"><span class="annottext">(Word8 -&gt; UTF8Size) -&gt; Word8 -&gt; UTF8Size
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HasCallStack =&gt; ByteString -&gt; Int -&gt; Word8
+ByteString -&gt; Int -&gt; Word8
+</span><span class="hs-identifier hs-var">BW.index</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679135343"><span class="hs-identifier hs-var">bs</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-264"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Single"><span class="hs-identifier hs-var">Single</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span><span>  </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span><span>    </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-265"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Double"><span class="hs-identifier hs-var">Double</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-266"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Triple"><span class="hs-identifier hs-var">Triple</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-267"></span><span>        </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Quadruple"><span class="hs-identifier hs-var">Quadruple</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; CharRange
+</span><a href="#local-6989586621679135353"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135360"><span class="hs-identifier hs-var">ix</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135361"><span class="hs-identifier hs-var">di</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135362"><span class="hs-identifier hs-var">dl</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CharRange) -&gt; Int -&gt; CharRange
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679135363"><span class="hs-identifier hs-var">c</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span>
+</span><span id="line-268"></span><span>
+</span><span id="line-269"></span><span class="hs-keyword">data</span><span> </span><span id="UTF8Size"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#UTF8Size"><span class="hs-identifier hs-var">UTF8Size</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Single"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Single"><span class="hs-identifier hs-var">Single</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Double"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Double"><span class="hs-identifier hs-var">Double</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Triple"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Triple"><span class="hs-identifier hs-var">Triple</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Quadruple"><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Quadruple"><span class="hs-identifier hs-var">Quadruple</span></a></span></span><span>
+</span><span id="line-270"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135365"><span id="local-6989586621679135367"><span id="local-6989586621679135371"><span class="annot"><span class="annottext">Int -&gt; UTF8Size -&gt; ShowS
+[UTF8Size] -&gt; ShowS
+UTF8Size -&gt; String
+(Int -&gt; UTF8Size -&gt; ShowS)
+-&gt; (UTF8Size -&gt; String) -&gt; ([UTF8Size] -&gt; ShowS) -&gt; Show UTF8Size
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; UTF8Size -&gt; ShowS
+showsPrec :: Int -&gt; UTF8Size -&gt; ShowS
+$cshow :: UTF8Size -&gt; String
+show :: UTF8Size -&gt; String
+$cshowList :: [UTF8Size] -&gt; ShowS
+showList :: [UTF8Size] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-271"></span><span>
+</span><span id="line-272"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#u8_width"><span class="hs-identifier hs-type">u8_width</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#UTF8Size"><span class="hs-identifier hs-type">UTF8Size</span></a></span><span>
+</span><span id="line-273"></span><span id="u8_width"><span class="annot"><span class="annottext">u8_width :: Word8 -&gt; UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#u8_width"><span class="hs-identifier hs-var hs-var">u8_width</span></a></span></span><span> </span><span id="local-6989586621679135373"><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679135373"><span class="hs-identifier hs-var">w8</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span>   </span><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679135373"><span class="hs-identifier hs-var">w8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0x80</span></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0x00</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-274"></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>       </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Single"><span class="hs-identifier hs-var">Single</span></a></span><span>
+</span><span id="line-275"></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span>      </span><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679135373"><span class="hs-identifier hs-var">w8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xE0</span></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xC0</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-276"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>     </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Double"><span class="hs-identifier hs-var">Double</span></a></span><span>
+</span><span id="line-277"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span>    </span><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679135373"><span class="hs-identifier hs-var">w8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xF0</span></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xE0</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-278"></span><span>      </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>   </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Triple"><span class="hs-identifier hs-var">Triple</span></a></span><span>
+</span><span id="line-279"></span><span>      </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span>  </span><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679135373"><span class="hs-identifier hs-var">w8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xF8</span></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span class="hs-number">0xF0</span></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-280"></span><span>        </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UTF8Size
+</span><a href="Text.RE.ZeInternals.Types.Match.html#Quadruple"><span class="hs-identifier hs-var">Quadruple</span></a></span><span>
+</span><span id="line-281"></span><span>        </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; UTF8Size
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;u8_width: UTF-8 decoding error&quot;</span></span><span>
+</span><span id="line-282"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-283"></span></pre></body></html>

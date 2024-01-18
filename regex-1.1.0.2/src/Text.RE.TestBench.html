@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings                  #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.TestBench</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-6"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Test Bench Tutorial</span></span><span>
+</span><span id="line-7"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Test Bench</span></span><span>
+</span><span id="line-10"></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#MacroEnv"><span class="hs-identifier">MacroEnv</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#MacroDescriptor"><span class="hs-identifier">MacroDescriptor</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#RegexSource"><span class="hs-identifier">RegexSource</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#WithCaptures"><span class="hs-identifier">WithCaptures</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#RegexType"><span class="hs-identifier">RegexType</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#isTDFA"><span class="hs-identifier">isTDFA</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#isPCRE"><span class="hs-identifier">isPCRE</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#presentRegexType"><span class="hs-identifier">presentRegexType</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Constructing a MacrosEnv</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#mkMacros"><span class="hs-identifier">mkMacros</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Formatting Macros</span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroTable"><span class="hs-identifier">formatMacroTable</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSummary"><span class="hs-identifier">formatMacroSummary</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSources"><span class="hs-identifier">formatMacroSources</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#formatMacroSource"><span class="hs-identifier">formatMacroSource</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#mdRegexSource"><span class="hs-identifier">mdRegexSource</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><span class="hs-comment">-- ** Formatting Macros</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#testMacroEnv"><span class="hs-identifier">testMacroEnv</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#runTests"><span class="hs-identifier">runTests</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html#runTests%27"><span class="hs-identifier">runTests'</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Parsers</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.TestBench.Parsers.html"><span class="hs-identifier">Text.RE.TestBench.Parsers</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Match Type</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier">Match</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.TestBench.Parsers.html"><span class="hs-identifier">Text.RE.TestBench.Parsers</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.TestBench.html"><span class="hs-identifier">Text.RE.ZeInternals.TestBench</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Match</span></a></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- This API module provides a test bench for developing, documenting and</span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- testing regex RE macros.</span><span>
+</span><span id="line-43"></span><span class="hs-comment">--</span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- See the tutorials at http://re-tutorial-testbench.regex.uk</span><span>
+</span><span id="line-45"></span></pre></body></html>

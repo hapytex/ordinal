@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.Types.LineNo</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="annot"><span class="hs-comment">-- | our line numbers are of the proper zero-based kind</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">newtype</span><span> </span><span id="LineNo"><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-var">LineNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-8"></span><span>    </span><span id="ZeroBasedLineNo"><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#ZeroBasedLineNo"><span class="hs-identifier hs-var">ZeroBasedLineNo</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getZeroBasedLineNo"><span class="annot"><span class="annottext">LineNo -&gt; Int
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#getZeroBasedLineNo"><span class="hs-identifier hs-var hs-var">getZeroBasedLineNo</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134799"><span id="local-6989586621679134805"><span id="local-6989586621679134809"><span class="annot"><span class="annottext">Int -&gt; LineNo -&gt; ShowS
+[LineNo] -&gt; ShowS
+LineNo -&gt; String
+(Int -&gt; LineNo -&gt; ShowS)
+-&gt; (LineNo -&gt; String) -&gt; ([LineNo] -&gt; ShowS) -&gt; Show LineNo
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; LineNo -&gt; ShowS
+showsPrec :: Int -&gt; LineNo -&gt; ShowS
+$cshow :: LineNo -&gt; String
+show :: LineNo -&gt; String
+$cshowList :: [LineNo] -&gt; ShowS
+showList :: [LineNo] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134813"><span id="local-6989586621679134817"><span id="local-6989586621679134821"><span id="local-6989586621679134825"><span id="local-6989586621679134829"><span id="local-6989586621679134833"><span id="local-6989586621679134837"><span id="local-6989586621679134841"><span class="annot"><span class="annottext">Int -&gt; LineNo
+LineNo -&gt; Int
+LineNo -&gt; [LineNo]
+LineNo -&gt; LineNo
+LineNo -&gt; LineNo -&gt; [LineNo]
+LineNo -&gt; LineNo -&gt; LineNo -&gt; [LineNo]
+(LineNo -&gt; LineNo)
+-&gt; (LineNo -&gt; LineNo)
+-&gt; (Int -&gt; LineNo)
+-&gt; (LineNo -&gt; Int)
+-&gt; (LineNo -&gt; [LineNo])
+-&gt; (LineNo -&gt; LineNo -&gt; [LineNo])
+-&gt; (LineNo -&gt; LineNo -&gt; [LineNo])
+-&gt; (LineNo -&gt; LineNo -&gt; LineNo -&gt; [LineNo])
+-&gt; Enum LineNo
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: LineNo -&gt; LineNo
+succ :: LineNo -&gt; LineNo
+$cpred :: LineNo -&gt; LineNo
+pred :: LineNo -&gt; LineNo
+$ctoEnum :: Int -&gt; LineNo
+toEnum :: Int -&gt; LineNo
+$cfromEnum :: LineNo -&gt; Int
+fromEnum :: LineNo -&gt; Int
+$cenumFrom :: LineNo -&gt; [LineNo]
+enumFrom :: LineNo -&gt; [LineNo]
+$cenumFromThen :: LineNo -&gt; LineNo -&gt; [LineNo]
+enumFromThen :: LineNo -&gt; LineNo -&gt; [LineNo]
+$cenumFromTo :: LineNo -&gt; LineNo -&gt; [LineNo]
+enumFromTo :: LineNo -&gt; LineNo -&gt; [LineNo]
+$cenumFromThenTo :: LineNo -&gt; LineNo -&gt; LineNo -&gt; [LineNo]
+enumFromThenTo :: LineNo -&gt; LineNo -&gt; LineNo -&gt; [LineNo]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="annot"><span class="hs-comment">-- | the first line in a file</span></span><span>
+</span><span id="line-12"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier hs-type">firstLine</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-13"></span><span id="firstLine"><span class="annot"><span class="annottext">firstLine :: LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier hs-var hs-var">firstLine</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#ZeroBasedLineNo"><span class="hs-identifier hs-var">ZeroBasedLineNo</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="annot"><span class="hs-comment">-- | extract a conventional 1-based line number</span></span><span>
+</span><span id="line-16"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#getLineNo"><span class="hs-identifier hs-type">getLineNo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-17"></span><span id="getLineNo"><span class="annot"><span class="annottext">getLineNo :: LineNo -&gt; Int
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#getLineNo"><span class="hs-identifier hs-var hs-var">getLineNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">succ</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (LineNo -&gt; Int) -&gt; LineNo -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LineNo -&gt; Int
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#getZeroBasedLineNo"><span class="hs-identifier hs-var">getZeroBasedLineNo</span></a></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="annot"><span class="hs-comment">-- | inject a conventional 1-based line number</span></span><span>
+</span><span id="line-20"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#lineNo"><span class="hs-identifier hs-type">lineNo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier hs-type">LineNo</span></a></span><span>
+</span><span id="line-21"></span><span id="lineNo"><span class="annot"><span class="annottext">lineNo :: Int -&gt; LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#lineNo"><span class="hs-identifier hs-var hs-var">lineNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; LineNo
+</span><a href="Text.RE.ZeInternals.Types.LineNo.html#ZeroBasedLineNo"><span class="hs-identifier hs-var">ZeroBasedLineNo</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; LineNo) -&gt; (Int -&gt; Int) -&gt; Int -&gt; LineNo
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span>
+</span><span id="line-22"></span></pre></body></html>

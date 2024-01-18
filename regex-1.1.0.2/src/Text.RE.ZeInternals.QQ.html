@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable         #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.QQ</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Exception</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Typeable</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH.Quote</span></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="annot"><span class="hs-comment">-- | used to throw an exception reporting an abuse of a quasi quoter</span></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">data</span><span> </span><span id="QQFailure"><span class="annot"><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-12"></span><span>  </span><span id="QQFailure"><span class="annot"><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="_qqf_context"><span class="annot"><span class="annottext">QQFailure -&gt; String
+</span><a href="Text.RE.ZeInternals.QQ.html#_qqf_context"><span class="hs-identifier hs-var hs-var">_qqf_context</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>  </span><span class="annot"><span class="hs-comment">-- ^ in what context was the quasi quoter used</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_qqf_component"><span class="annot"><span class="annottext">QQFailure -&gt; String
+</span><a href="Text.RE.ZeInternals.QQ.html#_qqf_component"><span class="hs-identifier hs-var hs-var">_qqf_component</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>  </span><span class="annot"><span class="hs-comment">-- ^ how was the quasi quoter being abused</span></span><span>
+</span><span id="line-15"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134323"><span id="local-6989586621679134331"><span id="local-6989586621679134335"><span class="annot"><span class="annottext">Int -&gt; QQFailure -&gt; ShowS
+[QQFailure] -&gt; ShowS
+QQFailure -&gt; String
+(Int -&gt; QQFailure -&gt; ShowS)
+-&gt; (QQFailure -&gt; String)
+-&gt; ([QQFailure] -&gt; ShowS)
+-&gt; Show QQFailure
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; QQFailure -&gt; ShowS
+showsPrec :: Int -&gt; QQFailure -&gt; ShowS
+$cshow :: QQFailure -&gt; String
+show :: QQFailure -&gt; String
+$cshowList :: [QQFailure] -&gt; ShowS
+showList :: [QQFailure] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679134344"><span id="local-6989586621679134347"><span id="local-6989586621679134350"><span class="annot"><span class="hs-identifier hs-type">Exception</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-type">QQFailure</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- | a quasi quoter that can be used in no context (to be extended with</span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- the appropriate quasi quoter parser)</span><span>
+</span><span id="line-22"></span><span class="annot"><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-type">qq0</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-23"></span><span id="qq0"><span class="annot"><span class="annottext">qq0 :: String -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-var hs-var">qq0</span></a></span></span><span> </span><span id="local-6989586621679134354"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134354"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">quoteExp :: String -&gt; Q Exp
+</span><span class="hs-identifier hs-var">quoteExp</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; String -&gt; Q Exp
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">(Q Exp -&gt; String -&gt; Q Exp) -&gt; Q Exp -&gt; String -&gt; Q Exp
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">QQFailure -&gt; Q Exp
+forall a e. Exception e =&gt; e -&gt; a
+</span><span class="hs-identifier hs-var">throw</span></span><span> </span><span class="annot"><span class="annottext">(QQFailure -&gt; Q Exp) -&gt; QQFailure -&gt; Q Exp
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; QQFailure
+</span><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134354"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;expression&quot;</span></span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">quotePat :: String -&gt; Q Pat
+</span><span class="hs-identifier hs-var">quotePat</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Pat -&gt; String -&gt; Q Pat
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">(Q Pat -&gt; String -&gt; Q Pat) -&gt; Q Pat -&gt; String -&gt; Q Pat
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">QQFailure -&gt; Q Pat
+forall a e. Exception e =&gt; e -&gt; a
+</span><span class="hs-identifier hs-var">throw</span></span><span> </span><span class="annot"><span class="annottext">(QQFailure -&gt; Q Pat) -&gt; QQFailure -&gt; Q Pat
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; QQFailure
+</span><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134354"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;pattern&quot;</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">quoteType :: String -&gt; Q Type
+</span><span class="hs-identifier hs-var">quoteType</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Type -&gt; String -&gt; Q Type
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">(Q Type -&gt; String -&gt; Q Type) -&gt; Q Type -&gt; String -&gt; Q Type
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">QQFailure -&gt; Q Type
+forall a e. Exception e =&gt; e -&gt; a
+</span><span class="hs-identifier hs-var">throw</span></span><span> </span><span class="annot"><span class="annottext">(QQFailure -&gt; Q Type) -&gt; QQFailure -&gt; Q Type
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; QQFailure
+</span><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134354"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;type&quot;</span></span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">quoteDec :: String -&gt; Q [Dec]
+</span><span class="hs-identifier hs-var">quoteDec</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q [Dec] -&gt; String -&gt; Q [Dec]
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">(Q [Dec] -&gt; String -&gt; Q [Dec]) -&gt; Q [Dec] -&gt; String -&gt; Q [Dec]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">QQFailure -&gt; Q [Dec]
+forall a e. Exception e =&gt; e -&gt; a
+</span><span class="hs-identifier hs-var">throw</span></span><span> </span><span class="annot"><span class="annottext">(QQFailure -&gt; Q [Dec]) -&gt; QQFailure -&gt; Q [Dec]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; QQFailure
+</span><a href="Text.RE.ZeInternals.QQ.html#QQFailure"><span class="hs-identifier hs-var">QQFailure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134354"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;declaration&quot;</span></span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-30"></span></pre></body></html>

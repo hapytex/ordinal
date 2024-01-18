@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# LANGUAGE TemplateHaskellQuotes      #-}</span><span class="hs-cpp">
+#else
+</span><span class="hs-pragma">{-# LANGUAGE QuasiQuotes                #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell            #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.SearchReplace.TDFA.Text</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed"><span class="hs-identifier">ed</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineSensitive"><span class="hs-identifier">edMultilineSensitive</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineInsensitive"><span class="hs-identifier">edMultilineInsensitive</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockSensitive"><span class="hs-identifier">edBlockSensitive</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockInsensitive"><span class="hs-identifier">edBlockInsensitive</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMS"><span class="hs-identifier">edMS</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMI"><span class="hs-identifier">edMI</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBS"><span class="hs-identifier">edBS</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBI"><span class="hs-identifier">edBI</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed_"><span class="hs-identifier">ed_</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>                     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH.Quote</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.REOptions.html"><span class="hs-identifier">Text.RE.REOptions</span></a></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html"><span class="hs-identifier">Text.RE.ZeInternals.SearchReplace.TDFAEdPrime</span></a></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html"><span class="hs-identifier">Text.RE.ZeInternals.TDFA</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- | @[ed| ... \/\/\/ ... |]@, is equivalent to @[edMultilineSensitive| ... \/\/\/ ... |]@,</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- compiling a case-sensitive, multi-line 'SearchReplace'</span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed"><span class="hs-identifier hs-type">ed</span></a></span><span>                      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-33"></span><span id="ed"><span class="annot"><span class="annottext">ed :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed"><span class="hs-identifier hs-var hs-var">ed</span></a></span></span><span>                       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var">sr_cast</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="annot"><span class="hs-comment">-- | @[edMultilineSensitive| ... \/\/\/ ... |]@ compiles a case-sensitive, multi-line 'SearchReplace' template</span></span><span>
+</span><span id="line-36"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineSensitive"><span class="hs-identifier hs-type">edMultilineSensitive</span></a></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-37"></span><span id="edMultilineSensitive"><span class="annot"><span class="annottext">edMultilineSensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineSensitive"><span class="hs-identifier hs-var hs-var">edMultilineSensitive</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var">sr_cast</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineSensitive"><span class="hs-identifier hs-var">MultilineSensitive</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><span class="hs-comment">-- | @[edMultilineInsensitive| ... \/\/\/ ... |]@ compiles a case-insensitive, multi-line 'SearchReplace' template</span></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineInsensitive"><span class="hs-identifier hs-type">edMultilineInsensitive</span></a></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-41"></span><span id="edMultilineInsensitive"><span class="annot"><span class="annottext">edMultilineInsensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineInsensitive"><span class="hs-identifier hs-var hs-var">edMultilineInsensitive</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var">sr_cast</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#MultilineInsensitive"><span class="hs-identifier hs-var">MultilineInsensitive</span></a></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="annot"><span class="hs-comment">-- | @[edBlockSensitive| ... \/\/\/ ... |]@ compiles a case-sensitive, non-multi-line 'SearchReplace' template</span></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockSensitive"><span class="hs-identifier hs-type">edBlockSensitive</span></a></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-45"></span><span id="edBlockSensitive"><span class="annot"><span class="annottext">edBlockSensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockSensitive"><span class="hs-identifier hs-var hs-var">edBlockSensitive</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var">sr_cast</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockSensitive"><span class="hs-identifier hs-var">BlockSensitive</span></a></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><span class="hs-comment">-- | @[edBlockInsensitive| ... \/\/\/ ... |]@ compiles a case-insensitive, non-multi-line 'SearchReplace' template</span></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockInsensitive"><span class="hs-identifier hs-type">edBlockInsensitive</span></a></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-49"></span><span id="edBlockInsensitive"><span class="annot"><span class="annottext">edBlockInsensitive :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockInsensitive"><span class="hs-identifier hs-var hs-var">edBlockInsensitive</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var">sr_cast</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe SimpleREOptions -&gt; QuasiQuoter)
+-&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; Maybe SimpleREOptions
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>  </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="Text.RE.REOptions.html#BlockInsensitive"><span class="hs-identifier hs-var">BlockInsensitive</span></a></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="annot"><span class="hs-comment">-- | @[edMS| ... \/\/\/ ... |]@ is a shorthand for @[edMultilineSensitive| ... \/\/\/ ... |]@</span></span><span>
+</span><span id="line-52"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMS"><span class="hs-identifier hs-type">edMS</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-53"></span><span id="edMS"><span class="annot"><span class="annottext">edMS :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMS"><span class="hs-identifier hs-var hs-var">edMS</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineSensitive"><span class="hs-identifier hs-var">edMultilineSensitive</span></a></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="annot"><span class="hs-comment">-- | @[edMI| ... \/\/\/ ... |]@ is a shorthand for @[edMultilineInsensitive| ... \/\/\/ ... |]@</span></span><span>
+</span><span id="line-56"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMI"><span class="hs-identifier hs-type">edMI</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-57"></span><span id="edMI"><span class="annot"><span class="annottext">edMI :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMI"><span class="hs-identifier hs-var hs-var">edMI</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edMultilineInsensitive"><span class="hs-identifier hs-var">edMultilineInsensitive</span></a></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="annot"><span class="hs-comment">-- | @[edBS| ... \/\/\/ ... |]@ is a shorthand for @[edBlockSensitive| ... \/\/\/ ... |]@</span></span><span>
+</span><span id="line-60"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBS"><span class="hs-identifier hs-type">edBS</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-61"></span><span id="edBS"><span class="annot"><span class="annottext">edBS :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBS"><span class="hs-identifier hs-var hs-var">edBS</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockSensitive"><span class="hs-identifier hs-var">edBlockSensitive</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="annot"><span class="hs-comment">-- | @[edBI| ... \/\/\/ ... |]@ is a shorthand for @[edBlockInsensitive| ... \/\/\/ ... |]@</span></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBI"><span class="hs-identifier hs-type">edBI</span></a></span><span>                    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-65"></span><span id="edBI"><span class="annot"><span class="annottext">edBI :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBI"><span class="hs-identifier hs-var hs-var">edBI</span></a></span></span><span>                     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#edBlockInsensitive"><span class="hs-identifier hs-var">edBlockInsensitive</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- | @[ed_| ... \/\/\/ ... |]@ compiles a 'SearchReplace' template to produce a function that</span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- takes the RE options (e.g., a 'SimpleREOptions' value) and yields the</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- 'SearchReplace' template compiled with those options. For example,</span><span>
+</span><span id="line-70"></span><span class="hs-comment">--</span><span>
+</span><span id="line-71"></span><span class="hs-comment">--   @s *=~/ [ed_|${hex}([0-9a-f]+)\/\/\/0x${hex}|] MultilineInsensitive@</span><span>
+</span><span id="line-72"></span><span class="hs-comment">--</span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- prefixes the hexadecimal digit strings in s with @0x@, allowing for</span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- upper- or lower-case hex digits (which is entirely equivalent</span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- in this example to just using @[edMultilineInsensitive|[0-9a-f]+|]@).</span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed_"><span class="hs-identifier hs-type">ed_</span></a></span><span>                     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-77"></span><span id="ed_"><span class="annot"><span class="annottext">ed_ :: QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#ed_"><span class="hs-identifier hs-var hs-var">ed_</span></a></span></span><span>                      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var">ed'</span></a></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#fn_cast"><span class="hs-identifier hs-var">fn_cast</span></a></span><span>   </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-type">sr_cast</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span>
+</span><span id="line-80"></span><span id="sr_cast"><span class="annot"><span class="annottext">sr_cast :: Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#sr_cast"><span class="hs-identifier hs-var hs-var">sr_cast</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[|</span><span class="hs-glyph">\</span><span class="hs-identifier">x</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier">x</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier">SearchReplace</span><span> </span><span class="hs-identifier">RE</span><span> </span><span class="hs-identifier">T.Text</span><span class="hs-special">|]</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#fn_cast"><span class="hs-identifier hs-type">fn_cast</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span>
+</span><span id="line-83"></span><span id="fn_cast"><span class="annot"><span class="annottext">fn_cast :: Q Exp
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFA.Text.html#fn_cast"><span class="hs-identifier hs-var hs-var">fn_cast</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[|</span><span class="hs-glyph">\</span><span class="hs-identifier">f</span><span> </span><span class="hs-identifier">x</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier">f</span><span> </span><span class="hs-identifier">x</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier">SearchReplace</span><span> </span><span class="hs-identifier">RE</span><span> </span><span class="hs-identifier">T.Text</span><span class="hs-special">|]</span><span>
+</span><span id="line-84"></span></pre></body></html>

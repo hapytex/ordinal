@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskellQuotes      #-}</span><span class="hs-cpp">
+#else
+</span><span class="hs-pragma">{-# LANGUAGE QuasiQuotes                #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell            #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.SearchReplace.TDFAEdPrime</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier">ed'</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH.Quote</span></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.REOptions.html"><span class="hs-identifier">Text.RE.REOptions</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.html"><span class="hs-identifier">Text.RE.ZeInternals</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html"><span class="hs-identifier">Text.RE.ZeInternals.TDFA</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Poss.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Poss</span></a></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | construct a quasi quoter from a casting function and @Just sro@</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- if the options are known, otherwise a function take takes the</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- 'SimpleREOptions' and constructs the 'SearchReplace' template</span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-type">ed'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">QuasiQuoter</span></span><span>
+</span><span id="line-31"></span><span id="ed%27"><span class="annot"><span class="annottext">ed' :: Q Exp -&gt; Maybe SimpleREOptions -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#ed%27"><span class="hs-identifier hs-var hs-var">ed'</span></a></span></span><span> </span><span id="local-6989586621679142315"><span class="annot"><span class="annottext">Q Exp
+</span><a href="#local-6989586621679142315"><span class="hs-identifier hs-var">qe</span></a></span></span><span> </span><span id="local-6989586621679142316"><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><a href="#local-6989586621679142316"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><a href="#local-6989586621679142316"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><span class="annottext">Maybe SimpleREOptions
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-var">qq0</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;ed'&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">quoteExp :: String -&gt; Q Exp
+</span><span class="hs-identifier hs-var">quoteExp</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142318"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span> </span><span class="annot"><span class="annottext">((String -&gt; Q Exp) -&gt; String -&gt; Q Exp)
+-&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679142320"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142320"><span class="hs-identifier hs-var">rs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Exp -&gt; Exp -&gt; Exp
+</span><span class="hs-identifier hs-var">AppE</span></span><span> </span><span class="annot"><span class="annottext">(Exp -&gt; Exp -&gt; Exp) -&gt; Q Exp -&gt; Q (Exp -&gt; Exp)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="#local-6989586621679142315"><span class="hs-identifier hs-var">qe</span></a></span><span> </span><span class="annot"><span class="annottext">Q (Exp -&gt; Exp) -&gt; Q Exp -&gt; Q Exp
+forall a b. Q (a -&gt; b) -&gt; Q a -&gt; Q b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">[|</span><span class="hs-identifier">flip</span><span> </span><span class="hs-identifier">unsafe_compile_sr</span><span> </span><span class="hs-identifier">rs</span><span class="hs-special">|]</span><span>
+</span><span id="line-35"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-36"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679142323"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142323"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; QuasiQuoter
+</span><a href="Text.RE.ZeInternals.QQ.html#qq0"><span class="hs-identifier hs-var">qq0</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;ed'&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">quoteExp :: String -&gt; Q Exp
+</span><span class="hs-identifier hs-var">quoteExp</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142318"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142323"><span class="hs-identifier hs-var">sro</span></a></span><span> </span><span class="annot"><span class="annottext">((String -&gt; Q Exp) -&gt; String -&gt; Q Exp)
+-&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679142324"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142324"><span class="hs-identifier hs-var">rs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Exp -&gt; Exp -&gt; Exp
+</span><span class="hs-identifier hs-var">AppE</span></span><span> </span><span class="annot"><span class="annottext">(Exp -&gt; Exp -&gt; Exp) -&gt; Q Exp -&gt; Q (Exp -&gt; Exp)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Q Exp
+</span><a href="#local-6989586621679142315"><span class="hs-identifier hs-var">qe</span></a></span><span> </span><span class="annot"><span class="annottext">Q (Exp -&gt; Exp) -&gt; Q Exp -&gt; Q Exp
+forall a b. Q (a -&gt; b) -&gt; Q a -&gt; Q b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">[|</span><span class="hs-identifier">unsafe_compile_sr_simple</span><span> </span><span class="hs-identifier">sro</span><span> </span><span class="hs-identifier">rs</span><span class="hs-special">|]</span><span>
+</span><span id="line-39"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>    </span><span class="annot"><a href="#local-6989586621679142318"><span class="hs-identifier hs-type">parse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Q</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Exp</span></span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621679142318"><span class="annot"><span class="annottext">parse :: SimpleREOptions -&gt; (String -&gt; Q Exp) -&gt; String -&gt; Q Exp
+</span><a href="#local-6989586621679142318"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679142325"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142325"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span id="local-6989586621679142326"><span class="annot"><span class="annottext">String -&gt; Q Exp
+</span><a href="#local-6989586621679142326"><span class="hs-identifier hs-var">mk</span></a></span></span><span> </span><span id="local-6989586621679142327"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142327"><span class="hs-identifier hs-var">ts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Q Exp)
+-&gt; (SearchReplace RE String -&gt; Q Exp)
+-&gt; Either String (SearchReplace RE String)
+-&gt; Q Exp
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Q Exp
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">SearchReplace RE String
+</span><span class="hs-identifier">_</span></span><span class="hs-glyph">-&gt;</span><span class="annot"><span class="annottext">String -&gt; Q Exp
+</span><a href="#local-6989586621679142326"><span class="hs-identifier hs-var">mk</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142327"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Either String (SearchReplace RE String)
+</span><a href="#local-6989586621679142330"><span class="hs-identifier hs-var">ei</span></a></span><span>
+</span><span id="line-43"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-44"></span><span>        </span><span class="annot"><a href="#local-6989586621679142330"><span class="hs-identifier hs-type">ei</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>        </span><span id="local-6989586621679142330"><span class="annot"><span class="annottext">ei :: Either String (SearchReplace RE String)
+</span><a href="#local-6989586621679142330"><span class="hs-identifier hs-var hs-var">ei</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Poss (SearchReplace RE String)
+-&gt; Either String (SearchReplace RE String)
+forall a. Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="annot"><span class="annottext">(Poss (SearchReplace RE String)
+ -&gt; Either String (SearchReplace RE String))
+-&gt; Poss (SearchReplace RE String)
+-&gt; Either String (SearchReplace RE String)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String)
+-&gt; (String -&gt; Either String RE)
+-&gt; String
+-&gt; Poss (SearchReplace RE String)
+forall (m :: * -&gt; *) s re.
+(Monad m, MonadFail m, Functor m) =&gt;
+(String -&gt; s)
+-&gt; (String -&gt; Either String re) -&gt; String -&gt; m (SearchReplace re s)
+</span><a href="Text.RE.ZeInternals.SearchReplace.html#compileSearchReplace_"><span class="hs-identifier hs-var">compileSearchReplace_</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Poss RE -&gt; Either String RE
+forall a. Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; Either String RE)
+-&gt; (String -&gt; Poss RE) -&gt; String -&gt; Either String RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; Poss RE
+forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-var">compileRegexWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142325"><span class="hs-identifier hs-var">sro</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679142327"><span class="hs-identifier hs-var">ts</span></a></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span id="local-6989586621679142264"><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#unsafe_compile_sr_simple"><span class="hs-identifier hs-type">unsafe_compile_sr_simple</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142264"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-48"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span><span>
+</span><span id="line-49"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-50"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142264"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-51"></span><span id="unsafe_compile_sr_simple"><span class="annot"><span class="annottext">unsafe_compile_sr_simple :: forall s.
+IsRegex RE s =&gt;
+SimpleREOptions -&gt; String -&gt; SearchReplace RE s
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#unsafe_compile_sr_simple"><span class="hs-identifier hs-var hs-var">unsafe_compile_sr_simple</span></a></span></span><span> </span><span id="local-6989586621679142341"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142341"><span class="hs-identifier hs-var">sro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-52"></span><span>    </span><span class="annot"><span class="annottext">REOptions -&gt; String -&gt; SearchReplace RE s
+forall o s.
+(IsOption o, IsRegex RE s) =&gt;
+o -&gt; String -&gt; SearchReplace RE s
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#unsafe_compile_sr"><span class="hs-identifier hs-var">unsafe_compile_sr</span></a></span><span> </span><span class="annot"><span class="annottext">(REOptions -&gt; String -&gt; SearchReplace RE s)
+-&gt; REOptions -&gt; String -&gt; SearchReplace RE s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; REOptions
+</span><a href="Text.RE.ZeInternals.TDFA.html#unpackSimpleREOptions"><span class="hs-identifier hs-var">unpackSimpleREOptions</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679142341"><span class="hs-identifier hs-var">sro</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span id="local-6989586621679142269"><span id="local-6989586621679142270"><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#unsafe_compile_sr"><span class="hs-identifier hs-type">unsafe_compile_sr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#IsOption"><span class="hs-identifier hs-type">IsOption</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142269"><span class="hs-identifier hs-type">o</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142270"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679142269"><span class="hs-identifier hs-type">o</span></a></span><span>
+</span><span id="line-56"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-57"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679142270"><span class="hs-identifier hs-type">s</span></a></span></span></span><span>
+</span><span id="line-58"></span><span id="unsafe_compile_sr"><span class="annot"><span class="annottext">unsafe_compile_sr :: forall o s.
+(IsOption o, IsRegex RE s) =&gt;
+o -&gt; String -&gt; SearchReplace RE s
+</span><a href="Text.RE.ZeInternals.SearchReplace.TDFAEdPrime.html#unsafe_compile_sr"><span class="hs-identifier hs-var hs-var">unsafe_compile_sr</span></a></span></span><span> </span><span id="local-6989586621679142353"><span class="annot"><span class="annottext">o
+</span><a href="#local-6989586621679142353"><span class="hs-identifier hs-var">os</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-59"></span><span>    </span><span class="annot"><span class="annottext">(String -&gt; s)
+-&gt; (String -&gt; Either String RE) -&gt; String -&gt; SearchReplace RE s
+forall s re.
+(String -&gt; s)
+-&gt; (String -&gt; Either String re) -&gt; String -&gt; SearchReplace re s
+</span><a href="Text.RE.ZeInternals.SearchReplace.html#unsafeCompileSearchReplace_"><span class="hs-identifier hs-var">unsafeCompileSearchReplace_</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; s
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">((String -&gt; Either String RE) -&gt; String -&gt; SearchReplace RE s)
+-&gt; (String -&gt; Either String RE) -&gt; String -&gt; SearchReplace RE s
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Poss RE -&gt; Either String RE
+forall a. Poss a -&gt; Either String a
+</span><a href="Text.RE.ZeInternals.Types.Poss.html#poss2either"><span class="hs-identifier hs-var">poss2either</span></a></span><span> </span><span class="annot"><span class="annottext">(Poss RE -&gt; Either String RE)
+-&gt; (String -&gt; Poss RE) -&gt; String -&gt; Either String RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">o -&gt; String -&gt; Poss RE
+forall o (m :: * -&gt; *).
+(IsOption o, Functor m, Monad m, MonadFail m) =&gt;
+o -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWithOptionsForQQ"><span class="hs-identifier hs-var">compileRegexWithOptionsForQQ</span></a></span><span> </span><span class="annot"><span class="annottext">o
+</span><a href="#local-6989586621679142353"><span class="hs-identifier hs-var">os</span></a></span><span>
+</span><span id="line-60"></span></pre></body></html>

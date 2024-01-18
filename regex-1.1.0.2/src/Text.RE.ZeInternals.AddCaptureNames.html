@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude          #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable         #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE ExistentialQuantification  #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings          #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.AddCaptureNames</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Char8</span></span><span>         </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">B</span></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy.Char8</span></span><span>    </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LBS</span></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Dynamic</span></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Sequence</span></span><span>                 </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>                     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span>                </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TL</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.CaptureID</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Match</span></a></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html"><span class="hs-identifier">Text.RE.ZeInternals.Types.Matches</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Unsafe.Coerce</span></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- | a convenience function used by the API modules to insert</span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- capture names extracted from the parsed RE into the (*=~) result</span><span>
+</span><span id="line-25"></span><span id="local-6989586621679137412"><span class="annot"><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatches"><span class="hs-identifier hs-type">addCaptureNamesToMatches</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier hs-type">Matches</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137412"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier hs-type">Matches</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137412"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-26"></span><span id="addCaptureNamesToMatches"><span class="annot"><span class="annottext">addCaptureNamesToMatches :: forall a. CaptureNames -&gt; Matches a -&gt; Matches a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatches"><span class="hs-identifier hs-var hs-var">addCaptureNamesToMatches</span></a></span></span><span> </span><span id="local-6989586621679137462"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137462"><span class="hs-identifier hs-var">cnms</span></a></span></span><span> </span><span id="local-6989586621679137463"><span class="annot"><span class="annottext">Matches a
+</span><a href="#local-6989586621679137463"><span class="hs-identifier hs-var">mtchs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><span class="annottext">Matches a
+</span><a href="#local-6989586621679137463"><span class="hs-identifier hs-var">mtchs</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">allMatches :: [Match a]
+</span><a href="Text.RE.ZeInternals.Types.Matches.html#allMatches"><span class="hs-identifier hs-var">allMatches</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Match a -&gt; Match a) -&gt; [Match a] -&gt; [Match a]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CaptureNames -&gt; Match a -&gt; Match a
+forall a. CaptureNames -&gt; Match a -&gt; Match a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatch"><span class="hs-identifier hs-var">addCaptureNamesToMatch</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137462"><span class="hs-identifier hs-var">cnms</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Match a] -&gt; [Match a]) -&gt; [Match a] -&gt; [Match a]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Matches a -&gt; [Match a]
+forall a. Matches a -&gt; [Match a]
+</span><a href="Text.RE.ZeInternals.Types.Matches.html#allMatches"><span class="hs-identifier hs-var">allMatches</span></a></span><span> </span><span class="annot"><span class="annottext">Matches a
+</span><a href="#local-6989586621679137463"><span class="hs-identifier hs-var">mtchs</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- | a convenience function used by the API modules to insert</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- capture names extracted from the parsed RE into the (?=~) result</span><span>
+</span><span id="line-31"></span><span id="local-6989586621679137418"><span class="annot"><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatch"><span class="hs-identifier hs-type">addCaptureNamesToMatch</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137418"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137418"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-32"></span><span id="addCaptureNamesToMatch"><span class="annot"><span class="annottext">addCaptureNamesToMatch :: forall a. CaptureNames -&gt; Match a -&gt; Match a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatch"><span class="hs-identifier hs-var hs-var">addCaptureNamesToMatch</span></a></span></span><span> </span><span id="local-6989586621679137466"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137466"><span class="hs-identifier hs-var">cnms</span></a></span></span><span> </span><span id="local-6989586621679137467"><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679137467"><span class="hs-identifier hs-var">mtch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Match a
+</span><a href="#local-6989586621679137467"><span class="hs-identifier hs-var">mtch</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">captureNames :: CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.Match.html#captureNames"><span class="hs-identifier hs-var">captureNames</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137466"><span class="hs-identifier hs-var">cnms</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- | a hairy dynamically-typed function used with the legacy (=~) and (=~~)</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- to see if it can/should add the capture names extracted from the RE</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- into the polymorphic result of the operator (it does for any Match</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- or Matches type, provided it is parameterised over a recognised type).</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- The test suite is all over this one, testing all of these cases.</span><span>
+</span><span id="line-39"></span><span id="local-6989586621679137424"><span class="annot"><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNames"><span class="hs-identifier hs-type">addCaptureNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621679137424"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137424"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137424"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-40"></span><span id="addCaptureNames"><span class="annot"><span class="annottext">addCaptureNames :: forall a. Typeable a =&gt; CaptureNames -&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNames"><span class="hs-identifier hs-var hs-var">addCaptureNames</span></a></span></span><span> </span><span id="local-6989586621679137487"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137487"><span class="hs-identifier hs-var">cnms</span></a></span></span><span> </span><span id="local-6989586621679137488"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a -&gt; a
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe a -&gt; a) -&gt; Maybe a -&gt; a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Maybe a
+forall a. [a] -&gt; Maybe a
+</span><span class="hs-identifier hs-var">listToMaybe</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Maybe a) -&gt; [a] -&gt; Maybe a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Maybe a] -&gt; [a]
+forall a. [Maybe a] -&gt; [a]
+</span><span class="hs-identifier hs-var">catMaybes</span></span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">a -&gt; String -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">String
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; String -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">String
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; ByteString -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ByteString
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">B.ByteString</span></span><span>   </span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; ByteString -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ByteString
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">B.ByteString</span></span><span>   </span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; ByteString -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ByteString
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; ByteString -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ByteString
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Text -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Text
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Text -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Text
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Text -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Text
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TL.Text</span></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Text -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Text
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TL.Text</span></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Seq Char -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var">test_match</span></a></span><span>   </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Seq Char
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">S.Seq</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Seq Char -&gt; Maybe a
+forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var">test_matches</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Seq Char
+forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">S.Seq</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-55"></span><span>    </span><span id="local-6989586621679137434"><span id="local-6989586621679137435"><span class="annot"><a href="#local-6989586621679137492"><span class="hs-identifier hs-type">test_match</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621679137434"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137435"><span class="hs-identifier hs-type">r</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137434"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679137435"><span class="hs-identifier hs-type">r</span></a></span></span></span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679137492"><span class="annot"><span class="annottext">test_match :: forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137492"><span class="hs-identifier hs-var hs-var">test_match</span></a></span></span><span> </span><span id="local-6989586621679137500"><span class="annot"><span class="annottext">r
+</span><a href="#local-6989586621679137500"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679137501"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679137501"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">r -&gt; t -&gt; Maybe (Match t) -&gt; Maybe r
+forall r' t'. r' -&gt; t' -&gt; Maybe (Match t') -&gt; Maybe r'
+</span><a href="#local-6989586621679137502"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">r
+</span><a href="#local-6989586621679137500"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679137501"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe (Match t) -&gt; Maybe r) -&gt; Maybe (Match t) -&gt; Maybe r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; Match t -&gt; Match t
+forall a. CaptureNames -&gt; Match a -&gt; Match a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatch"><span class="hs-identifier hs-var">addCaptureNamesToMatch</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137487"><span class="hs-identifier hs-var">cnms</span></a></span><span> </span><span class="annot"><span class="annottext">(Match t -&gt; Match t) -&gt; Maybe (Match t) -&gt; Maybe (Match t)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Dynamic -&gt; Maybe (Match t)
+forall a. Typeable a =&gt; Dynamic -&gt; Maybe a
+</span><span class="hs-identifier hs-var">fromDynamic</span></span><span> </span><span class="annot"><span class="annottext">Dynamic
+</span><a href="#local-6989586621679137505"><span class="hs-identifier hs-var">dyn</span></a></span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>        </span><span id="local-6989586621679137439"><span id="local-6989586621679137440"><span class="annot"><a href="#local-6989586621679137502"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679137439"><span class="hs-identifier hs-type">r'</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137440"><span class="hs-identifier hs-type">t'</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137440"><span class="hs-identifier hs-type">t'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679137439"><span class="hs-identifier hs-type">r'</span></a></span></span></span><span>
+</span><span id="line-59"></span><span>        </span><span id="local-6989586621679137502"><span class="annot"><span class="annottext">f :: forall r' t'. r' -&gt; t' -&gt; Maybe (Match t') -&gt; Maybe r'
+</span><a href="#local-6989586621679137502"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="annot"><span class="annottext">r'
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">t'
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Match t') -&gt; Maybe r'
+forall a b. a -&gt; b
+</span><span class="hs-identifier hs-var">unsafeCoerce</span></span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span>    </span><span id="local-6989586621679137507"><span id="local-6989586621679137508"><span class="annot"><a href="#local-6989586621679137494"><span class="hs-identifier hs-type">test_matches</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621679137507"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137508"><span class="hs-identifier hs-type">r</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137507"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679137508"><span class="hs-identifier hs-type">r</span></a></span></span></span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679137494"><span class="annot"><span class="annottext">test_matches :: forall t r. Typeable t =&gt; r -&gt; t -&gt; Maybe r
+</span><a href="#local-6989586621679137494"><span class="hs-identifier hs-var hs-var">test_matches</span></a></span></span><span> </span><span id="local-6989586621679137513"><span class="annot"><span class="annottext">r
+</span><a href="#local-6989586621679137513"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679137514"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679137514"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">r -&gt; t -&gt; Maybe (Matches t) -&gt; Maybe r
+forall r' t'. r' -&gt; t' -&gt; Maybe (Matches t') -&gt; Maybe r'
+</span><a href="#local-6989586621679137515"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">r
+</span><a href="#local-6989586621679137513"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679137514"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe (Matches t) -&gt; Maybe r) -&gt; Maybe (Matches t) -&gt; Maybe r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; Matches t -&gt; Matches t
+forall a. CaptureNames -&gt; Matches a -&gt; Matches a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatches"><span class="hs-identifier hs-var">addCaptureNamesToMatches</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679137487"><span class="hs-identifier hs-var">cnms</span></a></span><span> </span><span class="annot"><span class="annottext">(Matches t -&gt; Matches t) -&gt; Maybe (Matches t) -&gt; Maybe (Matches t)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Dynamic -&gt; Maybe (Matches t)
+forall a. Typeable a =&gt; Dynamic -&gt; Maybe a
+</span><span class="hs-identifier hs-var">fromDynamic</span></span><span> </span><span class="annot"><span class="annottext">Dynamic
+</span><a href="#local-6989586621679137505"><span class="hs-identifier hs-var">dyn</span></a></span><span>
+</span><span id="line-63"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-64"></span><span>        </span><span id="local-6989586621679137452"><span id="local-6989586621679137453"><span class="annot"><a href="#local-6989586621679137515"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679137452"><span class="hs-identifier hs-type">r'</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679137453"><span class="hs-identifier hs-type">t'</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier hs-type">Matches</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679137453"><span class="hs-identifier hs-type">t'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679137452"><span class="hs-identifier hs-type">r'</span></a></span></span></span><span>
+</span><span id="line-65"></span><span>        </span><span id="local-6989586621679137515"><span class="annot"><span class="annottext">f :: forall r' t'. r' -&gt; t' -&gt; Maybe (Matches t') -&gt; Maybe r'
+</span><a href="#local-6989586621679137515"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="annot"><span class="annottext">r'
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">t'
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Matches t') -&gt; Maybe r'
+forall a b. a -&gt; b
+</span><span class="hs-identifier hs-var">unsafeCoerce</span></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="#local-6989586621679137505"><span class="hs-identifier hs-type">dyn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Dynamic</span></span><span>
+</span><span id="line-68"></span><span>    </span><span id="local-6989586621679137505"><span class="annot"><span class="annottext">dyn :: Dynamic
+</span><a href="#local-6989586621679137505"><span class="hs-identifier hs-var hs-var">dyn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Dynamic
+forall a. Typeable a =&gt; a -&gt; Dynamic
+</span><span class="hs-identifier hs-var">toDyn</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679137488"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span>    </span><span id="local-6989586621679137436"><span class="annot"><a href="#local-6989586621679137493"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679137436"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679137493"><span class="annot"><span class="annottext">proxy :: forall a. a
+</span><a href="#local-6989586621679137493"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;addCaptureNames&quot;</span></span><span>
+</span><span id="line-72"></span></pre></body></html>

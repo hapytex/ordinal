@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.Types.SearchReplace</span><span>
+</span><span id="line-3"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-9"></span><span class="annot"><span class="hs-comment">-- | contains a compiled RE and replacement template</span></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">data</span><span> </span><span id="SearchReplace"><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-var">SearchReplace</span></a></span></span><span> </span><span id="local-6989586621679139291"><span class="annot"><a href="#local-6989586621679139291"><span class="hs-identifier hs-type">re</span></a></span></span><span> </span><span id="local-6989586621679139292"><span class="annot"><a href="#local-6989586621679139292"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-11"></span><span>  </span><span id="SearchReplace"><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-var">SearchReplace</span></a></span></span><span>
+</span><span id="line-12"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="getSearch"><span class="annot"><span class="annottext">forall re s. SearchReplace re s -&gt; re
+</span><a href="Text.RE.ZeInternals.Types.SearchReplace.html#getSearch"><span class="hs-identifier hs-var hs-var">getSearch</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679139291"><span class="hs-identifier hs-type">re</span></a></span><span>    </span><span class="annot"><span class="hs-comment">-- ^ the RE to match a string to replace</span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="getTemplate"><span class="annot"><span class="annottext">forall re s. SearchReplace re s -&gt; s
+</span><a href="Text.RE.ZeInternals.Types.SearchReplace.html#getTemplate"><span class="hs-identifier hs-var hs-var">getTemplate</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679139292"><span class="hs-identifier hs-type">s</span></a></span><span>     </span><span class="hs-comment">-- ^ the replacement template with ${cap}</span><span>
+</span><span id="line-14"></span><span>                            </span><span class="hs-comment">-- used to identify a capture (by number or</span><span>
+</span><span id="line-15"></span><span>                            </span><span class="hs-comment">-- name if one was given) and '$$' being</span><span>
+</span><span id="line-16"></span><span>                            </span><span class="hs-comment">-- used to escape a single '$'</span><span>
+</span><span id="line-17"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679139319"><span id="local-6989586621679139325"><span id="local-6989586621679139329"><span class="annot"><span class="annottext">Int -&gt; SearchReplace re s -&gt; ShowS
+[SearchReplace re s] -&gt; ShowS
+SearchReplace re s -&gt; String
+(Int -&gt; SearchReplace re s -&gt; ShowS)
+-&gt; (SearchReplace re s -&gt; String)
+-&gt; ([SearchReplace re s] -&gt; ShowS)
+-&gt; Show (SearchReplace re s)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+forall re s.
+(Show re, Show s) =&gt;
+Int -&gt; SearchReplace re s -&gt; ShowS
+forall re s. (Show re, Show s) =&gt; [SearchReplace re s] -&gt; ShowS
+forall re s. (Show re, Show s) =&gt; SearchReplace re s -&gt; String
+$cshowsPrec :: forall re s.
+(Show re, Show s) =&gt;
+Int -&gt; SearchReplace re s -&gt; ShowS
+showsPrec :: Int -&gt; SearchReplace re s -&gt; ShowS
+$cshow :: forall re s. (Show re, Show s) =&gt; SearchReplace re s -&gt; String
+show :: SearchReplace re s -&gt; String
+$cshowList :: forall re s. (Show re, Show s) =&gt; [SearchReplace re s] -&gt; ShowS
+showList :: [SearchReplace re s] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679139310"><span id="local-6989586621679139334"><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679139310"><span class="hs-identifier hs-type">re</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>  </span><span id="local-6989586621679139338"><span class="annot"><span class="annottext">fmap :: forall a b. (a -&gt; b) -&gt; SearchReplace re a -&gt; SearchReplace re b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">fmap</span></span></span><span> </span><span id="local-6989586621679139339"><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679139339"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span id="local-6989586621679139340"><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679139340"><span class="hs-identifier hs-var">re</span></a></span></span><span> </span><span id="local-6989586621679139341"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679139341"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">re -&gt; b -&gt; SearchReplace re b
+forall re s. re -&gt; s -&gt; SearchReplace re s
+</span><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-var">SearchReplace</span></a></span><span> </span><span class="annot"><span class="annottext">re
+</span><a href="#local-6989586621679139340"><span class="hs-identifier hs-var">re</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679139339"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679139341"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-25"></span></pre></body></html>

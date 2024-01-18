@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.ZeInternals.Types.CaptureID</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.HashMap.Strict</span></span><span>            </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">HMS</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Ix</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>                      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | CaptureID identifies captures, either by number</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- (e.g., [cp|1|]) or name (e.g., [cp|foo|]).</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">data</span><span> </span><span id="CaptureID"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-var">CaptureID</span></a></span></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="IsCaptureOrdinal"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#IsCaptureOrdinal"><span class="hs-identifier hs-var">IsCaptureOrdinal</span></a></span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span><span>   </span><span class="hs-comment">-- [cp|3|]</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="IsCaptureName"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#IsCaptureName"><span class="hs-identifier hs-var">IsCaptureName</span></a></span></span><span>    </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureName"><span class="hs-identifier hs-type">CaptureName</span></a></span><span>      </span><span class="hs-comment">-- [cp|y|]</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134504"><span id="local-6989586621679134513"><span id="local-6989586621679134517"><span class="annot"><span class="annottext">Int -&gt; CaptureID -&gt; ShowS
+[CaptureID] -&gt; ShowS
+CaptureID -&gt; String
+(Int -&gt; CaptureID -&gt; ShowS)
+-&gt; (CaptureID -&gt; String)
+-&gt; ([CaptureID] -&gt; ShowS)
+-&gt; Show CaptureID
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; CaptureID -&gt; ShowS
+showsPrec :: Int -&gt; CaptureID -&gt; ShowS
+$cshow :: CaptureID -&gt; String
+show :: CaptureID -&gt; String
+$cshowList :: [CaptureID] -&gt; ShowS
+showList :: [CaptureID] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134524"><span id="local-6989586621679134530"><span id="local-6989586621679134534"><span id="local-6989586621679134538"><span id="local-6989586621679134541"><span id="local-6989586621679134544"><span id="local-6989586621679134547"><span class="annot"><span class="annottext">Eq CaptureID
+Eq CaptureID
+-&gt; (CaptureID -&gt; CaptureID -&gt; Ordering)
+-&gt; (CaptureID -&gt; CaptureID -&gt; Bool)
+-&gt; (CaptureID -&gt; CaptureID -&gt; Bool)
+-&gt; (CaptureID -&gt; CaptureID -&gt; Bool)
+-&gt; (CaptureID -&gt; CaptureID -&gt; Bool)
+-&gt; (CaptureID -&gt; CaptureID -&gt; CaptureID)
+-&gt; (CaptureID -&gt; CaptureID -&gt; CaptureID)
+-&gt; Ord CaptureID
+CaptureID -&gt; CaptureID -&gt; Bool
+CaptureID -&gt; CaptureID -&gt; Ordering
+CaptureID -&gt; CaptureID -&gt; CaptureID
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: CaptureID -&gt; CaptureID -&gt; Ordering
+compare :: CaptureID -&gt; CaptureID -&gt; Ordering
+$c&lt; :: CaptureID -&gt; CaptureID -&gt; Bool
+&lt; :: CaptureID -&gt; CaptureID -&gt; Bool
+$c&lt;= :: CaptureID -&gt; CaptureID -&gt; Bool
+&lt;= :: CaptureID -&gt; CaptureID -&gt; Bool
+$c&gt; :: CaptureID -&gt; CaptureID -&gt; Bool
+&gt; :: CaptureID -&gt; CaptureID -&gt; Bool
+$c&gt;= :: CaptureID -&gt; CaptureID -&gt; Bool
+&gt;= :: CaptureID -&gt; CaptureID -&gt; Bool
+$cmax :: CaptureID -&gt; CaptureID -&gt; CaptureID
+max :: CaptureID -&gt; CaptureID -&gt; CaptureID
+$cmin :: CaptureID -&gt; CaptureID -&gt; CaptureID
+min :: CaptureID -&gt; CaptureID -&gt; CaptureID
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134551"><span id="local-6989586621679134556"><span class="annot"><span class="annottext">CaptureID -&gt; CaptureID -&gt; Bool
+(CaptureID -&gt; CaptureID -&gt; Bool)
+-&gt; (CaptureID -&gt; CaptureID -&gt; Bool) -&gt; Eq CaptureID
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: CaptureID -&gt; CaptureID -&gt; Bool
+== :: CaptureID -&gt; CaptureID -&gt; Bool
+$c/= :: CaptureID -&gt; CaptureID -&gt; Bool
+/= :: CaptureID -&gt; CaptureID -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- | the dictionary for named captures stored in compiled regular</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- expressions associates</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">type</span><span> </span><span id="CaptureNames"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-var">CaptureNames</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HMS.HashMap</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureName"><span class="hs-identifier hs-type">CaptureName</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="annot"><span class="hs-comment">-- | an empty 'CaptureNames' dictionary</span></span><span>
+</span><span id="line-23"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#noCaptureNames"><span class="hs-identifier hs-type">noCaptureNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span>
+</span><span id="line-24"></span><span id="noCaptureNames"><span class="annot"><span class="annottext">noCaptureNames :: CaptureNames
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#noCaptureNames"><span class="hs-identifier hs-var hs-var">noCaptureNames</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+forall k v. HashMap k v
+</span><span class="hs-identifier hs-var">HMS.empty</span></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="annot"><span class="hs-comment">-- | a 'CaptureName' is just the text of the name</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">newtype</span><span> </span><span id="CaptureName"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureName"><span class="hs-identifier hs-var">CaptureName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="CaptureName"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureName"><span class="hs-identifier hs-var">CaptureName</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getCaptureName"><span class="annot"><span class="annottext">CaptureName -&gt; Text
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureName"><span class="hs-identifier hs-var hs-var">getCaptureName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">T.Text</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134564"><span id="local-6989586621679134569"><span id="local-6989586621679134572"><span class="annot"><span class="annottext">Int -&gt; CaptureName -&gt; ShowS
+[CaptureName] -&gt; ShowS
+CaptureName -&gt; String
+(Int -&gt; CaptureName -&gt; ShowS)
+-&gt; (CaptureName -&gt; String)
+-&gt; ([CaptureName] -&gt; ShowS)
+-&gt; Show CaptureName
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; CaptureName -&gt; ShowS
+showsPrec :: Int -&gt; CaptureName -&gt; ShowS
+$cshow :: CaptureName -&gt; String
+show :: CaptureName -&gt; String
+$cshowList :: [CaptureName] -&gt; ShowS
+showList :: [CaptureName] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134577"><span id="local-6989586621679134582"><span id="local-6989586621679134586"><span id="local-6989586621679134590"><span id="local-6989586621679134594"><span id="local-6989586621679134598"><span id="local-6989586621679134602"><span class="annot"><span class="annottext">Eq CaptureName
+Eq CaptureName
+-&gt; (CaptureName -&gt; CaptureName -&gt; Ordering)
+-&gt; (CaptureName -&gt; CaptureName -&gt; Bool)
+-&gt; (CaptureName -&gt; CaptureName -&gt; Bool)
+-&gt; (CaptureName -&gt; CaptureName -&gt; Bool)
+-&gt; (CaptureName -&gt; CaptureName -&gt; Bool)
+-&gt; (CaptureName -&gt; CaptureName -&gt; CaptureName)
+-&gt; (CaptureName -&gt; CaptureName -&gt; CaptureName)
+-&gt; Ord CaptureName
+CaptureName -&gt; CaptureName -&gt; Bool
+CaptureName -&gt; CaptureName -&gt; Ordering
+CaptureName -&gt; CaptureName -&gt; CaptureName
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: CaptureName -&gt; CaptureName -&gt; Ordering
+compare :: CaptureName -&gt; CaptureName -&gt; Ordering
+$c&lt; :: CaptureName -&gt; CaptureName -&gt; Bool
+&lt; :: CaptureName -&gt; CaptureName -&gt; Bool
+$c&lt;= :: CaptureName -&gt; CaptureName -&gt; Bool
+&lt;= :: CaptureName -&gt; CaptureName -&gt; Bool
+$c&gt; :: CaptureName -&gt; CaptureName -&gt; Bool
+&gt; :: CaptureName -&gt; CaptureName -&gt; Bool
+$c&gt;= :: CaptureName -&gt; CaptureName -&gt; Bool
+&gt;= :: CaptureName -&gt; CaptureName -&gt; Bool
+$cmax :: CaptureName -&gt; CaptureName -&gt; CaptureName
+max :: CaptureName -&gt; CaptureName -&gt; CaptureName
+$cmin :: CaptureName -&gt; CaptureName -&gt; CaptureName
+min :: CaptureName -&gt; CaptureName -&gt; CaptureName
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134606"><span id="local-6989586621679134611"><span class="annot"><span class="annottext">CaptureName -&gt; CaptureName -&gt; Bool
+(CaptureName -&gt; CaptureName -&gt; Bool)
+-&gt; (CaptureName -&gt; CaptureName -&gt; Bool) -&gt; Eq CaptureName
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: CaptureName -&gt; CaptureName -&gt; Bool
+== :: CaptureName -&gt; CaptureName -&gt; Bool
+$c/= :: CaptureName -&gt; CaptureName -&gt; Bool
+/= :: CaptureName -&gt; CaptureName -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679134618"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureName"><span class="hs-identifier hs-type">CaptureName</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span>  </span><span id="local-6989586621679134623"><span class="annot"><span class="annottext">hashWithSalt :: Int -&gt; CaptureName -&gt; Int
+</span><a href="#local-6989586621679134623"><span class="hs-identifier hs-var hs-var hs-var hs-var">hashWithSalt</span></a></span></span><span> </span><span id="local-6989586621679134625"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134625"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Text -&gt; Int
+forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134625"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Int) -&gt; (CaptureName -&gt; Text) -&gt; CaptureName -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">CaptureName -&gt; Text
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureName"><span class="hs-identifier hs-var">getCaptureName</span></a></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- | a 'CaptureOrdinal' is just the number of the capture, starting</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- with 0 for the whole of the text matched, then in leftmost,</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- outermost</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">newtype</span><span> </span><span id="CaptureOrdinal"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="CaptureOrdinal"><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-var">CaptureOrdinal</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getCaptureOrdinal"><span class="annot"><span class="annottext">CaptureOrdinal -&gt; Int
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureOrdinal"><span class="hs-identifier hs-var hs-var">getCaptureOrdinal</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134630"><span id="local-6989586621679134635"><span id="local-6989586621679134638"><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal -&gt; ShowS
+[CaptureOrdinal] -&gt; ShowS
+CaptureOrdinal -&gt; String
+(Int -&gt; CaptureOrdinal -&gt; ShowS)
+-&gt; (CaptureOrdinal -&gt; String)
+-&gt; ([CaptureOrdinal] -&gt; ShowS)
+-&gt; Show CaptureOrdinal
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; CaptureOrdinal -&gt; ShowS
+showsPrec :: Int -&gt; CaptureOrdinal -&gt; ShowS
+$cshow :: CaptureOrdinal -&gt; String
+show :: CaptureOrdinal -&gt; String
+$cshowList :: [CaptureOrdinal] -&gt; ShowS
+showList :: [CaptureOrdinal] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134643"><span id="local-6989586621679134647"><span id="local-6989586621679134651"><span id="local-6989586621679134655"><span id="local-6989586621679134659"><span id="local-6989586621679134663"><span id="local-6989586621679134667"><span class="annot"><span class="annottext">Eq CaptureOrdinal
+Eq CaptureOrdinal
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Ordering)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; Ord CaptureOrdinal
+CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+CaptureOrdinal -&gt; CaptureOrdinal -&gt; Ordering
+CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Ordering
+compare :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Ordering
+$c&lt; :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+&lt; :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+$c&lt;= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+&lt;= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+$c&gt; :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+&gt; :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+$c&gt;= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+&gt;= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+$cmax :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+max :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+$cmin :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+min :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134671"><span id="local-6989586621679134676"><span class="annot"><span class="annottext">CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+(CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool) -&gt; Eq CaptureOrdinal
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+== :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+$c/= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+/= :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134680"><span id="local-6989586621679134685"><span id="local-6989586621679134689"><span id="local-6989586621679134693"><span id="local-6989586621679134697"><span id="local-6989586621679134701"><span id="local-6989586621679134705"><span id="local-6989586621679134709"><span class="annot"><span class="annottext">Int -&gt; CaptureOrdinal
+CaptureOrdinal -&gt; Int
+CaptureOrdinal -&gt; [CaptureOrdinal]
+CaptureOrdinal -&gt; CaptureOrdinal
+CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+CaptureOrdinal
+-&gt; CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+(CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (Int -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; Int)
+-&gt; (CaptureOrdinal -&gt; [CaptureOrdinal])
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal])
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal])
+-&gt; (CaptureOrdinal
+    -&gt; CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal])
+-&gt; Enum CaptureOrdinal
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: CaptureOrdinal -&gt; CaptureOrdinal
+succ :: CaptureOrdinal -&gt; CaptureOrdinal
+$cpred :: CaptureOrdinal -&gt; CaptureOrdinal
+pred :: CaptureOrdinal -&gt; CaptureOrdinal
+$ctoEnum :: Int -&gt; CaptureOrdinal
+toEnum :: Int -&gt; CaptureOrdinal
+$cfromEnum :: CaptureOrdinal -&gt; Int
+fromEnum :: CaptureOrdinal -&gt; Int
+$cenumFrom :: CaptureOrdinal -&gt; [CaptureOrdinal]
+enumFrom :: CaptureOrdinal -&gt; [CaptureOrdinal]
+$cenumFromThen :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+enumFromThen :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+$cenumFromTo :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+enumFromTo :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+$cenumFromThenTo :: CaptureOrdinal
+-&gt; CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+enumFromThenTo :: CaptureOrdinal
+-&gt; CaptureOrdinal -&gt; CaptureOrdinal -&gt; [CaptureOrdinal]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134717"><span id="local-6989586621679134722"><span id="local-6989586621679134726"><span id="local-6989586621679134730"><span id="local-6989586621679134734"><span id="local-6989586621679134738"><span class="annot"><span class="annottext">Ord CaptureOrdinal
+Ord CaptureOrdinal
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; [CaptureOrdinal])
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int)
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int)
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Bool)
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; Int)
+-&gt; ((CaptureOrdinal, CaptureOrdinal) -&gt; Int)
+-&gt; Ix CaptureOrdinal
+(CaptureOrdinal, CaptureOrdinal) -&gt; Int
+(CaptureOrdinal, CaptureOrdinal) -&gt; [CaptureOrdinal]
+(CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Bool
+(CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int
+forall a.
+Ord a
+-&gt; ((a, a) -&gt; [a])
+-&gt; ((a, a) -&gt; a -&gt; Int)
+-&gt; ((a, a) -&gt; a -&gt; Int)
+-&gt; ((a, a) -&gt; a -&gt; Bool)
+-&gt; ((a, a) -&gt; Int)
+-&gt; ((a, a) -&gt; Int)
+-&gt; Ix a
+$crange :: (CaptureOrdinal, CaptureOrdinal) -&gt; [CaptureOrdinal]
+range :: (CaptureOrdinal, CaptureOrdinal) -&gt; [CaptureOrdinal]
+$cindex :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int
+index :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int
+$cunsafeIndex :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int
+unsafeIndex :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Int
+$cinRange :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Bool
+inRange :: (CaptureOrdinal, CaptureOrdinal) -&gt; CaptureOrdinal -&gt; Bool
+$crangeSize :: (CaptureOrdinal, CaptureOrdinal) -&gt; Int
+rangeSize :: (CaptureOrdinal, CaptureOrdinal) -&gt; Int
+$cunsafeRangeSize :: (CaptureOrdinal, CaptureOrdinal) -&gt; Int
+unsafeRangeSize :: (CaptureOrdinal, CaptureOrdinal) -&gt; Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ix</span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134744"><span id="local-6989586621679134749"><span id="local-6989586621679134753"><span id="local-6989586621679134757"><span id="local-6989586621679134761"><span id="local-6989586621679134765"><span id="local-6989586621679134769"><span class="annot"><span class="annottext">Integer -&gt; CaptureOrdinal
+CaptureOrdinal -&gt; CaptureOrdinal
+CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+(CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (CaptureOrdinal -&gt; CaptureOrdinal)
+-&gt; (Integer -&gt; CaptureOrdinal)
+-&gt; Num CaptureOrdinal
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+$c+ :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
++ :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+$c- :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+- :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+$c* :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+* :: CaptureOrdinal -&gt; CaptureOrdinal -&gt; CaptureOrdinal
+$cnegate :: CaptureOrdinal -&gt; CaptureOrdinal
+negate :: CaptureOrdinal -&gt; CaptureOrdinal
+$cabs :: CaptureOrdinal -&gt; CaptureOrdinal
+abs :: CaptureOrdinal -&gt; CaptureOrdinal
+$csignum :: CaptureOrdinal -&gt; CaptureOrdinal
+signum :: CaptureOrdinal -&gt; CaptureOrdinal
+$cfromInteger :: Integer -&gt; CaptureOrdinal
+fromInteger :: Integer -&gt; CaptureOrdinal
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><span class="hs-comment">-- | look up a 'CaptureID' in the 'CaptureNames' dictionary</span></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#findCaptureID"><span class="hs-identifier hs-type">findCaptureID</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureID"><span class="hs-identifier hs-type">CaptureID</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureNames"><span class="hs-identifier hs-type">CaptureNames</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#CaptureOrdinal"><span class="hs-identifier hs-type">CaptureOrdinal</span></a></span><span>
+</span><span id="line-41"></span><span id="findCaptureID"><span class="annot"><span class="annottext">findCaptureID :: CaptureID -&gt; CaptureNames -&gt; Either String CaptureOrdinal
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#findCaptureID"><span class="hs-identifier hs-var hs-var">findCaptureID</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#IsCaptureOrdinal"><span class="hs-identifier hs-type">IsCaptureOrdinal</span></a></span><span> </span><span id="local-6989586621679134775"><span class="annot"><span class="annottext">CaptureOrdinal
+</span><a href="#local-6989586621679134775"><span class="hs-identifier hs-var">o</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><span class="hs-identifier">_</span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal -&gt; Either String CaptureOrdinal
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal
+</span><a href="#local-6989586621679134775"><span class="hs-identifier hs-var">o</span></a></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#findCaptureID"><span class="hs-identifier hs-var">findCaptureID</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.ZeInternals.Types.CaptureID.html#IsCaptureName"><span class="hs-identifier hs-type">IsCaptureName</span></a></span><span>    </span><span id="local-6989586621679134776"><span class="annot"><span class="annottext">CaptureName
+</span><a href="#local-6989586621679134776"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679134777"><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679134777"><span class="hs-identifier hs-var">hms</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="annottext">Either String CaptureOrdinal
+-&gt; (CaptureOrdinal -&gt; Either String CaptureOrdinal)
+-&gt; Maybe CaptureOrdinal
+-&gt; Either String CaptureOrdinal
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">Either String CaptureOrdinal
+forall {b}. Either String b
+</span><a href="#local-6989586621679134779"><span class="hs-identifier hs-var">oops</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureOrdinal -&gt; Either String CaptureOrdinal
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">(Maybe CaptureOrdinal -&gt; Either String CaptureOrdinal)
+-&gt; Maybe CaptureOrdinal -&gt; Either String CaptureOrdinal
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CaptureName -&gt; CaptureNames -&gt; Maybe CaptureOrdinal
+forall k v. (Eq k, Hashable k) =&gt; k -&gt; HashMap k v -&gt; Maybe v
+</span><span class="hs-identifier hs-var">HMS.lookup</span></span><span> </span><span class="annot"><span class="annottext">CaptureName
+</span><a href="#local-6989586621679134776"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679134777"><span class="hs-identifier hs-var">hms</span></a></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-45"></span><span>    </span><span id="local-6989586621679134779"><span class="annot"><span class="annottext">oops :: Either String b
+</span><a href="#local-6989586621679134779"><span class="hs-identifier hs-var hs-var">oops</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String b
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Either String b) -&gt; String -&gt; Either String b
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unlines</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;lookupCaptureID: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">T.unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679134783"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; not found in:&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; [String]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span>
+</span><span id="line-47"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;  &quot;</span></span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">T.unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CaptureName -&gt; Text
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureName"><span class="hs-identifier hs-var">getCaptureName</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureName
+</span><a href="#local-6989586621679134784"><span class="hs-identifier hs-var">nm</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679134784"><span class="annot"><span class="annottext">CaptureName
+</span><a href="#local-6989586621679134784"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; [CaptureName]
+forall k v. HashMap k v -&gt; [k]
+</span><span class="hs-identifier hs-var">HMS.keys</span></span><span> </span><span class="annot"><span class="annottext">CaptureNames
+</span><a href="#local-6989586621679134777"><span class="hs-identifier hs-var">hms</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679134783"><span class="annot"><span class="annottext">t :: Text
+</span><a href="#local-6989586621679134783"><span class="hs-identifier hs-var hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureName -&gt; Text
+</span><a href="Text.RE.ZeInternals.Types.CaptureID.html#getCaptureName"><span class="hs-identifier hs-var">getCaptureName</span></a></span><span> </span><span class="annot"><span class="annottext">CaptureName
+</span><a href="#local-6989586621679134776"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-49"></span></pre></body></html>

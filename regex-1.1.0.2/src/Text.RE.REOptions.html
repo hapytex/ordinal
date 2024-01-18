@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679134056"><span id="local-6989586621679134057"></span></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FunctionalDependencies     #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE CPP                        #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# LANGUAGE TemplateHaskellQuotes      #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE DeriveLift                 #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span class="hs-cpp">
+#else
+</span><span class="hs-pragma">{-# LANGUAGE QuasiQuotes                #-}</span><span>
+</span><span id="line-12"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell            #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.REOptions</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Options Tutorial</span></span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><span class="hs-comment">-- * 'SimpleREOptions'</span></span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier">SimpleREOptions</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><span class="hs-comment">-- * 'REOptions_'</span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#REOptions_"><span class="hs-identifier">REOptions_</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Macro Tables</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier">Macros</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier">MacroID</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#emptyMacros"><span class="hs-identifier">emptyMacros</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.HashMap.Strict</span></span><span>        </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">HM</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.Haskell.TH.Syntax</span></span><span>
+</span><span id="line-34"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-identifier">The</span><span> </span><span class="hs-identifier">RE</span><span> </span><span class="hs-identifier">Options</span><span>
+</span><span id="line-38"></span><span class="hs-comment">--------------</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- | the default API uses these simple, universal RE options,</span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- which get auto-converted into the appropriate back-end 'REOptions_'</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">data</span><span> </span><span id="SimpleREOptions"><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-var">SimpleREOptions</span></a></span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="MultilineSensitive"><span class="annot"><a href="Text.RE.REOptions.html#MultilineSensitive"><span class="hs-identifier hs-var">MultilineSensitive</span></a></span></span><span>        </span><span class="annot"><span class="hs-comment">-- ^ case-sensitive with ^ and $ matching the start and end of a line</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="MultilineInsensitive"><span class="annot"><a href="Text.RE.REOptions.html#MultilineInsensitive"><span class="hs-identifier hs-var">MultilineInsensitive</span></a></span></span><span>      </span><span class="annot"><span class="hs-comment">-- ^ case-insensitive with ^ and $ matsh the start and end of a line</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="BlockSensitive"><span class="annot"><a href="Text.RE.REOptions.html#BlockSensitive"><span class="hs-identifier hs-var">BlockSensitive</span></a></span></span><span>            </span><span class="annot"><span class="hs-comment">-- ^ case-sensitive with ^ and $ matching the start and end of the input text</span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="BlockInsensitive"><span class="annot"><a href="Text.RE.REOptions.html#BlockInsensitive"><span class="hs-identifier hs-var">BlockInsensitive</span></a></span></span><span>          </span><span class="annot"><span class="hs-comment">-- ^ case-insensitive with ^ and $ matching the start and end of the input text</span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134064"><span id="local-6989586621679134066"><span class="annot"><span class="annottext">SimpleREOptions
+SimpleREOptions -&gt; SimpleREOptions -&gt; Bounded SimpleREOptions
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: SimpleREOptions
+minBound :: SimpleREOptions
+$cmaxBound :: SimpleREOptions
+maxBound :: SimpleREOptions
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134070"><span id="local-6989586621679134078"><span id="local-6989586621679134084"><span id="local-6989586621679134094"><span id="local-6989586621679134096"><span id="local-6989586621679134100"><span id="local-6989586621679134104"><span id="local-6989586621679134108"><span class="annot"><span class="annottext">Int -&gt; SimpleREOptions
+SimpleREOptions -&gt; Int
+SimpleREOptions -&gt; [SimpleREOptions]
+SimpleREOptions -&gt; SimpleREOptions
+SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+SimpleREOptions
+-&gt; SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+(SimpleREOptions -&gt; SimpleREOptions)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions)
+-&gt; (Int -&gt; SimpleREOptions)
+-&gt; (SimpleREOptions -&gt; Int)
+-&gt; (SimpleREOptions -&gt; [SimpleREOptions])
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions])
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions])
+-&gt; (SimpleREOptions
+    -&gt; SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions])
+-&gt; Enum SimpleREOptions
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: SimpleREOptions -&gt; SimpleREOptions
+succ :: SimpleREOptions -&gt; SimpleREOptions
+$cpred :: SimpleREOptions -&gt; SimpleREOptions
+pred :: SimpleREOptions -&gt; SimpleREOptions
+$ctoEnum :: Int -&gt; SimpleREOptions
+toEnum :: Int -&gt; SimpleREOptions
+$cfromEnum :: SimpleREOptions -&gt; Int
+fromEnum :: SimpleREOptions -&gt; Int
+$cenumFrom :: SimpleREOptions -&gt; [SimpleREOptions]
+enumFrom :: SimpleREOptions -&gt; [SimpleREOptions]
+$cenumFromThen :: SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+enumFromThen :: SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+$cenumFromTo :: SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+enumFromTo :: SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+$cenumFromThenTo :: SimpleREOptions
+-&gt; SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+enumFromThenTo :: SimpleREOptions
+-&gt; SimpleREOptions -&gt; SimpleREOptions -&gt; [SimpleREOptions]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134112"><span id="local-6989586621679134114"><span class="annot"><span class="annottext">SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+(SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; Eq SimpleREOptions
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+== :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+$c/= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+/= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134121"><span id="local-6989586621679134123"><span id="local-6989586621679134125"><span id="local-6989586621679134129"><span id="local-6989586621679134132"><span id="local-6989586621679134135"><span id="local-6989586621679134138"><span class="annot"><span class="annottext">Eq SimpleREOptions
+Eq SimpleREOptions
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Ordering)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; Bool)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions)
+-&gt; (SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions)
+-&gt; Ord SimpleREOptions
+SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+SimpleREOptions -&gt; SimpleREOptions -&gt; Ordering
+SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: SimpleREOptions -&gt; SimpleREOptions -&gt; Ordering
+compare :: SimpleREOptions -&gt; SimpleREOptions -&gt; Ordering
+$c&lt; :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+&lt; :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+$c&lt;= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+&lt;= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+$c&gt; :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+&gt; :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+$c&gt;= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+&gt;= :: SimpleREOptions -&gt; SimpleREOptions -&gt; Bool
+$cmax :: SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions
+max :: SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions
+$cmin :: SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions
+min :: SimpleREOptions -&gt; SimpleREOptions -&gt; SimpleREOptions
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134142"><span id="local-6989586621679134144"><span id="local-6989586621679134148"><span class="annot"><span class="annottext">Int -&gt; SimpleREOptions -&gt; ShowS
+[SimpleREOptions] -&gt; ShowS
+SimpleREOptions -&gt; String
+(Int -&gt; SimpleREOptions -&gt; ShowS)
+-&gt; (SimpleREOptions -&gt; String)
+-&gt; ([SimpleREOptions] -&gt; ShowS)
+-&gt; Show SimpleREOptions
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; SimpleREOptions -&gt; ShowS
+showsPrec :: Int -&gt; SimpleREOptions -&gt; ShowS
+$cshow :: SimpleREOptions -&gt; String
+show :: SimpleREOptions -&gt; String
+$cshowList :: [SimpleREOptions] -&gt; ShowS
+showList :: [SimpleREOptions] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- | we need to use this in the quasi quoters to specify @SimpleREOptions@</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- selected by the quasi quoter</span><span>
+</span><span id="line-54"></span><span id="local-6989586621679134152"><span id="local-6989586621679134159"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Lift</span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier hs-type">SimpleREOptions</span></a></span></span></span><span>
+</span><span id="line-55"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- | the general options for an RE are dependent on which back end is</span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- being used and are parameterised over the @RE@ type for the back end,</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- and its @CompOption@ and @ExecOption@ types (the compile-time and</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- execution time options, respectively); each back end will define an</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- @REOptions@ type that fills out these three type parameters with the</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- appropriate types (see, for example, &quot;Text.RE.TDFA&quot;)</span><span>
+</span><span id="line-64"></span><span class="hs-keyword">data</span><span> </span><span id="REOptions_"><span class="annot"><a href="Text.RE.REOptions.html#REOptions_"><span class="hs-identifier hs-var">REOptions_</span></a></span></span><span> </span><span id="local-6989586621679134017"><span class="annot"><a href="#local-6989586621679134017"><span class="hs-identifier hs-type">r</span></a></span></span><span> </span><span id="local-6989586621679134018"><span class="annot"><a href="#local-6989586621679134018"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679134019"><span class="annot"><a href="#local-6989586621679134019"><span class="hs-identifier hs-type">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-65"></span><span>  </span><span id="REOptions"><span class="annot"><a href="Text.RE.REOptions.html#REOptions"><span class="hs-identifier hs-var">REOptions</span></a></span></span><span>
+</span><span id="line-66"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="optionsMacs"><span class="annot"><span class="annottext">forall r c e. REOptions_ r c e -&gt; Macros r
+</span><a href="Text.RE.REOptions.html#optionsMacs"><span class="hs-identifier hs-var hs-var">optionsMacs</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier hs-type">Macros</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134017"><span class="hs-identifier hs-type">r</span></a></span><span class="hs-special">)</span><span>    </span><span class="annot"><span class="hs-comment">-- ^ the available TestBench RE macros</span></span><span>
+</span><span id="line-67"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="optionsComp"><span class="annot"><span class="annottext">forall r c e. REOptions_ r c e -&gt; c
+</span><a href="Text.RE.REOptions.html#optionsComp"><span class="hs-identifier hs-var hs-var">optionsComp</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679134018"><span class="hs-identifier hs-type">c</span></a></span><span>             </span><span class="annot"><span class="hs-comment">-- ^ the back end compile-time options</span></span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="optionsExec"><span class="annot"><span class="annottext">forall r c e. REOptions_ r c e -&gt; e
+</span><a href="Text.RE.REOptions.html#optionsExec"><span class="hs-identifier hs-var hs-var">optionsExec</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679134019"><span class="hs-identifier hs-type">e</span></a></span><span>             </span><span class="annot"><span class="hs-comment">-- ^ the back end execution-time options</span></span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134175"><span id="local-6989586621679134183"><span id="local-6989586621679134187"><span class="annot"><span class="annottext">Int -&gt; REOptions_ r c e -&gt; ShowS
+[REOptions_ r c e] -&gt; ShowS
+REOptions_ r c e -&gt; String
+(Int -&gt; REOptions_ r c e -&gt; ShowS)
+-&gt; (REOptions_ r c e -&gt; String)
+-&gt; ([REOptions_ r c e] -&gt; ShowS)
+-&gt; Show (REOptions_ r c e)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+forall r c e.
+(Show r, Show c, Show e) =&gt;
+Int -&gt; REOptions_ r c e -&gt; ShowS
+forall r c e.
+(Show r, Show c, Show e) =&gt;
+[REOptions_ r c e] -&gt; ShowS
+forall r c e.
+(Show r, Show c, Show e) =&gt;
+REOptions_ r c e -&gt; String
+$cshowsPrec :: forall r c e.
+(Show r, Show c, Show e) =&gt;
+Int -&gt; REOptions_ r c e -&gt; ShowS
+showsPrec :: Int -&gt; REOptions_ r c e -&gt; ShowS
+$cshow :: forall r c e.
+(Show r, Show c, Show e) =&gt;
+REOptions_ r c e -&gt; String
+show :: REOptions_ r c e -&gt; String
+$cshowList :: forall r c e.
+(Show r, Show c, Show e) =&gt;
+[REOptions_ r c e] -&gt; ShowS
+showList :: [REOptions_ r c e] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-identifier">The</span><span> </span><span class="hs-identifier">Macro</span><span> </span><span class="hs-identifier">Tables</span><span>
+</span><span id="line-75"></span><span class="hs-comment">----------------</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- | our macro tables are parameterised over the back end @RE@ type and</span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- and just associate each @MacroID@ with an @RE@ (which may in turn</span><span>
+</span><span id="line-80"></span><span class="hs-comment">-- contain macros to be expanded)</span><span>
+</span><span id="line-81"></span><span class="hs-keyword">type</span><span> </span><span id="Macros"><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier hs-var">Macros</span></a></span></span><span> </span><span id="local-6989586621679134190"><span class="annot"><a href="#local-6989586621679134190"><span class="hs-identifier hs-type">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HM.HashMap</span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier hs-type">MacroID</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134190"><span class="hs-identifier hs-type">r</span></a></span><span>
+</span><span id="line-82"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | @MacroID@ is just a wrapped @String@ type with an @IsString@</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- instance</span><span>
+</span><span id="line-87"></span><span class="hs-keyword">newtype</span><span> </span><span id="MacroID"><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier hs-var">MacroID</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-88"></span><span>    </span><span id="MacroID"><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier hs-var">MacroID</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getMacroID"><span class="annot"><span class="annottext">MacroID -&gt; String
+</span><a href="Text.RE.REOptions.html#getMacroID"><span class="hs-identifier hs-var hs-var">getMacroID</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134194"><span class="annot"><span class="annottext">String -&gt; MacroID
+(String -&gt; MacroID) -&gt; IsString MacroID
+forall a. (String -&gt; a) -&gt; IsString a
+$cfromString :: String -&gt; MacroID
+fromString :: String -&gt; MacroID
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></span></span><span class="hs-special">,</span><span id="local-6989586621679134205"><span id="local-6989586621679134211"><span id="local-6989586621679134216"><span id="local-6989586621679134221"><span id="local-6989586621679134226"><span id="local-6989586621679134231"><span id="local-6989586621679134236"><span class="annot"><span class="annottext">Eq MacroID
+Eq MacroID
+-&gt; (MacroID -&gt; MacroID -&gt; Ordering)
+-&gt; (MacroID -&gt; MacroID -&gt; Bool)
+-&gt; (MacroID -&gt; MacroID -&gt; Bool)
+-&gt; (MacroID -&gt; MacroID -&gt; Bool)
+-&gt; (MacroID -&gt; MacroID -&gt; Bool)
+-&gt; (MacroID -&gt; MacroID -&gt; MacroID)
+-&gt; (MacroID -&gt; MacroID -&gt; MacroID)
+-&gt; Ord MacroID
+MacroID -&gt; MacroID -&gt; Bool
+MacroID -&gt; MacroID -&gt; Ordering
+MacroID -&gt; MacroID -&gt; MacroID
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: MacroID -&gt; MacroID -&gt; Ordering
+compare :: MacroID -&gt; MacroID -&gt; Ordering
+$c&lt; :: MacroID -&gt; MacroID -&gt; Bool
+&lt; :: MacroID -&gt; MacroID -&gt; Bool
+$c&lt;= :: MacroID -&gt; MacroID -&gt; Bool
+&lt;= :: MacroID -&gt; MacroID -&gt; Bool
+$c&gt; :: MacroID -&gt; MacroID -&gt; Bool
+&gt; :: MacroID -&gt; MacroID -&gt; Bool
+$c&gt;= :: MacroID -&gt; MacroID -&gt; Bool
+&gt;= :: MacroID -&gt; MacroID -&gt; Bool
+$cmax :: MacroID -&gt; MacroID -&gt; MacroID
+max :: MacroID -&gt; MacroID -&gt; MacroID
+$cmin :: MacroID -&gt; MacroID -&gt; MacroID
+min :: MacroID -&gt; MacroID -&gt; MacroID
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134243"><span id="local-6989586621679134249"><span class="annot"><span class="annottext">MacroID -&gt; MacroID -&gt; Bool
+(MacroID -&gt; MacroID -&gt; Bool)
+-&gt; (MacroID -&gt; MacroID -&gt; Bool) -&gt; Eq MacroID
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: MacroID -&gt; MacroID -&gt; Bool
+== :: MacroID -&gt; MacroID -&gt; Bool
+$c/= :: MacroID -&gt; MacroID -&gt; Bool
+/= :: MacroID -&gt; MacroID -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span id="local-6989586621679134255"><span id="local-6989586621679134261"><span id="local-6989586621679134264"><span class="annot"><span class="annottext">Int -&gt; MacroID -&gt; ShowS
+[MacroID] -&gt; ShowS
+MacroID -&gt; String
+(Int -&gt; MacroID -&gt; ShowS)
+-&gt; (MacroID -&gt; String) -&gt; ([MacroID] -&gt; ShowS) -&gt; Show MacroID
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; MacroID -&gt; ShowS
+showsPrec :: Int -&gt; MacroID -&gt; ShowS
+$cshow :: MacroID -&gt; String
+show :: MacroID -&gt; String
+$cshowList :: [MacroID] -&gt; ShowS
+showList :: [MacroID] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-93"></span><span class="annot"><span class="hs-comment">-- | @MacroID@ is used with @HM.HashMap@ to build macro lookup tables</span></span><span>
+</span><span id="line-94"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679134271"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#MacroID"><span class="hs-identifier hs-type">MacroID</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-95"></span><span>  </span><span id="local-6989586621679134279"><span class="annot"><span class="annottext">hashWithSalt :: Int -&gt; MacroID -&gt; Int
+</span><a href="#local-6989586621679134279"><span class="hs-identifier hs-var hs-var hs-var hs-var">hashWithSalt</span></a></span></span><span> </span><span id="local-6989586621679134281"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134281"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Int
+forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134281"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int) -&gt; (MacroID -&gt; String) -&gt; MacroID -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">MacroID -&gt; String
+</span><a href="Text.RE.REOptions.html#getMacroID"><span class="hs-identifier hs-var">getMacroID</span></a></span><span>
+</span><span id="line-96"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-99"></span><span class="annot"><span class="hs-comment">-- | a macro table containing no entries</span></span><span>
+</span><span id="line-100"></span><span id="local-6989586621679134052"><span class="annot"><a href="Text.RE.REOptions.html#emptyMacros"><span class="hs-identifier hs-type">emptyMacros</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#Macros"><span class="hs-identifier hs-type">Macros</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679134052"><span class="hs-identifier hs-type">r</span></a></span></span><span>
+</span><span id="line-101"></span><span id="emptyMacros"><span class="annot"><span class="annottext">emptyMacros :: forall r. Macros r
+</span><a href="Text.RE.REOptions.html#emptyMacros"><span class="hs-identifier hs-var hs-var">emptyMacros</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HashMap MacroID r
+forall k v. HashMap k v
+</span><span class="hs-identifier hs-var">HM.empty</span></span><span>
+</span><span id="line-102"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-glyph">\</span><span class="hs-identifier">begin</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- This API module provides the generic types used to specify the options</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- when compiling REs for each of the backl ends.</span><span>
+</span><span id="line-109"></span><span class="hs-comment">--</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- See the tutorials at http://re-tutorial-options.regex.uk</span><span>
+</span><span id="line-111"></span><span class="hs-glyph">\</span><span class="hs-identifier">end</span><span class="hs-special">{</span><span class="hs-identifier">code</span><span class="hs-special">}</span><span>
+</span><span id="line-112"></span></pre></body></html>

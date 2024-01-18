@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-duplicate-exports #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.Tools</span><span>
+</span><span id="line-4"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-5"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Tools Tutorial</span></span><span>
+</span><span id="line-6"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Sed</span></span><span>
+</span><span id="line-9"></span><span>    </span><span class="annot"><a href="Text.RE.Tools.Sed.html#sed"><span class="hs-identifier">sed</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Sed.html#sed%27"><span class="hs-identifier">sed'</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Grep</span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#grep"><span class="hs-identifier">grep</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#Verbosity"><span class="hs-identifier">Verbosity</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#Line"><span class="hs-identifier">Line</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#grepLines"><span class="hs-identifier">grepLines</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#grepFilter"><span class="hs-identifier">grepFilter</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#GrepScript"><span class="hs-identifier">GrepScript</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#grepWithScript"><span class="hs-identifier">grepWithScript</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#report"><span class="hs-identifier">report</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Grep.html#linesMatched"><span class="hs-identifier">linesMatched</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Lex</span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Tools.Lex.html#alex"><span class="hs-identifier">alex</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Tools.Lex.html#alex%27"><span class="hs-identifier">alex'</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Find</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#FindMethods"><span class="hs-identifier">FindMethods</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_"><span class="hs-identifier">findMatches_</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Find.html#findMatches_%27"><span class="hs-identifier">findMatches_'</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsRegex</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier">IsRegex</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceAll"><span class="hs-identifier">searchReplaceAll</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceFirst"><span class="hs-identifier">searchReplaceFirst</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Edit</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edits"><span class="hs-identifier">Edits</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#Edit"><span class="hs-identifier">Edit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#LineEdit"><span class="hs-identifier">LineEdit</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdits"><span class="hs-identifier">applyEdits</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyEdit"><span class="hs-identifier">applyEdit</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.Tools.Edit.html#applyLineEdit"><span class="hs-identifier">applyLineEdit</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="hs-comment">-- * LineNo</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#LineNo"><span class="hs-identifier">LineNo</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#firstLine"><span class="hs-identifier">firstLine</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#getLineNo"><span class="hs-identifier">getLineNo</span></a></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.LineNo.html#lineNo"><span class="hs-identifier">lineNo</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Replace</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Edit.html"><span class="hs-identifier">Text.RE.Tools.Edit</span></a></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Find.html"><span class="hs-identifier">Text.RE.Tools.Find</span></a></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Grep.html"><span class="hs-identifier">Text.RE.Tools.Grep</span></a></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Lex.html"><span class="hs-identifier">Text.RE.Tools.Lex</span></a></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.Sed.html"><span class="hs-identifier">Text.RE.Tools.Sed</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- This API module provides some familiar RE tools on top of the core</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- package functions and types.</span><span>
+</span><span id="line-59"></span><span class="hs-comment">--</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- See the Regex Tools tutorial at http://re-tutorial-tools.regex.uk</span><span>
+</span><span id="line-61"></span></pre></body></html>

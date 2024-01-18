@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude              #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts               #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances              #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-orphans           #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-duplicate-exports #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE CPP                            #-}</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &gt;= 800
+</span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-unused-imports        #-}</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.RE.TDFA.ByteString.Lazy</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">(</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Tutorial</span></span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><span class="hs-comment">-- $tutorial</span></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The 'Matches' and 'Match' Operators</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~"><span class="hs-operator">(*=~)</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~"><span class="hs-operator">(?=~)</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The 'SearchReplace' Operators</span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~%2F"><span class="hs-operator">(*=~/)</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~%2F"><span class="hs-operator">(?=~/)</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The 'Matches' Type</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier">Matches</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#matchesSource"><span class="hs-identifier">matchesSource</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#allMatches"><span class="hs-identifier">allMatches</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#anyMatches"><span class="hs-identifier">anyMatches</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#countMatches"><span class="hs-identifier">countMatches</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#matches"><span class="hs-identifier">matches</span></a></span><span>
+</span><span id="line-31"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The 'Match' Type</span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier">Match</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchSource"><span class="hs-identifier">matchSource</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matched"><span class="hs-identifier">matched</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#matchedText"><span class="hs-identifier">matchedText</span></a></span><span>
+</span><span id="line-36"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Macros and Parsers</span></span><span>
+</span><span id="line-37"></span><span>  </span><span class="annot"><span class="hs-comment">-- $macros</span></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.TestBench.Parsers.html"><span class="hs-identifier">Text.RE.TestBench.Parsers</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The 'RE' Type</span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier">RE</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier">reSource</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Options</span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><span class="hs-comment">-- $options</span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.REOptions.html#SimpleREOptions"><span class="hs-identifier">SimpleREOptions</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Compiling and Escaping REs</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier">SearchReplace</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegex"><span class="hs-identifier">compileRegex</span></a></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier">compileRegexWith</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplace"><span class="hs-identifier">compileSearchReplace</span></a></span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier">compileSearchReplaceWith</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escape"><span class="hs-identifier">escape</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#escapeWith"><span class="hs-identifier">escapeWith</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.EscapeREString.html#escapeREString"><span class="hs-identifier">escapeREString</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Classic regex-base Match Operators</span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~"><span class="hs-operator">(=~)</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~~"><span class="hs-operator">(=~~)</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The re Quasi Quoters</span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-comment">-- $re</span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re"><span class="hs-identifier">re</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineSensitive"><span class="hs-identifier">reMultilineSensitive</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMultilineInsensitive"><span class="hs-identifier">reMultilineInsensitive</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockSensitive"><span class="hs-identifier">reBlockSensitive</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBlockInsensitive"><span class="hs-identifier">reBlockInsensitive</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMS"><span class="hs-identifier">reMS</span></a></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reMI"><span class="hs-identifier">reMI</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBS"><span class="hs-identifier">reBS</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#reBI"><span class="hs-identifier">reBI</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#re_"><span class="hs-identifier">re_</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The Ed Quasi Quoters</span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-comment">-- $ed</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edMultilineSensitive"><span class="hs-identifier">edMultilineSensitive</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edMultilineInsensitive"><span class="hs-identifier">edMultilineInsensitive</span></a></span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edBlockSensitive"><span class="hs-identifier">edBlockSensitive</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edBlockInsensitive"><span class="hs-identifier">edBlockInsensitive</span></a></span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#ed"><span class="hs-identifier">ed</span></a></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edMS"><span class="hs-identifier">edMS</span></a></span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edMI"><span class="hs-identifier">edMI</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edBS"><span class="hs-identifier">edBS</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#edBI"><span class="hs-identifier">edBI</span></a></span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html#ed_"><span class="hs-identifier">ed_</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><span class="hs-comment">-- * The cp Quasi Quoters</span></span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.NamedCaptures.html#cp"><span class="hs-identifier">cp</span></a></span><span>
+</span><span id="line-83"></span><span>  </span><span class="annot"><span class="hs-comment">-- * IsRegex</span></span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="hs-comment">-- $isregex</span></span><span>
+</span><span id="line-85"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-86"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Fail</span></span><span>
+</span><span id="line-89"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy.Char8</span></span><span>    </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LBS</span></span><span>
+</span><span id="line-90"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Typeable</span></span><span>
+</span><span id="line-91"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Prelude.Compat</span></span><span>
+</span><span id="line-92"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.REOptions.html"><span class="hs-identifier">Text.RE.REOptions</span></a></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Replace.html"><span class="hs-identifier">Text.RE.Replace</span></a></span><span>
+</span><span id="line-94"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.TestBench.Parsers.html"><span class="hs-identifier">Text.RE.TestBench.Parsers</span></a></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.Tools.IsRegex.html"><span class="hs-identifier">Text.RE.Tools.IsRegex</span></a></span><span>
+</span><span id="line-96"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.html"><span class="hs-identifier">Text.RE.ZeInternals</span></a></span><span>
+</span><span id="line-97"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy.html"><span class="hs-identifier">Text.RE.ZeInternals.SearchReplace.TDFA.ByteString.Lazy</span></a></span><span>
+</span><span id="line-98"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html"><span class="hs-identifier">Text.RE.ZeInternals.TDFA</span></a></span><span>
+</span><span id="line-99"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Regex.Base</span></span><span>
+</span><span id="line-100"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Text.Regex.TDFA</span></span><span>               </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TDFA</span></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- NB regex-base instance imports maybe be needed for for some API modules</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | find all the matches in the argument text; e.g., to count the number</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- of naturals in s:</span><span>
+</span><span id="line-105"></span><span class="hs-comment">--</span><span>
+</span><span id="line-106"></span><span class="hs-comment">--   @countMatches $ s *=~ [re|[0-9]+|]@</span><span>
+</span><span id="line-107"></span><span class="hs-comment">--</span><span>
+</span><span id="line-108"></span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~"><span class="hs-operator hs-type">(*=~)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-109"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-110"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Matches.html#Matches"><span class="hs-identifier hs-type">Matches</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-111"></span><span id="%2A%3D~"><span class="annot"><span class="annottext">*=~ :: ByteString -&gt; RE -&gt; Matches ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~"><span class="hs-operator hs-var hs-var">(*=~)</span></a></span></span><span> </span><span id="local-6989586621679143846"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143846"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span id="local-6989586621679143847"><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143847"><span class="hs-identifier hs-var">rex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; Matches ByteString -&gt; Matches ByteString
+forall a. CaptureNames -&gt; Matches a -&gt; Matches a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatches"><span class="hs-identifier hs-var">addCaptureNamesToMatches</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-var">reCaptureNames</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143847"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Matches ByteString -&gt; Matches ByteString)
+-&gt; Matches ByteString -&gt; Matches ByteString
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Regex -&gt; ByteString -&gt; Matches ByteString
+forall regex source target.
+RegexContext regex source target =&gt;
+regex -&gt; source -&gt; target
+</span><span class="hs-identifier hs-var">match</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-var">reRegex</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143847"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143846"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- | find the first match in the argument text; e.g., to test if there</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- is a natural number in the input text:</span><span>
+</span><span id="line-115"></span><span class="hs-comment">--</span><span>
+</span><span id="line-116"></span><span class="hs-comment">--   @matched $ s ?=~ [re|[0-9]+|]@</span><span>
+</span><span id="line-117"></span><span class="hs-comment">--</span><span>
+</span><span id="line-118"></span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~"><span class="hs-operator hs-type">(?=~)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-119"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-120"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.Match.html#Match"><span class="hs-identifier hs-type">Match</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-121"></span><span id="%3F%3D~"><span class="annot"><span class="annottext">?=~ :: ByteString -&gt; RE -&gt; Match ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~"><span class="hs-operator hs-var hs-var">(?=~)</span></a></span></span><span> </span><span id="local-6989586621679143852"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143852"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span id="local-6989586621679143853"><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143853"><span class="hs-identifier hs-var">rex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; Match ByteString -&gt; Match ByteString
+forall a. CaptureNames -&gt; Match a -&gt; Match a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNamesToMatch"><span class="hs-identifier hs-var">addCaptureNamesToMatch</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-var">reCaptureNames</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143853"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Match ByteString -&gt; Match ByteString)
+-&gt; Match ByteString -&gt; Match ByteString
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Regex -&gt; ByteString -&gt; Match ByteString
+forall regex source target.
+RegexContext regex source target =&gt;
+regex -&gt; source -&gt; target
+</span><span class="hs-identifier hs-var">match</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-var">reRegex</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143853"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143852"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- | search and replace all matches in the argument text; e.g., this section</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- will convert every YYYY-MM-DD format date in its argument text into a</span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- DD\/MM\/YYYY date:</span><span>
+</span><span id="line-126"></span><span class="hs-comment">--</span><span>
+</span><span id="line-127"></span><span class="hs-comment">--   @(*=~\/ [ed|${y}([0-9]{4})-0*${m}([0-9]{2})-0*${d}([0-9]{2})\/\/\/${d}\/${m}\/${y}|])@</span><span>
+</span><span id="line-128"></span><span class="hs-comment">--</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~%2F"><span class="hs-operator hs-type">(*=~/)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-130"></span><span id="%2A%3D~%2F"><span class="annot"><span class="annottext">*=~/ :: ByteString -&gt; SearchReplace RE ByteString -&gt; ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~%2F"><span class="hs-operator hs-var hs-var">(*=~/)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(SearchReplace RE ByteString -&gt; ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; SearchReplace RE ByteString -&gt; ByteString
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">SearchReplace RE ByteString -&gt; ByteString -&gt; ByteString
+forall re s. IsRegex re s =&gt; SearchReplace re s -&gt; s -&gt; s
+</span><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceAll"><span class="hs-identifier hs-var">searchReplaceAll</span></a></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span class="hs-comment">-- | search and replace the first occurrence only (if any) in the input text</span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- e.g., to prefix the first string of four hex digits in the input text,</span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- if any, with @0x@:</span><span>
+</span><span id="line-135"></span><span class="hs-comment">--</span><span>
+</span><span id="line-136"></span><span class="hs-comment">--  @(?=~\/ [ed|[0-9A-Fa-f]{4}\/\/\/0x$0|])@</span><span>
+</span><span id="line-137"></span><span class="hs-comment">--</span><span>
+</span><span id="line-138"></span><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~%2F"><span class="hs-operator hs-type">(?=~/)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.Types.SearchReplace.html#SearchReplace"><span class="hs-identifier hs-type">SearchReplace</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-139"></span><span id="%3F%3D~%2F"><span class="annot"><span class="annottext">?=~/ :: ByteString -&gt; SearchReplace RE ByteString -&gt; ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~%2F"><span class="hs-operator hs-var hs-var">(?=~/)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(SearchReplace RE ByteString -&gt; ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; SearchReplace RE ByteString -&gt; ByteString
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">SearchReplace RE ByteString -&gt; ByteString -&gt; ByteString
+forall re s. IsRegex re s =&gt; SearchReplace re s -&gt; s -&gt; s
+</span><a href="Text.RE.ZeInternals.Types.IsRegex.html#searchReplaceFirst"><span class="hs-identifier hs-var">searchReplaceFirst</span></a></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="annot"><span class="hs-comment">-- | the `regex-base` polymorphic match operator</span></span><span>
+</span><span id="line-142"></span><span id="local-6989586621679143750"><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~"><span class="hs-operator hs-type">(=~)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621679143750"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-143"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RegexContext</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="annot"><a href="#local-6989586621679143750"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-144"></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-146"></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-147"></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679143750"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-148"></span><span id="%3D~"><span class="annot"><span class="annottext">=~ :: forall a.
+(Typeable a, RegexContext Regex ByteString a) =&gt;
+ByteString -&gt; RE -&gt; a
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~"><span class="hs-operator hs-var hs-var">(=~)</span></a></span></span><span> </span><span id="local-6989586621679143862"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143862"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span id="local-6989586621679143863"><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143863"><span class="hs-identifier hs-var">rex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; a -&gt; a
+forall a. Typeable a =&gt; CaptureNames -&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNames"><span class="hs-identifier hs-var">addCaptureNames</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-var">reCaptureNames</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143863"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; a -&gt; a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Regex -&gt; ByteString -&gt; a
+forall regex source target.
+RegexContext regex source target =&gt;
+regex -&gt; source -&gt; target
+</span><span class="hs-identifier hs-var">match</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-var">reRegex</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143863"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143862"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span class="annot"><span class="hs-comment">-- | the `regex-base` monadic, polymorphic match operator</span></span><span>
+</span><span id="line-151"></span><span id="local-6989586621679143753"><span id="local-6989586621679143754"><span class="annot"><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~~"><span class="hs-operator hs-type">(=~~)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679143753"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadFail</span></span><span> </span><span class="annot"><a href="#local-6989586621679143753"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-152"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679143753"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-153"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621679143754"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-154"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">RegexContext</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TDFA.Regex</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span> </span><span class="annot"><a href="#local-6989586621679143754"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-155"></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-156"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span><span>
+</span><span id="line-157"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span>
+</span><span id="line-158"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679143753"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679143754"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-159"></span><span id="%3D~~"><span class="annot"><span class="annottext">=~~ :: forall (m :: * -&gt; *) a.
+(Monad m, MonadFail m, Functor m, Typeable a,
+ RegexContext Regex ByteString a) =&gt;
+ByteString -&gt; RE -&gt; m a
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%3D~~"><span class="hs-operator hs-var hs-var">(=~~)</span></a></span></span><span> </span><span id="local-6989586621679143874"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143874"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span id="local-6989586621679143875"><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143875"><span class="hs-identifier hs-var">rex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CaptureNames -&gt; a -&gt; a
+forall a. Typeable a =&gt; CaptureNames -&gt; a -&gt; a
+</span><a href="Text.RE.ZeInternals.AddCaptureNames.html#addCaptureNames"><span class="hs-identifier hs-var">addCaptureNames</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; CaptureNames
+</span><a href="Text.RE.ZeInternals.TDFA.html#reCaptureNames"><span class="hs-identifier hs-var">reCaptureNames</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143875"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; m a -&gt; m a
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Regex -&gt; ByteString -&gt; m a
+forall regex source target (m :: * -&gt; *).
+(RegexContext regex source target, MonadFail m) =&gt;
+regex -&gt; source -&gt; m target
+forall (m :: * -&gt; *). MonadFail m =&gt; Regex -&gt; ByteString -&gt; m a
+</span><span class="hs-identifier hs-var">matchM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RE -&gt; Regex
+</span><a href="Text.RE.ZeInternals.TDFA.html#reRegex"><span class="hs-identifier hs-var">reRegex</span></a></span><span> </span><span class="annot"><span class="annottext">RE
+</span><a href="#local-6989586621679143875"><span class="hs-identifier hs-var">rex</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143874"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679143884"><span id="local-6989586621679143894"><span id="local-6989586621679143906"><span id="local-6989586621679143915"><span class="annot"><a href="Text.RE.ZeInternals.Types.IsRegex.html#IsRegex"><span class="hs-identifier hs-type">IsRegex</span></a></span><span> </span><span class="annot"><a href="Text.RE.ZeInternals.TDFA.html#RE"><span class="hs-identifier hs-type">RE</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">LBS.ByteString</span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-162"></span><span>  </span><span id="local-6989586621679143925"><span class="annot"><span class="annottext">matchOnce :: RE -&gt; ByteString -&gt; Match ByteString
+</span><a href="#local-6989586621679143925"><span class="hs-identifier hs-var hs-var hs-var hs-var">matchOnce</span></a></span></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; RE -&gt; Match ByteString)
+-&gt; RE -&gt; ByteString -&gt; Match ByteString
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; RE -&gt; Match ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%3F%3D~"><span class="hs-operator hs-var">(?=~)</span></a></span><span>
+</span><span id="line-163"></span><span>  </span><span id="local-6989586621679143927"><span class="annot"><span class="annottext">matchMany :: RE -&gt; ByteString -&gt; Matches ByteString
+</span><a href="#local-6989586621679143927"><span class="hs-identifier hs-var hs-var hs-var hs-var">matchMany</span></a></span></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; RE -&gt; Matches ByteString)
+-&gt; RE -&gt; ByteString -&gt; Matches ByteString
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; RE -&gt; Matches ByteString
+</span><a href="Text.RE.TDFA.ByteString.Lazy.html#%2A%3D~"><span class="hs-operator hs-var">(*=~)</span></a></span><span>
+</span><span id="line-164"></span><span>  </span><span id="local-6989586621679143936"><span class="annot"><span class="annottext">makeRegexWith :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; ByteString -&gt; m RE
+</span><a href="#local-6989586621679143936"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeRegexWith</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679143938"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679143938"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions -&gt; String -&gt; m RE
+forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m) =&gt;
+SimpleREOptions -&gt; String -&gt; m RE
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileRegexWith"><span class="hs-identifier hs-var">compileRegexWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679143938"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; m RE) -&gt; (ByteString -&gt; String) -&gt; ByteString -&gt; m RE
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span>
+</span><span id="line-165"></span><span>  </span><span id="local-6989586621679143953"><span class="annot"><span class="annottext">makeSearchReplaceWith :: forall (m :: * -&gt; *).
+(Functor m, Monad m, MonadFail m, IsRegex RE ByteString) =&gt;
+SimpleREOptions
+-&gt; ByteString -&gt; ByteString -&gt; m (SearchReplace RE ByteString)
+</span><a href="#local-6989586621679143953"><span class="hs-identifier hs-var hs-var hs-var hs-var">makeSearchReplaceWith</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679143955"><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679143955"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span id="local-6989586621679143956"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143956"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679143957"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143957"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+-&gt; String -&gt; String -&gt; m (SearchReplace RE ByteString)
+forall (m :: * -&gt; *) s.
+(Monad m, MonadFail m, Functor m, IsRegex RE s) =&gt;
+SimpleREOptions -&gt; String -&gt; String -&gt; m (SearchReplace RE s)
+</span><a href="Text.RE.ZeInternals.TDFA.html#compileSearchReplaceWith"><span class="hs-identifier hs-var">compileSearchReplaceWith</span></a></span><span> </span><span class="annot"><span class="annottext">SimpleREOptions
+</span><a href="#local-6989586621679143955"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143956"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; String
+forall a. Replace a =&gt; a -&gt; String
+</span><a href="Text.RE.ZeInternals.Replace.html#unpackR"><span class="hs-identifier hs-var">unpackR</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679143957"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span>  </span><span id="local-6989586621679143959"><span class="annot"><span class="annottext">regexSource :: RE -&gt; ByteString
+</span><a href="#local-6989586621679143959"><span class="hs-identifier hs-var hs-var hs-var hs-var">regexSource</span></a></span></span><span>           </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ByteString
+forall a. Replace a =&gt; String -&gt; a
+</span><a href="Text.RE.ZeInternals.Replace.html#packR"><span class="hs-identifier hs-var">packR</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ByteString) -&gt; (RE -&gt; String) -&gt; RE -&gt; ByteString
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RE -&gt; String
+</span><a href="Text.RE.ZeInternals.TDFA.html#reSource"><span class="hs-identifier hs-var">reSource</span></a></span><span>
+</span><span id="line-167"></span><span>
+</span><span id="line-168"></span><span class="hs-comment">-- $tutorial</span><span>
+</span><span id="line-169"></span><span class="hs-comment">-- We have a regex tutorial at &lt;http://tutorial.regex.uk&gt;.</span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- $macros</span><span>
+</span><span id="line-172"></span><span class="hs-comment">-- There are a number of RE macros and corresponding Haskell parsers</span><span>
+</span><span id="line-173"></span><span class="hs-comment">-- for parsing the matched text into appropriate Haskell types. See</span><span>
+</span><span id="line-174"></span><span class="hs-comment">-- the [Macros Tables](http://regex.uk/macros) for details.</span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- $options</span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- You can specify different compilation options by appending a</span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- to the name of an [re| ... |] or [ed| ... \/\/\/ ... |] quasi quoter</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- to select the corresponding compilation option. For example, the</span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- section,</span><span>
+</span><span id="line-181"></span><span class="hs-comment">--</span><span>
+</span><span id="line-182"></span><span class="hs-comment">--  @(?=~/ [edBlockInsensitive|foo$\/\/\/bar|])@</span><span>
+</span><span id="line-183"></span><span class="hs-comment">--</span><span>
+</span><span id="line-184"></span><span class="hs-comment">-- will replace a @foo@ suffix of the argument text, of any</span><span>
+</span><span id="line-185"></span><span class="hs-comment">-- capitalisation, with a (lower case) @bar@. If you need to specify the</span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- options dynamically, use the @[re_| ... |]@ and @[ed_| ... \/\/\/ ... |]@</span><span>
+</span><span id="line-187"></span><span class="hs-comment">-- quasi quoters, which generate functions that take an 'IsOption' option</span><span>
+</span><span id="line-188"></span><span class="hs-comment">-- (e.g., a 'SimpleReOptions' value) and yields a 'RE' or 'SearchReplace'</span><span>
+</span><span id="line-189"></span><span class="hs-comment">-- as appropriate. For example if you have a 'SimpleReOptions' value in</span><span>
+</span><span id="line-190"></span><span class="hs-comment">-- @sro@ then</span><span>
+</span><span id="line-191"></span><span class="hs-comment">--</span><span>
+</span><span id="line-192"></span><span class="hs-comment">--  @(?=~/ [ed_|foo$\/\/\/bar|] sro)@</span><span>
+</span><span id="line-193"></span><span class="hs-comment">--</span><span>
+</span><span id="line-194"></span><span class="hs-comment">-- will compile the @foo$@ RE according to the value of @sro@. For more</span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- on specifying RE options see &quot;Text.RE.REOptions&quot;.</span><span>
+</span><span id="line-196"></span><span>
+</span><span id="line-197"></span><span class="hs-comment">-- $re</span><span>
+</span><span id="line-198"></span><span class="hs-comment">-- The @[re|.*|]@ quasi quoters, with variants for specifying different</span><span>
+</span><span id="line-199"></span><span class="hs-comment">-- options to the RE compiler (see &quot;Text.RE.REOptions&quot;), and the</span><span>
+</span><span id="line-200"></span><span class="hs-comment">-- specialised back-end types and functions.</span><span>
+</span><span id="line-201"></span><span>
+</span><span id="line-202"></span><span class="hs-comment">-- $ed</span><span>
+</span><span id="line-203"></span><span class="hs-comment">-- The @[ed|.*\/\/\/foo|]@ quasi quoters, with variants for specifying different</span><span>
+</span><span id="line-204"></span><span class="hs-comment">-- options to the RE compiler (see &quot;Text.RE.REOptions&quot;).</span><span>
+</span><span id="line-205"></span><span>
+</span><span id="line-206"></span><span class="hs-comment">-- $ed</span><span>
+</span><span id="line-207"></span><span class="hs-comment">-- The -- | the @[ed| ... \/\/\/ ... |]@ quasi quoters; for example,</span><span>
+</span><span id="line-208"></span><span class="hs-comment">--</span><span>
+</span><span id="line-209"></span><span class="hs-comment">--  @[ed|${y}([0-9]{4})-0*${m}([0-9]{2})-0*${d}([0-9]{2})\/\/\/${d}\/${m}\/${y}|])@</span><span>
+</span><span id="line-210"></span><span class="hs-comment">--</span><span>
+</span><span id="line-211"></span><span class="hs-comment">-- represents a @SearchReplace@ that will convert a YYYY-MM-DD format date</span><span>
+</span><span id="line-212"></span><span class="hs-comment">-- into a DD\/MM\/YYYY format date.</span><span>
+</span><span id="line-213"></span><span class="hs-comment">--</span><span>
+</span><span id="line-214"></span><span class="hs-comment">-- The only difference between these quasi quoters is the RE options that are set,</span><span>
+</span><span id="line-215"></span><span class="hs-comment">-- using the same conventions as the @[re| ... |]@ quasi quoters.</span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- $isregex</span><span>
+</span><span id="line-218"></span><span class="hs-comment">-- The 'IsRegex' class is used to abstract over the different regex back ends and</span><span>
+</span><span id="line-219"></span><span class="hs-comment">-- the text types they work with -- see &quot;Text.RE.Tools.IsRegex&quot; for details.</span><span>
+</span><span id="line-220"></span></pre></body></html>
