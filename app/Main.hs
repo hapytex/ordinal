@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Data.Char (digitToInt)
+import Data.Char (digitToInt, isDigit)
 import Data.Default.Class (Default (def))
 import Data.HashMap.Strict (HashMap, fromList, lookup)
 import Data.Maybe (fromMaybe)
@@ -42,7 +42,7 @@ determine Ordinal = toOrdinal
 determine ShortOrdinal = toShortOrdinal
 determine Time = go
   where
-    go lang x = toTimeText' lang (fromIntegral (x `div` 60)) (fromIntegral (x `mod` 60))
+    go lng x = toTimeText' lng (fromIntegral (x `div` 60)) (fromIntegral (x `mod` 60))
 
 findLanguage :: String -> IO NumeralsAlgorithm
 findLanguage k =
@@ -70,10 +70,10 @@ compilerOpts argv =
     (_, _, errs) -> ioError (userError (concat errs ++ usageInfo header options))
 
 readInt :: String -> Integer
-readInt x = fromMaybe (read x) (go 0 x)
+readInt v = fromMaybe (read v) (go 0 v)
   where
     go h (':' : xs) = Just (60 * h + read xs)
-    go h (x : xs) | '0' <= x && x <= '9' = go (h * 10 + fromIntegral (digitToInt x)) xs
+    go h (x : xs) | isDigit x = go (h * 10 + fromIntegral (digitToInt x)) xs
     go _ _ = Nothing
 
 main :: IO ()
