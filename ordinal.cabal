@@ -73,7 +73,7 @@ test-suite             cardinal
       Text.Numerals.Languages.GermanSpec
   build-depends:
       base
-    , libordinal
+    , ordinal
     , hspec ==2.*
     , QuickCheck >=2.8
     , text >= 0.1
