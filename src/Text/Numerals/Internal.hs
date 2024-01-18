@@ -1,46 +1,62 @@
-{-# LANGUAGE CPP, Safe #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE Safe #-}
 
-module Text.Numerals.Internal (
-    _div10, _rem10, _divisableBy, _divisable100
-  , _pluralize, _pluralize'
-  , _showText
-  , _mergeWith, _mergeWithSpace, _mergeWithHyphen, _mergeWith', _replaceSuffix
-  , _hundred, _thousand, _million, _billion, _trillion
-  , _iLog, _iLogFloor
-  , _stripLastIf
-  , _showIntegral
-  , _showPositive
-  , _genText, _shrinkText
-  ) where
+module Text.Numerals.Internal
+  ( _div10,
+    _rem10,
+    _divisableBy,
+    _divisable100,
+    _pluralize,
+    _pluralize',
+    _showText,
+    _mergeWith,
+    _mergeWithSpace,
+    _mergeWithHyphen,
+    _mergeWith',
+    _replaceSuffix,
+    _hundred,
+    _thousand,
+    _million,
+    _billion,
+    _trillion,
+    _iLog,
+    _iLogFloor,
+    _stripLastIf,
+    _showIntegral,
+    _showPositive,
+    _genText,
+    _shrinkText,
+  )
+where
 
-import Control.Applicative(liftA2)
-
-import Data.Char(intToDigit)
+import Control.Applicative (liftA2)
+import Data.Char (intToDigit)
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
-import Data.Text(Text, cons, dropEnd, inits, isSuffixOf, singleton, tails, pack)
+import Data.Text (Text, cons, dropEnd, inits, isSuffixOf, pack, singleton, tails)
 import qualified Data.Text as T
-
-import Test.QuickCheck(listOf)
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary))
-import Test.QuickCheck.Gen(Gen)
+import Test.QuickCheck (listOf)
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary))
+import Test.QuickCheck.Gen (Gen)
 
 _pluralize :: a -> a -> Int -> a
 _pluralize sing plur = go
-    where go 1 = sing
-          go (-1) = sing
-          go _ = plur
+  where
+    go 1 = sing
+    go (-1) = sing
+    go _ = plur
 
 _pluralize' :: a -> a -> Int -> a
 _pluralize' sing plur = go
-    where go 1 = sing
-          go _ = plur
+  where
+    go 1 = sing
+    go _ = plur
 
 _stripLastIf :: Char -> Text -> Text
 _stripLastIf c t
-    | singleton c `isSuffixOf` t = T.init t
-    | otherwise = t
+  | singleton c `isSuffixOf` t = T.init t
+  | otherwise = t
 
 _mergeWith' :: Char -> Text -> Text -> Text
 _mergeWith' m = (. cons m) . (<>)
@@ -89,35 +105,43 @@ _trillion = 1000000000000
 
 _iLogFloor :: (Integral i, Integral j) => i -> i -> (i, j, i)
 _iLogFloor b m = go b
-  where go i | m < i = (m, 0, 1)
-             | q < i = (q, 2 * e, j)
-             | otherwise = (div q i, 2 * e + 1, j * i)
-            where ~(q, e, j) = go (i*i)
+  where
+    go i
+      | m < i = (m, 0, 1)
+      | q < i = (q, 2 * e, j)
+      | otherwise = (div q i, 2 * e + 1, j * i)
+      where
+        ~(q, e, j) = go (i * i)
 
 _iLog :: (Integral i, Integral j) => i -> i -> Maybe j
 _iLog b m = snd <$> go b
-  where go i | m < i = Just (m, 0)
-             | Just (q, e) <- go (i*i) = go' i q e
-             | otherwise = Nothing
-        go' i q e | q < i = Just (q, 2 * e)
-                  | md == 0 = Just (d, 2 * e + 1)
-                  | otherwise = Nothing
-            where (d, md) = divMod q i
+  where
+    go i
+      | m < i = Just (m, 0)
+      | Just (q, e) <- go (i * i) = go' i q e
+      | otherwise = Nothing
+    go' i q e
+      | q < i = Just (q, 2 * e)
+      | md == 0 = Just (d, 2 * e + 1)
+      | otherwise = Nothing
+      where
+        (d, md) = divMod q i
 
 _replaceSuffix :: Int -> Text -> Text -> Text
 _replaceSuffix n s = (<> s) . dropEnd n
 
 _showIntegral :: Integral i => i -> String -> String
 _showIntegral n s
-    | n < 0 = '-' : _showPositive (-(fromIntegral n :: Integer)) s
-    | otherwise = _showPositive n s
+  | n < 0 = '-' : _showPositive (-(fromIntegral n :: Integer)) s
+  | otherwise = _showPositive n s
 
 _showPositive :: Integral i => i -> String -> String
 _showPositive n s
-    | q == 0 = tl
-    | otherwise = _showPositive q tl
-    where (q, r) = quotRem n 10
-          tl = intToDigit (fromIntegral r) : s
+  | q == 0 = tl
+  | otherwise = _showPositive q tl
+  where
+    (q, r) = quotRem n 10
+    tl = intToDigit (fromIntegral r) : s
 
 _genText :: Gen Text
 _genText = pack <$> listOf arbitrary
