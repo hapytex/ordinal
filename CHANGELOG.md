@@ -2,7 +2,7 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/ordinal).
 
-## Version 0.7.0.0
+## Version 0.6.0.0
 
 Added an executable to make conversions more convenient.
 
