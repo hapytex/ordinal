@@ -14,8 +14,9 @@ The following languages are currently supported (in *alphabetical* order):
 
  1. Dutch (nl);
  2. English (en);
- 3. French (fr); and
- 4. German (de).
+ 3. French (fr);
+ 4. German (de); and
+ 5. Klingon (tlh).
 
 ## Usage
 

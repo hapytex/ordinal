@@ -33,6 +33,7 @@ library
     , Text.Numerals.Languages.English
     , Text.Numerals.Languages.French
     , Text.Numerals.Languages.German
+    , Text.Numerals.Languages.Klingon
     , Text.Numerals.Prefix
   other-modules:
       Text.Numerals.Internal
@@ -67,10 +68,11 @@ test-suite             cardinal
   hs-source-dirs:      test
   other-modules:
       Text.Numerals.LanguageTest
-      Text.Numerals.Languages.DutchSpec
-      Text.Numerals.Languages.EnglishSpec
-      Text.Numerals.Languages.FrenchSpec
-      Text.Numerals.Languages.GermanSpec
+    , Text.Numerals.Languages.DutchSpec
+    , Text.Numerals.Languages.EnglishSpec
+    , Text.Numerals.Languages.FrenchSpec
+    , Text.Numerals.Languages.GermanSpec
+    , Text.Numerals.Languages.KlingonSpec
   build-depends:
       base
     , ordinal

@@ -1,5 +1,5 @@
 module Text.Numerals.LanguageTest (
-    testLanguage
+    testLanguage, testTimeLanguage
   ) where
 
 import Data.Int(Int8, Int16, Int32, Int64)
