@@ -38,6 +38,24 @@ twaalf minuten na half zeven 's avonds
 One can also define a language algorithm themselves, for this one can look at
 the source code of the language modules.
 
+## Executable
+
+The package also includes an executable named `ordinal`. One can use `ordinal` with:
+
+```
+ordinal [OPTIONS..] [numbers..]
+```
+
+where `OPTIONS` specifies the language and the format that should be used to convert the numbers, and the numbers can be specified as an integer, or with `hh:mm` notation.
+
+The options are:
+
+ - **`-l=en`**/**`-lang=en`**/**`--language=en`**: is used to specify the language as an ISO-639 code, or the full name of the language. By default English (`en`);
+ - **`-c`**/**`--cardinal`** set the number mode to cardinal, which is the default mode;
+ - **`-o`**/**`--ordinal`** set the number mode to ordinal;
+ - **`-s`**/**`--short-ordinal`** set the number mode to short ordinal; and
+ - **`-t`**/**`--time`** set the number mode to time.
+
 ## Package structure
 
 The modules are all located under `Text.Numerals` module. The `Text.Numerals`
